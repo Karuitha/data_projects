@@ -1,0 +1,2 @@
+"0","BodyFat4 <- read_excel(""BodyFat4.xlsx"")"
+"0","BodyFat4 <- BodyFat4 %>% set_names(names(.) %>% str_to_lower())"

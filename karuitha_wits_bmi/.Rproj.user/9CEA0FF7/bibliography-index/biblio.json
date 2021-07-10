@@ -1,0 +1,186 @@
+{
+    "sources": [
+        {
+            "author": [
+                {
+                    "family": "Frost",
+                    "given": "J"
+                }
+            ],
+            "container-title": "Statistics by Jim publishing",
+            "id": "frost2019introduction",
+            "issued": {
+                "date-parts": [
+                    [
+                        2019
+                    ]
+                ]
+            },
+            "page": "196-204",
+            "title": "Introduction to statistics: An intuitive guide",
+            "title-short": "Introduction to statistics",
+            "type": "article-journal"
+        },
+        {
+            "author": [
+                {
+                    "family": "Jolliffe",
+                    "given": "Ian T"
+                },
+                {
+                    "family": "Cadima",
+                    "given": "Jorge"
+                }
+            ],
+            "container-title": "Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences",
+            "id": "jolliffe2016principal",
+            "issue": "2065",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016
+                    ]
+                ]
+            },
+            "page": "20150202",
+            "publisher": "The Royal Society Publishing",
+            "title": "Principal component analysis: A review and recent developments",
+            "title-short": "Principal component analysis",
+            "type": "article-journal",
+            "volume": "374"
+        },
+        {
+            "author": [
+                {
+                    "family": "Bruce",
+                    "given": "Peter"
+                },
+                {
+                    "family": "Bruce",
+                    "given": "Andrew"
+                },
+                {
+                    "family": "Gedeck",
+                    "given": "Peter"
+                }
+            ],
+            "id": "bruce2020practical",
+            "issued": {
+                "date-parts": [
+                    [
+                        2020
+                    ]
+                ]
+            },
+            "publisher": "O’Reilly Media",
+            "title": "Practical statistics for data scientists: 50+ essential concepts using r and python",
+            "title-short": "Practical statistics for data scientists",
+            "type": "book"
+        },
+        {
+            "author": [
+                {
+                    "family": "James",
+                    "given": "Gareth"
+                },
+                {
+                    "family": "Witten",
+                    "given": "Daniela"
+                },
+                {
+                    "family": "Hastie",
+                    "given": "Trevor"
+                },
+                {
+                    "family": "Tibshirani",
+                    "given": "Robert"
+                }
+            ],
+            "id": "james2013introduction",
+            "issued": {
+                "date-parts": [
+                    [
+                        2013
+                    ]
+                ]
+            },
+            "publisher": "Springer",
+            "title": "An introduction to statistical learning",
+            "type": "book",
+            "volume": "112"
+        },
+        {
+            "author": [
+                {
+                    "family": "Zhu",
+                    "given": "J."
+                },
+                {
+                    "family": "Ge",
+                    "given": "Z."
+                },
+                {
+                    "family": "Song",
+                    "given": "Z."
+                }
+            ],
+            "container-title": "IEEE Transactions on Industrial Informatics",
+            "id": "7835187",
+            "issue": "4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2017
+                    ]
+                ]
+            },
+            "page": "1877-1885",
+            "title": "Distributed parallel pca for modeling and monitoring of large-scale plant-wide processes with big data",
+            "type": "article-journal",
+            "volume": "13"
+        },
+        {
+            "author": [
+                {
+                    "family": "Portet",
+                    "given": "Stéphanie"
+                }
+            ],
+            "container-title": "Infectious Disease Modelling",
+            "id": "portet2020primer",
+            "issued": {
+                "date-parts": [
+                    [
+                        2020
+                    ]
+                ]
+            },
+            "page": "111-128",
+            "publisher": "Elsevier",
+            "title": "A primer on model selection using the akaike information criterion",
+            "type": "article-journal",
+            "volume": "5"
+        },
+        {
+            "author": [
+                {
+                    "family": "Frost",
+                    "given": "J"
+                }
+            ],
+            "id": "frost2019regression",
+            "issued": {
+                "date-parts": [
+                    [
+                        2019
+                    ]
+                ]
+            },
+            "publisher": "E-book",
+            "title": "Regression analysis: An intuitive guide",
+            "title-short": "Regression analysis",
+            "type": "no-type"
+        }
+    ],
+    "project_biblios": []
+}
