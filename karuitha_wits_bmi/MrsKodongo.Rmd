@@ -12,11 +12,8 @@ header-includes:
 - \usepackage{amsmath}
 mainfont: garamond
 output:
-  pdf_document:
-    toc: true
   prettydoc::html_pretty:
     theme: hpstr
-  word_document: default
   html_document:
     theme: readable
     highlight: haddock
@@ -24,6 +21,9 @@ output:
     toc_float: TRUE
     number_sections: FALSE
     code_folding: hide
+  word_document: default
+  pdf_document:
+    toc: true
 bibliography: citation.bib
 ---
 
