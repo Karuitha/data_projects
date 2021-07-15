@@ -1,0 +1,9 @@
+## **Practical, Ethical and Legal Considerations in Web-Scraping**
+
+As in every other activity, it is essential to make ethical considerations when harvesting data from the internet. Ethics in garnering data from the internet is especially pertinent with the increase in online criminal activity [@krotov2018legality]. Several issues are important in this respect.
+
+- If there is an API allowing one to download data directly, it is much simpler to use it than web scraping. This API matter is a practical consideration; do not waste your time. 
+- Some websites, like Amazon, have a policy prohibiting web scraping. It would not be safe to against this policy as it has legal implications. Always read the terms of use before scraping data from any website. 
+- When scraping many web pages, the website owners may mistake it for a denial of service (DoS) attack. It is always safe to include a piece of code to pause your scrapper. For instance, you could write code to wait for 5 seconds after each page before resuming the scraping. 
+
+***NB: Just because you can do web scraping does not mean you must do it. ***

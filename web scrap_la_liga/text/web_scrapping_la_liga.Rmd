@@ -1,0 +1,204 @@
+---
+title: "Gathering Data from Websites Using `R` Programming language"
+runningheader: "Web Scrapping in R" # only for pdf output
+subtitle: "Scrapping Premier Spanish Soccer League Data" # only for html output
+author: "John Karuitha"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+output:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(tufte)
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
+options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(rvest)
+```
+
+
+```{r, child = "../text/intro.rmd"}
+
+```
+
+
+```{r, child = "../text/objective.Rmd"}
+```
+
+
+```{r, child = "../text/ethics.Rmd"}
+
+```
+
+
+```{r, child = "../text/scrapping_intuition.Rmd"}
+
+```
+
+
+## **Part A: Scraping Data from a Webpage**
+
+In this section, I highlight how one can get data from a webpage. As noted earlier, I use the Wikipedia site. The data of interest is tabular. The steps in scraping this data using the `rvest` [@rvest2020] package in `R` are as follows [@tidyverse]. 
+
+- First, read in the web address, using the `read_html` function. 
+- Capture the HTML nodes that point to tables using the `html_nodes` function and specifying `table`. 
+- Extract the tables. Here, use the `html_table` function. Note that this page has many tables.
+- Get the table of interest. Here, you subset the list using square brackets, `[[a]]`.
+- Clean the data to suit your analysis needs. 
+
+The code below reproduces these steps.  
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::read_chunk("../code/scraps.R")
+```
+
+```{r, install_packages, echo = FALSE, message = FALSE, warning = FALSE}
+```
+
+Because the dataset is massive, I only present the first ten rows of the data. Please scroll right or left to view the entire set of variables in the table [@mailund2017beginning].
+
+
+
+```{r}
+url2 <- "https://en.wikipedia.org/wiki/List_of_Spanish_football_champions"
+
+read_html(url2) %>% 
+        
+        ## Capture the nodes for tables
+        html_nodes("table") %>% 
+        
+        ## Capture the tables
+        html_table() %>% 
+        
+        ## Capture the third table in the series
+        .[[3]] %>% 
+        
+        ## Remove square brackets in names
+        set_names(names(.) %>% str_remove_all("\\[|\\]|\\d")) %>% 
+        
+        ## Clean names by removing spaces
+        janitor::clean_names() %>%
+        
+        ## Remove redundant columns
+        select(-starts_with("x")) %>% 
+        
+        ## Clean the team names
+        mutate(winners = str_remove_all(winners, "\\(\\d+\\)|\\*")) %>% 
+        
+        ## Pick the top 10
+        head(10) %>% 
+        
+        ## make a nice table
+        knitr::kable()
+```
+
+
+
+I follow the same steps on the sky news website to generate the La Liga standings for the 2020-2021 season.
+
+```{r, scrap_one_sky}
+
+```
+
+So far, so good. 
+
+## **Part B: Scraping Data from Multiple Webpages**
+
+What happens when the data of interest spans multiple pages of a website? For instance, in the Sky News website for the La Liga results, each season has its page. However, the pagination follows a consistent pattern as follows. 
+
+- For the 2020/21 season: <https://www.skysports.com/la-liga-table/2020>
+- For the 2019/20 season: <https://www.skysports.com/la-liga-table/2019>
+- Hence, for the nth season: <https://www.skysports.com/la-liga-table/n>
+
+Hence, we can generate web addresses that match the seasons we are targeting. We shall revisit ^[This reminds me of Kenya's President Uhuru Kenyatta's promise to "revisit" the judiciary. Both parties are now busy reviewing each other.] this critical issue in a moment. First, I write a function that will allow us to scrap a website when provided with a URL. 
+
+```{r, scrap_many_sky_function}
+
+```
+
+The following code generates the web addresses on the Sky News website that correspond to the seasons from 2009 to 2020. Notice now we have all the URLs. 
+
+```{r, get_many_address}
+
+```
+
+Now, we run a loop over all URLs using the function defined earlier. The results are in the appendix. 
+
+```{r, scrap_many_sky}
+
+```
+
+## **Basic Data Exploration**
+
+In this section, I do some data exploration using the La Liga data from 2009-2021. My question is, which team has won the most La Liga trophies over these seasons (2009-2021)? The visualization below tells it all.
+
+```{r, top_teams_2009_2020}
+
+```
+
+
+```{r, graph_top_teams_2009_20}
+
+```
+
+## **Conclusion**
+
+Web scraping is a valuable skill in every researcher's toolkit, more so with the rise of social media research. However, most scrapped data can be messy and may require substantial effort cleaning. In this write-up, I used `R` to demonstrate web scrapping. Other programming languages like `Python` do offer the same capabilities. 
+
+## **Appendix**
+
+### Appendix 1: la Liga Standings 2009-2021
+
+```{r, full_listing}
+```
+
+## Appendix 2: La Liga Top 3 Teams and Top Scorers 1929-2021
+
+```{r, echo = FALSE, message = FALSE, warning=FALSE}
+## Data is from the following url
+
+url2 <- "https://en.wikipedia.org/wiki/List_of_Spanish_football_champions"
+
+## We now scrap the data
+
+## Read the html
+
+read_html(url2) %>% 
+        
+        ## Capture the nodes for tables
+        html_nodes("table") %>% 
+        
+        ## Capture the tables
+        html_table() %>% 
+        
+        ## Capture the third table in the series
+        .[[3]] %>% 
+        
+        ## Remove square brackets in names
+        set_names(names(.) %>% str_remove_all("\\[|\\]|\\d")) %>% 
+        
+        ## Clean names by removing spaces
+        janitor::clean_names() %>%
+        
+        ## Remove redundant columns
+        select(-starts_with("x")) %>% 
+        
+        ## Clean the team names
+        mutate(winners = str_remove_all(winners, "\\(\\d+\\)|\\*")) %>% 
+        
+        ## make a nice table
+        knitr::kable() %>% 
+        
+        ## Specify the table
+        kableExtra::kable_styling(bootstrap_options = "striped")
+```
+

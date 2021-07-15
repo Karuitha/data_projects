@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/789042/a5f8bcc274ab40fbb596f6ba06ef0e86
+bundleId: https://api.rpubs.com/api/v1/document/789042/a5f8bcc274ab40fbb596f6ba06ef0e86
+url: http://rpubs.com/Karuitha/789042/edit
+when: 1626190830.22486
+lastSyncTime: 1626190830.22487
