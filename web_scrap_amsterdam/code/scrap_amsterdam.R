@@ -77,15 +77,13 @@ amsterdam_data_tibble <- amsterdam_data %>%
         set_names("person") %>% 
         
         ## Separate years from persons
-        mutate(year = str_extract(person, "\\(.*\\)")) %>% 
+        mutate(year = str_extract(person, "\\(.*\\s+-\\s+.*\\)$")) %>% 
         
         ## Remove years from the names 
-        mutate(person = str_remove_all(person, "\\(.*\\)")) %>% 
+        mutate(person = str_remove_all(person, "\\(.*\\s+-\\s+.*\\)$")) %>% 
         
         ## Remove brackets from years 
-        mutate(year = str_remove_all(year, "\\(|\\)"))
+        mutate(year = str_remove_all(year, "\\(|\\)$"))
 
 ###############################################THE END
-
-
 

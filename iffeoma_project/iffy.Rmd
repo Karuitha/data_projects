@@ -1,0 +1,238 @@
+---
+title: "Untitled"
+author: "Iffy"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+always_allow_html: true
+output:
+  html_document:
+    toc: yes
+    toc_depth: 4
+    code_folding: hide
+    number_sections: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 4
+    number_sections: yes
+  word_document:
+    toc: yes
+    toc_depth: '4'
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1]{fontenc}
+- \usepackage{amsmath}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+## Install pacman
+
+if(!require(pacman)){
+  
+  install.packages("pacman")
+  
+}
+
+## Load required packages- ensure internet connection to load the packages
+pacman::p_load(tidyverse, tidymodels, skimr, janitor, Amelia, knitr, kableExtra, 
+               
+               pglm, baguette, rpart.plot)
+```
+
+
+\newpage
+
+# Background
+
+## Purpose of the study 
+The main objective of this study is to identify different the factors that influence misreporting of financial information amongst the top 40 Johannesburg Stock Exchange (JSE) listed firms. The presence of misreporting for firms listed on the JSE has been detected mostly by restatements firms have made through the Stock Exchange News Services (SENS), although this has not been the only way. Some firms may have wanted to perpetuate the misreporting for different reasons until the errors are exposed through media, rating agencies, whistle blowing, underground investigations, and so on. 
+Rasyid and Ardana (2014) agreed with Ciesielski and Weirich (2006) that accounting complexities are the main drivers of most restatements. These restatements are the main triggers for firms presenting restated financial statements. The restated financial statements eventually lead to huge transaction costs emanating from the errors of the initial presentation. The errors mislead the interpretation of the state of the firm, which in turn influences the whole decision-making process in the stock market regarding appropriate capital and is thus misleading to investors at large.
+
+
+## Research questions
+Flowing from the stated research problems, the following are the research questions for this study:
+
+- Do equity incentives to executives influence financial misreporting?
+- Does financial distress influence financial misreporting?
+- Does poor internal corporate governance influence financial misreporting?
+- Does family ownership influence financial misreporting?
+- Does state ownership influence misreporting?
+
+
+#Hypotheses
+Based on the research questions, the following testable hypotheses are formulated in the positive form:
+
+- Equity incentives to executives to encourage financial misreporting;
+- Financial distress of a company influences financial misreporting;
+- Poor internal corporate governance influences financial misreporting;
+- Family ownership influences financial misreporting; and
+- State ownership influences misreporting.
+
+# Data and variables definitions
+
+- RESTATEMENTS-------Restatement…dependent variable
+- EB--------------------------Equity Incentives for executives
+- FAMILY B----------------Family owned businesses
+- STATE OWN-------------State owned businesses
+- FIN DS---------------------Financial distress
+- POOR CORG-------------Poor internal controls and corporate governance (Penalties, qualified audit and separation of control were used to determine poor internal controls and corporate governance) and the highest number here is 2.
+
+All these are 1 or 0, except number 6 that has 0, 1, 2.
+
+Poor internal controls and corporate governance is made up of Penalties, qualified audit and separation of control were used to determine poor internal controls and corporate governance. Where either variable was in any given year it was marked by 1 and 0 when not found and a total score was given for that year with a minimum of 0 and max of 3.
+ 
+There is 1 independent variable: Restatement. In each year of the 20 years, I had to determine whether there was a restatement or not. Where a restatement was found in any year I allocated 1 and 0 for no restatement. And the same way I allocated a 1 or 0 for the variables 1 to 4.
+
+## Read in the Data 
+
+```{r}
+iffy_data <- readxl::read_xlsx("data/iffy_data.xlsx") %>% 
+  
+  janitor::clean_names() %>% 
+  
+  select(name, company_code, year, restatements, family_b, eb, 
+         
+         state_own, fin_ds, poor_corg) %>% 
+  
+  mutate(restatements = factor(restatements),
+         
+         family_b = factor(family_b),
+         
+         eb = factor(eb),
+         
+         state_own = factor(state_own),
+         
+         fin_ds = factor(fin_ds),
+         
+         poor_corg = factor(poor_corg)
+         )
+
+head(iffy_data)
+```
+
+\blandscape
+
+# Exploring the Data
+
+## Missing data 
+
+There are no missing data points for the key variables.
+
+```{r}
+
+## Graphing missing data  
+Amelia::missmap(iffy_data)
+
+## Count of missing data 
+
+sapply(iffy_data, is.na) %>% 
+  
+  colSums() %>% 
+  
+  tibble(VarNames = names(iffy_data), missing = .) %>% 
+  
+  arrange(desc(missing)) %>% 
+  
+  kableExtra::kbl(booktabs = TRUE, caption = "Missing Data") %>% 
+  
+  kableExtra::kable_classic(full_width = FALSE)
+  
+  
+```
+
+\elandscape
+
+
+## Data duplication 
+
+There are no duplicates
+
+```{r}
+iffy_data %>% filter(duplicated(.))
+```
+
+
+## First we check the Dependent Variable
+
+Here, we have an extreme case of class imbalance in the dependent variable, meaning we have very few restatements. See visualization on next page. 
+
+```{r}
+table(iffy_data$restatements)
+```
+
+\blandscape
+
+## Data Visualisation
+
+```{r}
+iffy_data %>% 
+  
+  GGally::ggpairs(columns = c("family_b", "eb", "state_own", "fin_ds", "poor_corg"),
+                  mapping = aes(fill = restatements)
+                  ) + scale_fill_manual(values = c("black", "red"))
+```
+
+
+\elandscape
+
+# The Models
+
+## First try panel logit model 
+
+- We fit a random effects panel logit model. It shows that the significant variables are financial distress and corporate governance.
+
+```{r}
+iffy_pglm <- pglm(restatements ~ family_b + eb + state_own + fin_ds + poor_corg,
+           data = iffy_data,
+           family = binomial("logit"), R = 5, print.level = 3,
+           method = 'bfgs', index = c('company_code', 'year'),  model = "random")
+
+summary(iffy_pglm)
+```
+
+
+## The tree based model 
+
+- Even after adding name and year, they are not coming out as important factors. 
+- The tree shows that what is important is corporate governance, financial distress and whether or not a company is family owned. 
+- The variable importance is as follows: corporate governance comes first, followed by financial distress and then family ownership. 
+
+```{r}
+## The model 
+iffy_decision_tree <- decision_tree() %>% 
+  
+  set_mode("classification") %>% 
+  
+  set_engine("rpart")
+
+## Run the model
+
+iffy_decision_regression <- workflow() %>% 
+  
+  add_model(iffy_decision_tree) %>% 
+  
+  add_formula(restatements ~ family_b + eb + state_own + fin_ds + poor_corg) %>% 
+  
+  fit(data = iffy_data)
+
+## Draw the tree
+
+iffy_decision_plot <- iffy_decision_regression %>% extract_fit_parsnip()
+
+rpart.plot(iffy_decision_plot$fit)
+
+```
+
+
+# Way forward
+
+- Attempt up sampling (bootstrap the data to make the dependent variable more balanced between companies that have restated versus those that have not restated) of the data to deal with the low prevalence of the companies that have restated.
+- re run the models using the up sampled data.
+
+
+
