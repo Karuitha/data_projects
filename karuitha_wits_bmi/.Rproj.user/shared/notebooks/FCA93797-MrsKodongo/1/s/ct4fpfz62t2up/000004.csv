@@ -1,2 +1,0 @@
-"0","BodyFat4 %>% .[,-c(1:13)] %>% pivot_longer(cols = starts_with(""PC""), names_to = ""prcomp"", values_to = ""value"") %>% ggplot(aes(x = reorder(prcomp, value, sd), y = value, fill = Body_Fat_Level)) + geom_boxplot() + labs(x = ""Principal Components"", title = ""Contributions of Principal Componets in Explaining Variance"") + "
-"0","  ggthemes::theme_economist()"

@@ -10,10 +10,14 @@ header-includes:
 - \usepackage[default]{sourcesanspro}
 - \usepackage[T1]{fontenc}
 - \usepackage{amsmath}
-mainfont: garamond
+- \usepackage{subcaption}
+mainfont: firacode
 output:
   prettydoc::html_pretty:
     theme: hpstr
+  pdf_document:
+    toc: true
+  word_document: default
   html_document:
     theme: readable
     highlight: haddock
@@ -21,9 +25,6 @@ output:
     toc_float: TRUE
     number_sections: FALSE
     code_folding: hide
-  word_document: default
-  pdf_document:
-    toc: true
 bibliography: citation.bib
 ---
 
@@ -31,7 +32,7 @@ bibliography: citation.bib
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load( "knitr", "tidyverse", "tidyquant", "skimr", "gt", "ggthemes", "MASS", "readxl", "psych", "corrplot", "gvlma", "prettydoc")
+pacman::p_load( "knitr", "tidyverse", "tidyquant", "skimr", "gt", "ggthemes", "MASS", "readxl", "psych", "corrplot", "gvlma", "prettydoc", "kableExtra")
 
 options(digits = 4)
 
@@ -53,7 +54,9 @@ library(prettydoc)
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 BodyFat4 <- read_excel("BodyFat4.xlsx")
-BodyFat4 <- BodyFat4 %>% set_names(names(.) %>% str_to_lower())
+BodyFat4 <- BodyFat4 %>% 
+  
+  janitor::clean_names() 
 ```
 
 The dataset `Bodyfat4` shows the body fat percentage for 252 individuals. There are 13 variables. First, there is an identifier variable (IDNO) that uniquely identifies each observation. The body fat (BODYFAT) content is the dependent variable. The remaining eleven (11) are the independent variables that could explain the variability of body fat among the different individuals. The dataset has no missing values. The task is to build a regression model that can be useful in explaining and predicting the body fat of individuals. The data analysis proceeds as follows. In the next section, I visualize the data and then present summary statistics. Next, I present the correlation analysis and then the results of the regression.
@@ -66,12 +69,29 @@ In this section, we describe the data by generating summary statistics and a cor
 Table () below shows a summary of the variables. Among the dependent variables, the highest variability(SD- standard deviation) is observed between individuals' abdomen, age, and weight. For the dependent variable body fat, the mean is 18.9, with an unusual observation of zero body fat as the minimum value. Given that there is a base level of body fat necessary for humans to survive, this is a peculiar observation. For robustness, it would be advisable to drop this case.
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-skim_without_charts(BodyFat4[,-1]) %>%
+BodyFat4 %>% 
+  
+  dplyr::select(-1) %>% 
+  
+  skim_without_charts() %>% 
+  
   dplyr::select(-c(skim_type, n_missing)) %>% tibble() %>% 
+  
   rename(Variable = skim_variable, Complete = complete_rate, 
+         
          Mean = numeric.mean, SD = numeric.sd, Min = numeric.p0,
+         
          Q1 = numeric.p25, Median = numeric.p50, Q3 = numeric.p75,
-         Max = numeric.p100) %>% knitr::kable()
+         
+         Max = numeric.p100) %>% 
+  
+  kableExtra::kbl(., booktabs = TRUE, caption = "Summary Statistics") %>% 
+  
+  kableExtra::kable_classic(full_width = TRUE, font_size = 12) %>% 
+  
+  footnote(general = "Source: Author's construction from title",
+           
+           general_title = "")
 ```
 
 ## **2.2 Correlation Analysis**
@@ -82,8 +102,11 @@ In this section, I present the pairwise plots for all the variables, excluding t
 
 Figure 3.1:
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width=12, fig.height=8}
-BodyFat4[, 2:13] %>% pairs.panels(gap = 0, pch = 21, ssmooth = FALSE)
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width=9, fig.height=6}
+
+BodyFat4 %>% 
+  
+  GGally::ggpairs(columns = 2:13)
 ```
 
 \elandscape
@@ -110,14 +133,33 @@ PCA is sensitive to differences in scale between the variables used. Hence, it i
 library(tidyverse)
 pca <- BodyFat4[,3:13] %>% prcomp(scale. = TRUE, center = TRUE)
 pca[1]
-pca[2] %>% knitr::kable()
+pca[2] %>% 
+  
+  kableExtra::kbl(., booktabs = TRUE, caption = "Principal Components") %>% 
+  
+  kableExtra::kable_classic(full_width = TRUE, font_size = 12) %>% 
+  
+  footnote(general = "Source: Author's construction from title",
+           
+           general_title = "")
+  
+  
 ```
 
 Note that the PCA allows us to deal with the problem of correlation between variables. Table () below shows that the correlations between the principal components is now zero.
 
-```{r echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=FALSE}
-pairs.panels(pca$x, gap = 0)
+\blandscape
+
+```{r echo=FALSE, fig.height=6, fig.width=9, message=FALSE, warning=FALSE}
+pca$x %>% 
+  
+  data.frame() %>% 
+  
+  GGally::ggpairs()
 ```
+
+
+\elandscape
 
 ### **2.3.2 Composition of PCA**
 
@@ -155,7 +197,9 @@ Given that the first two principal components account for almost 75% of the vari
 
 -   Very high: Greater than 30.
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
+\blandscape
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
 BodyFat4 <- BodyFat4 %>% bind_cols(pca$x %>% data.frame())
 BodyFat4 <- BodyFat4 %>% mutate(Body_Fat_Level = case_when(
   bodyfat >= 0 & bodyfat <= 10 ~ "Low", 
@@ -170,12 +214,19 @@ BodyFat4 %>% ggplot(aes(x = PC1, y = PC2, col = Body_Fat_Level)) + geom_point() 
   labs(title = "Visualization of First Two Principal Components") + 
   theme(legend.title = element_text("Body Fat")) + tidyquant::theme_tq()
 ```
+
+\elandscape
+
 I also visualize each of the principal components faceted by the `Body_Fat_Level` defined above. 
 
-```{r}
+\blandscape
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
 BodyFat4 %>% .[,-c(1:13)] %>% pivot_longer(cols = starts_with("PC"), names_to = "prcomp", values_to = "value") %>% ggplot(aes(x = reorder(prcomp, value, sd), y = value, fill = Body_Fat_Level)) + geom_boxplot() + labs(x = "Principal Components", title = "Contributions of Principal Componets in Explaining Variance") + 
   ggthemes::theme_economist()
 ```
+
+\elandscape
 
 lastly, we examine the correlation between PC1, PC2 and PC3 and the variables of BodyFat dataset. Table () shows that PC1 has very high correlation with most of the variables. For instance, PC1 has a correlation greater than 0.7 (absolute value) with 7 of the 11 independent variables. PC2 is not so strong but still has a correlation above 0.6 (absolute) with 2 variables, while PC3 has a correlation greater than 0.6 with one variable. In this case, it appears like PC1 and PC2 are adequate to capture most of the variability in the data.
 

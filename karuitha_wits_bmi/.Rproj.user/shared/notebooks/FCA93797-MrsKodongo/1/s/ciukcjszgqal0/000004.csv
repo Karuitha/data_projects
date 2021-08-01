@@ -1,6 +1,0 @@
-"0","skim_without_charts(BodyFat4[,-1]) %>%"
-"0","  dplyr::select(-c(skim_type, n_missing)) %>% tibble() %>% "
-"0","  rename(Variable = skim_variable, Complete = complete_rate, "
-"0","         Mean = numeric.mean, SD = numeric.sd, Min = numeric.p0,"
-"0","         Q1 = numeric.p25, Median = numeric.p50, Q3 = numeric.p75,"
-"0","         Max = numeric.p100) %>% knitr::kable()"

@@ -1,1 +1,0 @@
-"0","cor(BodyFat4[,3], BodyFat4[,c(4, 9)]) %>% knitr::kable()"
