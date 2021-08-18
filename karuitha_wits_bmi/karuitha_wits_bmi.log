@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.3.25)  1 AUG 2021 10:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.3.25)  1 AUG 2021 16:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -837,39 +837,33 @@ File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/SourceSansPro-LF/b/n' will be
 (Font)              scaled to size 12.0pt on input line 147.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 157.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 157.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 157.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1.pdf, id=25, 640.3925pt 
+<karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1.pdf, id=26, 640.3925pt 
 x 421.575pt>
 File: karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (
 type pdf)
 <use karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1.pdf>
 Package pdftex.def Info: karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1
-.pdf  used on input line 203.
+.pdf  used on input line 201.
 (pdftex.def)             Requested size: 640.4007pt x 421.58038pt.
 [3
 
  <./karuitha_wits_bmi_files/figure-latex/unnamed-chunk-3-1.pdf>]
-<karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1.pdf, id=37, 286.06876pt
+<karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1.pdf, id=38, 286.06876pt
  x 300.12125pt>
 File: karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (
 type pdf)
 <use karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1.pdf>
 Package pdftex.def Info: karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1
-.pdf  used on input line 216.
+.pdf  used on input line 214.
 (pdftex.def)             Requested size: 286.07242pt x 300.12509pt.
 [4
 
  <./karuitha_wits_bmi_files/figure-latex/unnamed-chunk-4-1.pdf>]
 LaTeX Font Info:    Font shape `T1/SourceSansPro-LF/b/n' will be
-(Font)              scaled to size 10.0pt on input line 260.
+(Font)              scaled to size 10.0pt on input line 258.
 
 ! LaTeX Error: Not in outer par mode.
 
@@ -877,15 +871,15 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 
+l.274 
        
 Here is how much of TeX's memory you used:
- 16259 strings out of 481745
- 244061 string characters out of 5930830
+ 16210 strings out of 481745
+ 243338 string characters out of 5930830
  529327 words of memory out of 5000000
- 30968 multiletter control sequences out of 15000+600000
- 633668 words of font info for 113 fonts, out of 8000000 for 9000
+ 30932 multiletter control sequences out of 15000+600000
+ 621471 words of font info for 96 fonts, out of 8000000 for 9000
  891 hyphenation exceptions out of 8191
- 62i,7n,100p,816b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 62i,10n,100p,816b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
 
 !  ==> Fatal error occurred, no output PDF file produced!

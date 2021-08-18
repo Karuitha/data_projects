@@ -1,0 +1,245 @@
+---
+title: "Infrastructure Gap"
+author: "Paul Mukoki"
+date: "8/6/2021"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    code_folding: hide
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1,T2A]{fontenc}
+- \usepackage{amsmath}
+- \usepackage{dcolumn}
+mainfont: palatino
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+## Download packages if not available
+if(!require(pacman)){
+  
+  install.packages("pacman")
+  
+}
+
+
+## All the required packages
+pacman::p_load("tidyverse", "janitor", "kableExtra", 
+                      
+                      "knitr", "rmarkdown", "plm", "stargazer",
+               
+               "skimr", "GGally", "kableExtra", "corrplot")
+
+options(scipen = 999)
+```
+
+## Preliminary: Read in the data
+Here I load the dataset
+
+```{r}
+mukoki_gap_data <- readxl::read_xlsx("dataset_40_countries.xlsx") %>% 
+  
+  janitor::clean_names() %>% 
+  
+  data.frame()
+```
+
+## Dependent and Independent Variables
+
+I select the dependent and independent variables
+
+```{r}
+modelling_data <- mukoki_gap_data %>% 
+  
+  select(countries, country, state, year, 
+         
+         income_group_2009, income_2009,
+         
+         overall_index, infra_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap, overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  tibble()
+```
+
+\newpage
+
+\blandscape
+
+### Dependent Variables
+
+```{r}
+
+modelling_data %>% 
+  
+  select(income_2009,
+         
+         overall_index, infra_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap) %>% 
+  
+  na.omit() %>% 
+  
+  skim_without_charts() %>% 
+  
+  select(-n_missing, -complete_rate, -skim_type) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Independent Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
+  
+  
+```
+
+\elandscape
+
+\newpage
+
+
+\newpage
+
+\blandscape
+
+```{r, fig.width = 12, fig.height = 8}
+modelling_data %>% 
+  
+  select(income_2009,
+         
+         overall_index, infra_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap) %>% 
+  
+  na.omit() %>% 
+  
+  ggpairs()
+```
+
+\elandscape
+
+\newpage
+
+
+### Independent Variables
+
+\newpage
+
+\blandscape
+
+We examine the independent variables. Please confirm that these are correct before I go ahead and run the regressions. I am especially keen on overall index and its meaning. What variable in the data stands for `Public-Private Partnerships (PPP) investment in Aggregate/overall infrastructure`? I dont think its the overall index. 
+
+
+```{r}
+
+modelling_data %>% 
+  
+  select(overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  skim_without_charts() %>% 
+  
+  select(-n_missing, -complete_rate, -skim_type) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Independent Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
+  
+  
+```
+
+\elandscape
+
+\newpage
+
+```{r}
+modelling_data %>% 
+  
+  select(overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  drop_na(percent_change_in_gfcf_public) %>% 
+  
+  cor() %>% 
+  
+  corrplot(method = "number", type = "lower", 
+           
+           diag = FALSE, number.digits = 2, 
+           
+           title = "Correlation Matrix for Dependent Variables")
+```
+
+\newpage
+
+\blandscape
+
+```{r, fig.width = 12, fig.height = 8}
+modelling_data %>% 
+  
+  select(overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  drop_na(percent_change_in_gfcf_public) %>% 
+  
+  ggpairs()
+```
+
+\elandscape
+
+\newpage
+
+Write a regression function to run fixed and random effects  models 
+
+```{r}
+
+```
+

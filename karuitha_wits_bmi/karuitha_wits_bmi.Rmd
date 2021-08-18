@@ -13,10 +13,10 @@ header-includes:
 - \usepackage{subcaption}
 mainfont: firacode
 output:
-  prettydoc::html_pretty:
-    theme: hpstr
   pdf_document:
     toc: true
+  prettydoc::html_pretty:
+    theme: hpstr
   word_document: default
   html_document:
     theme: readable
@@ -87,7 +87,7 @@ BodyFat4 %>%
   
   kableExtra::kbl(., booktabs = TRUE, caption = "Summary Statistics") %>% 
   
-  kableExtra::kable_classic(full_width = TRUE, font_size = 12) %>% 
+  kableExtra::kable_classic(full_width = FALSE, font_size = 12) %>% 
   
   footnote(general = "Source: Author's construction from title",
            
@@ -137,7 +137,7 @@ pca[2] %>%
   
   kableExtra::kbl(., booktabs = TRUE, caption = "Principal Components") %>% 
   
-  kableExtra::kable_classic(full_width = TRUE, font_size = 12) %>% 
+  kableExtra::kable_classic(full_width = FALSE, font_size = 12) %>% 
   
   footnote(general = "Source: Author's construction from title",
            
@@ -200,8 +200,14 @@ Given that the first two principal components account for almost 75% of the vari
 \blandscape
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
-BodyFat4 <- BodyFat4 %>% bind_cols(pca$x %>% data.frame())
-BodyFat4 <- BodyFat4 %>% mutate(Body_Fat_Level = case_when(
+BodyFat4 <- BodyFat4 %>% 
+  
+  bind_cols(pca$x %>% data.frame())
+
+BodyFat4 <- BodyFat4 %>% 
+  
+  mutate(Body_Fat_Level = case_when(
+    
   bodyfat >= 0 & bodyfat <= 10 ~ "Low", 
   bodyfat > 10 & bodyfat <= 20 ~ "Medium",
   bodyfat > 20 & bodyfat <= 30 ~ "High", 
@@ -222,7 +228,22 @@ I also visualize each of the principal components faceted by the `Body_Fat_Level
 \blandscape
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
-BodyFat4 %>% .[,-c(1:13)] %>% pivot_longer(cols = starts_with("PC"), names_to = "prcomp", values_to = "value") %>% ggplot(aes(x = reorder(prcomp, value, sd), y = value, fill = Body_Fat_Level)) + geom_boxplot() + labs(x = "Principal Components", title = "Contributions of Principal Componets in Explaining Variance") + 
+BodyFat4 %>% .[,-c(1:13)] %>% 
+  
+  pivot_longer(cols = starts_with("PC"), 
+               
+               names_to = "prcomp", values_to = "value") %>% 
+  
+  ggplot(aes(x = reorder(prcomp, value, sd), 
+             
+             y = value, fill = Body_Fat_Level)) +
+  
+  geom_boxplot() + 
+  
+  labs(x = "Principal Components", 
+       
+       title = "Contributions of Principal Componets in Explaining Variance") + 
+  
   ggthemes::theme_economist()
 ```
 
@@ -356,7 +377,9 @@ Over 60 years
 I call the new variable age_group. 
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
-BodyFat4 <- BodyFat4 %>% mutate(age_group = case_when(
+BodyFat4 <- BodyFat4 %>% 
+  
+  mutate(age_group = case_when(
   age >= 20 & age <= 29 ~ "20-29", 
   age >= 30 & age <= 39 ~ "30-39", 
   age >= 40 & age <= 49 ~ "40-49", 

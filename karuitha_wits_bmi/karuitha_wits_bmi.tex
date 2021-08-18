@@ -19,7 +19,7 @@
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-  \setmainfont[]{garamond}
+  \setmainfont[]{firacode}
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -154,35 +154,33 @@ body fat as the minimum value. Given that there is a base level of body
 fat necessary for humans to survive, this is a peculiar observation. For
 robustness, it would be advisable to drop this case.
 
-\begin{tabular}{l|r|r|r|r|r|r|r|r}
-\hline
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-2}Summary Statistics}
+\centering
+\fontsize{12}{14}\selectfont
+\begin{tabular}[t]{lrrrrrrrr}
+\toprule
 Variable & Complete & Mean & SD & Min & Q1 & Median & Q3 & Max\\
-\hline
+\midrule
 bodyfat & 1 & 18.939 & 7.7509 & 0.000 & 12.800 & 19.000 & 24.60 & 45.100\\
-\hline
 density & 1 & 1.056 & 0.0190 & 0.995 & 1.041 & 1.055 & 1.07 & 1.109\\
-\hline
 age & 1 & 44.885 & 12.6020 & 22.000 & 35.750 & 43.000 & 54.00 & 81.000\\
-\hline
 weight & 1 & 178.924 & 29.3892 & 118.500 & 159.000 & 176.500 & 197.00 & 363.150\\
-\hline
 height & 1 & 70.149 & 3.6629 & 29.500 & 68.250 & 70.000 & 72.25 & 77.750\\
-\hline
+\addlinespace
 adiposity & 1 & 25.437 & 3.6481 & 18.100 & 23.100 & 25.050 & 27.32 & 48.900\\
-\hline
 thigh & 1 & 59.406 & 5.2500 & 47.200 & 56.000 & 59.000 & 62.35 & 87.300\\
-\hline
 abdomen & 1 & 92.556 & 10.7831 & 69.400 & 84.575 & 90.950 & 99.33 & 148.100\\
-\hline
 ankle & 1 & 23.102 & 1.6949 & 19.100 & 22.000 & 22.800 & 24.00 & 33.900\\
-\hline
 hip & 1 & 99.905 & 7.1641 & 85.000 & 95.500 & 99.300 & 103.53 & 147.700\\
-\hline
+\addlinespace
 wrist & 1 & 18.230 & 0.9336 & 15.800 & 17.600 & 18.300 & 18.80 & 21.400\\
-\hline
 knee & 1 & 38.590 & 2.4118 & 33.000 & 36.975 & 38.500 & 39.92 & 49.100\\
-\hline
+\bottomrule
+\multicolumn{9}{l}{\rule{0pt}{1em}Source: Author's construction from title}\\
 \end{tabular}
+\end{table}
 
 \hypertarget{correlation-analysis}{%
 \subsection{\texorpdfstring{\textbf{2.2 Correlation
@@ -276,7 +274,7 @@ dividing by the standard deviation.
 
 \centering
 \fontsize{12}{14}\selectfont
-\begin{tabu} to \linewidth {>{\raggedright}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X>{\raggedleft}X}
+\begin{tabular}[t]{lrrrrrrrrrrr}
 \toprule
   & PC1 & PC2 & PC3 & PC4 & PC5 & PC6 & PC7 & PC8 & PC9 & PC10 & PC11\\
 \midrule
@@ -295,7 +293,7 @@ wrist & 0.2904 & 0.0984 & -0.4421 & -0.2573 & 0.4238 & 0.4565 & -0.4923 & 0.0221
 knee & 0.3417 & 0.1242 & -0.0581 & -0.0361 & 0.0821 & -0.7419 & -0.3546 & -0.3742 & 0.1648 & 0.0454 & 0.1048\\
 \bottomrule
 \multicolumn{12}{l}{\rule{0pt}{1em}Source: Author's construction from title}\\
-\end{tabu}
+\end{tabular}
 \end{table}
 \end{table}
 
@@ -303,7 +301,11 @@ Note that the PCA allows us to deal with the problem of correlation
 between variables. Table () below shows that the correlations between
 the principal components is now zero.
 
+\begin{landscape}
+
 \includegraphics{karuitha_wits_bmi_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\end{landscape}
 
 \hypertarget{composition-of-pca}{%
 \subsubsection{\texorpdfstring{\textbf{2.3.2 Composition of
@@ -383,11 +385,20 @@ according to the level of body fat.
   Very high: Greater than 30.
 \end{itemize}
 
+\begin{landscape}
+
 \includegraphics{karuitha_wits_bmi_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\end{landscape}
+
 I also visualize each of the principal components faceted by the
 \texttt{Body\_Fat\_Level} defined above.
 
+\begin{landscape}
+
 \includegraphics{karuitha_wits_bmi_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\end{landscape}
 
 lastly, we examine the correlation between PC1, PC2 and PC3 and the
 variables of BodyFat dataset. Table () shows that PC1 has very high
