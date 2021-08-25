@@ -36,7 +36,9 @@ pacman::p_load("tidyverse", "janitor", "kableExtra",
                       
                       "knitr", "rmarkdown", "plm", "stargazer",
                
-               "skimr", "GGally", "kableExtra", "corrplot")
+               "skimr", "GGally", "kableExtra", "corrplot", "plm", 
+               
+               "punitroots")
 
 options(scipen = 999)
 ```
@@ -94,7 +96,7 @@ modelling_data %>%
   
   select(income_2009,
          
-         overall_index, infra_index, 
+         overall_index, 
          
          transport_gap, electricity_gap,
          
@@ -156,7 +158,7 @@ We examine the independent variables. Please confirm that these are correct befo
 
 modelling_data %>% 
   
-  select(overall_index,
+  select(infra_index,
          
          transport_invest, electricity_invest,
          
@@ -186,7 +188,7 @@ modelling_data %>%
 ```{r}
 modelling_data %>% 
   
-  select(overall_index,
+  select(infra_index,
          
          transport_invest, electricity_invest,
          
@@ -237,9 +239,81 @@ modelling_data %>%
 
 \newpage
 
+
+## The Fixed Effects Model
 Write a regression function to run fixed and random effects  models 
 
 ```{r}
+model_fixed <- plm(overall_index ~ transport_invest + electricity_invest +
+         
+         ict_invest + water_invest + water_invest +
+         
+         stock_mkt_cap + human_di + exchange_rate + 
+         
+         rinterestrate + percent_change_in_gfcf_public + 
+         
+         fdi_gdp + govenance_index, data = modelling_data, 
+    
+    effect = "twoways", model = "within", index = c("country", "year"))
 
+summary(model_fixed)
+```
+
+## The Random Effects Model
+
+```{r}
+model_random <- plm(overall_index ~ transport_invest + electricity_invest +
+         
+         ict_invest + water_invest + water_invest +
+         
+         stock_mkt_cap + human_di + exchange_rate + 
+         
+         rinterestrate + percent_change_in_gfcf_public + 
+         
+         fdi_gdp + govenance_index, data = modelling_data, 
+    
+    effect = "twoways", model = "random", index = c("country", "year"))
+
+summary(model_random)
+```
+
+### The Hausmann Test
+Given that the test is significant, then we should use the fixed effects model .
+
+```{r}
+phtest(model_fixed, model_random)
+```
+
+## Cross-Sectional Dependence
+
+The model shows the presence of cross sectional dependence. Thus, the unit roots tests have to consider the presence of cross sectional dependence in the panels. 
+
+```{r}
+pcdtest(model_fixed, method = "cd")
+```
+
+
+## Panel unit root tests in the Presence of Cross-Sectional Dependence
+
+The main unit root tests implemented in  R's plm and punitroots, namely the tests proposed in Maddala and Wu (1999), Choi (2001), Levin, Lin, and Chu (2002), Im, Pesaran, and Shin (2003) (plm); Deme-
+trescu, Hassler, and Tarcolea (2006), Hanck (2008), Costantini and Lupi (2011) (punitroots).
+The first four tests assume that the series under scrutiny are cross-sectionally independent:
+the last three allow for cross-dependence across the panel units.
+
+```{r}
+infra_index_wide <- modelling_data %>% 
+  
+  select(countries, year, infra_index) %>% 
+  
+  pivot_wider(names_from = "countries", values_from = "infra_index") %>% 
+  
+  as.matrix()
+```
+
+
+```{r}
+my_matrix_csd <- as.matrix(modelling_data[, c("transport_invest", "electricity_invest", "ict_invest", "water_invest", "water_invest", "stock_mkt_cap", "human_di", "exchange_rate", "rinterestrate",  "percent_change_in_gfcf_public", "fdi_gdp", "govenance_index")], nrow = 640, ncol = 12)
+
+punitroots::pCADFtest(Y = infra_index_wide[,-1], type = "drift", max.lag.y = 5, criterion = "AIC", crosscorr=0.10)
 ```
 

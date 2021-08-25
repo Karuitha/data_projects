@@ -1,0 +1,9 @@
+# **Objectives** 
+
+This data analysis project has the following objectives;
+
+- Extract useful insights and visualize them in the most interesting way possible.
+- Assess how long it takes for users to pay back their loan.
+- Figure out what kind of people take a loan for what purposes.
+- Discover the types of loans that have the highest or lowest risk of default.
+- Build a model that can predict the probability a user will be able to pay back their loan within a certain period.

@@ -1,0 +1,91 @@
+---
+title: "**Analyzing `lendingclub.com` Loan Data**"
+runningheader: "Analyzing `lendingclub.com` Loan Data" # only for pdf output
+subtitle: "*What Kind of Customers Take Loans? For What Purpose?*" # only for html output
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+always_allow_html: true
+output:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1,T2A]{fontenc}
+- \usepackage{amsmath}
+---
+
+```{r setup, include=FALSE}
+library(tufte)
+library(skimr)
+library(tidyverse)
+library(knitr)
+library(GGally)
+library(ggthemes)
+library(tibble)
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
+options(htmltools.dir.version = FALSE)
+
+##Options
+options(digits = 4)
+options(scipen = 999)
+theme_set(theme_clean())
+```
+
+```{r, echo = FALSE}
+knitr::read_chunk("code/my_loan_script.R")
+```
+
+
+```{r loaddata, echo = FALSE}
+```
+
+
+```{r, child = "text/Background.Rmd"}
+
+```
+
+```{r, child = "text/Objectives.Rmd"}
+
+```
+
+```{r, child = "text/Data.Rmd"}
+
+```
+
+# Exploratory Data Analysis
+In this section, I load the data and do exploratory data analysis, starting first with data visualisation followed by summary statistics aimed at uncovering the insights stated in the objectives section above. 
+
+```{r loandatastructure}
+```
+
+## Data Visualization
+
+\blandscape
+```{r ggallyvisual, fig.width=9, fig.height=6, fig.cap = "Correlation Matrix for Numeric Predictors"}
+```
+
+\newpage
+
+```{r bank_risk_perception, fig.width=9, fig.height=6}
+```
+
+\elandscape
+
+## Summarising the Data
+
+### Basic Modelling
+
+```{r, child = "text/Conclusion.Rmd"}
+
+```
