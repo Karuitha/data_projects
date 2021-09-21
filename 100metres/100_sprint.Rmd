@@ -1,0 +1,50 @@
+---
+title: "Analyzing the 100 Metres Men's Sprint"
+runningheader: "100 Metres Men Best Times" # only for pdf output
+subtitle: "100 Metres Sprint Best Times, 1900 - Present" # only for html output
+author: "John King'athia Karuitha"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(tufte)
+library(tidyverse)
+library(rvest)
+library(janitor)
+library(lubridate)
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
+options(htmltools.dir.version = FALSE)
+```
+
+# Background
+
+I use data from [World Athletics](https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20) on the best times posted by male athletes in the 100 metres sprint from 1900  to present  ^[The data is available on this link <https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20>]. Note that many athletes appear multiple times provided the times. For instance, Usain Bolt posted top 3 best times in different races. 
+
+```{r}
+
+```
+
+The data consists of the following variables;
+
+- rank: Starting from the athlete that has posted the best time to date.
+- mark: The time (in seconds) posted by the athlete.
+- wind: The wind assist. Negative speeds indicate the athlete was running against the wind. 
+- competitor: The name of the athlete.
+- dob: Date of birth of the athlete.
+- nat: Nationality of the athlete.
+- pos: position of the athlete in the given race. 
+- venue: Venue of the race.
+- date: Date the race happened. 
+- results_score: The score of the athlete in the race by World Athletics. 
+
