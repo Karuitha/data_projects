@@ -57,9 +57,25 @@ my_100_dash_data <- read_csv("data/my_100_dash_data.csv") %>%
                                                 
                                                 origin = "ioc", 
                                                 
-                                                destination = "country.name"))
-
-
+                                                destination = "country.name")) %>% 
+        
+        mutate(venue_country_name = case_when(venue_country_code == "AHO" ~ "Netherlands Antilles",
+                                              
+                                              venue_country_code == "FRG" ~ "Germany",
+                                              
+                                              venue_country_code == "GDR" ~ "Germany",
+                                              
+                                              venue_country_code == "MAC" ~ "Macau",
+                                              
+                                              venue_country_code == "TCH" ~ "Czechia",
+                                              
+                                              venue_country_code == "TKS" ~ "Turks and Caicos Islands",
+                                              
+                                              venue_country_code == "URS" ~ "Russia",
+                                              
+                                              TRUE ~ venue_country_name
+                                              
+                                              ))
 
 ## Check out NAs
 
@@ -134,11 +150,32 @@ my_100_dash_data %>%
         
         na.omit() %>% 
         
-        group_by(venue_country) %>% 
+        group_by(venue_country_name) %>% 
         
         skim_without_charts(mark) %>% 
         
         select(-complete_rate, -n_missing) %>% 
         
         arrange(numeric.mean)
+
+
+my_100_dash_data[my_100_dash_data$venue_country_name == "Kenya", ]  
+
+## Mean and Median age of athletes over time
+my_100_dash_data %>% 
         
+        group_by(year(date)) %>% 
+        
+        summarise(mean_age = mean(age_years, na.rm = TRUE),
+                  
+                  median_age = median(age_years, na.rm = TRUE)) %>% 
+        
+        rename(year = `year(date)`) %>% 
+        
+        pivot_longer(-year, names_to = "metric", values_to = "age") %>% 
+        
+        ggplot(mapping = aes(x = year, y = age, col = metric)) + 
+        
+        geom_line() + 
+        
+        ggthemes::theme_economist()

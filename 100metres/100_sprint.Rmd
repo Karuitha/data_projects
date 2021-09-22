@@ -48,3 +48,6 @@ The data consists of the following variables;
 - date: Date the race happened. 
 - results_score: The score of the athlete in the race by World Athletics. 
 
+
+
+Another source of country [codes](https://www.olympiandatabase.com/index.php?id=1670&L=1). 
