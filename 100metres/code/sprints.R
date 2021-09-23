@@ -179,3 +179,59 @@ my_100_dash_data %>%
         geom_line() + 
         
         ggthemes::theme_economist()
+
+
+##########################################################################################
+## Number of races versus times posted
+races_vs_time <- my_100_dash_data %>% 
+        
+        group_by(competitor, year(date)) %>% 
+        
+        rename(year = `year(date)`) %>% 
+        
+        summarise(races = n(),
+                  
+                  best_time = min(mark),
+                  
+                  median_time = median(mark),
+                  
+                  mean_time = mean(mark), 
+                  
+                  max_time = max(mark))
+
+## Races versus best/min times
+races_vs_time %>% 
+        
+        ggplot(mapping = aes(x = races, y = best_time)) + 
+        
+        geom_point(shape = 1, size = 4, alpha = 0.5) + 
+        
+        geom_smooth()
+
+## Races versus median times
+races_vs_time %>% 
+        
+        ggplot(mapping = aes(x = races, y = median_time)) + 
+        
+        geom_point(shape = 1, size = 4, alpha = 0.5) + 
+        
+        geom_smooth()
+
+## Races versus mean times
+races_vs_time %>% 
+        
+        ggplot(mapping = aes(x = races, y = mean_time)) + 
+        
+        geom_point(shape = 1, size = 4, alpha = 0.5) + 
+        
+        geom_smooth()
+
+## Races versus worst/max times 
+races_vs_time %>% 
+        
+        ggplot(mapping = aes(x = races, y = max_time)) + 
+        
+        geom_point(shape = 1, size = 4, alpha = 0.5) + 
+        
+        geom_smooth()
+##########################################################################################
