@@ -5,11 +5,11 @@ subtitle: "100 Metres Sprint Best Times, 1900 - Present" # only for html output
 author: "John King'athia Karuitha"
 date: "`r Sys.Date()`"
 output:
-  tufte::tufte_html: default
-  tufte::tufte_handout:
+  tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
-  tufte::tufte_book:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
     citation_package: natbib
     latex_engine: xelatex
 bibliography: skeleton.bib
@@ -18,21 +18,27 @@ link-citations: yes
 
 ```{r setup, include=FALSE}
 library(tufte)
+library(knitr)
 library(tidyverse)
 library(rvest)
 library(janitor)
 library(lubridate)
+library(skimr)
+library(countrycode)
 # invalidate cache when the tufte version changes
 knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
 options(htmltools.dir.version = FALSE)
 ```
 
-# Background
+# **Background**
 
 I use data from [World Athletics](https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20) on the best times posted by male athletes in the 100 metres sprint from 1900  to present  ^[The data is available on this link <https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20>]. Note that many athletes appear multiple times provided the times. For instance, Usain Bolt posted top 3 best times in different races. 
 
 ```{r}
-
+read_chunk("code/sprints.R")
 ```
 
 The data consists of the following variables;
@@ -49,5 +55,77 @@ The data consists of the following variables;
 - results_score: The score of the athlete in the race by World Athletics. 
 
 
+## **The Data**
 
-Another source of country [codes](https://www.olympiandatabase.com/index.php?id=1670&L=1). 
+As noted, the data is available in the World Athletics website. This data spans two hundred and twenty four (224) web pages at the time of this write up. Hence, the first exercise is to scrap the data. Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. The steps in scrapping the data are outlined below. 
+
+### **Web Scrapping**
+
+The scrapping process takes considerable time. For this reason, I have commented out the last two lines of code that do the scrapping. 
+
+*NOTE*: To repeat the scrapping process, just remove the # before the two lines of code. 
+
+```{r webscrap}
+
+```
+
+### **Data Cleaning and Feature Engineering**
+
+The data cleaning process involves converting the date of `birth` (dob) and `date` to date/ time format. After this, I did feature engineering, adding the following variables. 
+
+- Age of athletes at the time of the race in days.
+
+- Age of athletes at the time of the race in years. I divided the age in days by 365.25 to get years. 
+
+- Venue country code: The code of the country where the race happened. 
+
+- Venue country name: I used the `countrycode` package in R to convert the country codes into country names. Where missing, I used information available on  <https://www.olympiandatabase.com/index.php?id=1670&L=1> to fill in the country names. 
+
+```{r data_cleaning}
+
+```
+
+### Missing Data
+
+Only 4 variables have missing data- wind, dob, age_days, age_years, and pos. However, the extent of missingness is not high as the proportion of missing data shows in the table below. 
+
+```{r nas}
+
+```
+
+## Exploratory Data Analysis
+I examine the country with the most athletes that have posted the best times in the 100 metres dash. The United States leads as the table below shows. However, as noted ealier, the athletes are repeated given that one athlete may have posted multiple times. In table () I remove the duplicates to get the country with the most athletes which again is the United States. 
+
+### Most Successful Countries
+
+```{r most_athletes_country}
+
+```
+
+### World Record Holders
+
+The table below shows the 10 athletes who have posted the best times in the 100 metres dash. Note that Usain Bolt appears in this list 4 times. 
+
+```{r top_athletes_best_times}
+
+```
+
+
+## Top 10 100 Metres Dash Athletes
+It is common knowledge that Usain Bolt is the record holder. But who are the other top contenders. Usain Bolt holds the three best times in the dash. To deal with this duplication, I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are shown below. 
+
+```{r top_all_time_best}
+
+```
+
+
+
+
+### Athletes With the Most appearances in the Fastest Athletes List
+
+The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. Here, Michael Rodgers from the USA leads the way having run 267 races with some of the best times in the World. 
+
+```{r top_athlete_appearances}
+
+```
+
