@@ -1,0 +1,60 @@
+---
+title: "Most Popular R packages on Tweeter"
+author: "John Karuitha"
+date: "10/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(rtweet)
+library(tidyverse)
+library(rvest)
+library(tidytext)
+```
+## Background
+In this mini-project, I extract data from tweeter regarding popular `R` packages. The aim is to get a picture of the projects 
+## The List of R packages
+I get a list of R packages from <https://cran.r-project.org/>. 
+
+```{r}
+my_r_packages <- read_html("https://cran.r-project.org/web/packages/available_packages_by_name.html") %>% 
+        ## Capture the nodes for the names
+        html_nodes("td:nth-child(1)") %>% 
+        
+        html_text()
+
+head(my_r_packages)
+
+available.packages() %>% rownames() %>% length()
+```
+
+## Tweets Mentioning R and Rstats
+
+Next, I get tweets that mention `#rstats`. 
+
+```{r}
+df_tweets <- search_tweets(q = "#rstats", n = 10000, include_rts = FALSE)
+
+head(df_tweets$description)
+```
+
+I then `unnest` all the tokens to create a new column `words` from the `text` column of tweets. After removing stopwords. Stopwords are essential in communication but do not carry meaning on their own, for instance prepositions. Next, I filter for names of `R` packages and then count the words, sorted in descending order of frequency. 
+
+```{r}
+df_tweets %>% 
+        
+        unnest_tokens(word, text) %>% 
+        
+        anti_join(stop_words) %>% 
+        
+        filter(word %in% my_r_packages) %>% 
+        
+        count(word) %>% 
+        
+        arrange(desc(word))
+```
+
+
+

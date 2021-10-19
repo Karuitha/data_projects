@@ -1,23 +1,28 @@
 ## 100 metres all records ----
+
+library(tufte)
+library(knitr)
 library(tidyverse)
 library(rvest)
 library(janitor)
 library(lubridate)
 library(skimr)
 library(countrycode)
+library(kableExtra)
+library(Amelia)
 
+##########################################################################################
 ## @knitr webscrap
-pages <- 1:224
+pages <- 1:225
 
 
 url <- "https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page="
 
 url_2 <- "&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20"
 
-## Full url example
-full_url <- paste0(url, "1", url_2)
-
+##########################################################################################
 ## Scrapping function 
+
 scrapper <- function(x){
         
         Sys.sleep(4)
@@ -31,12 +36,12 @@ scrapper <- function(x){
 }
 
 
+##########################################################################################
+my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
 
-# my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
+write_csv(my_100_dash_data, "my_100_dash_data.csv")
 
-# write_csv(my_100_dash_data, "my_100_dash_data.csv")
-
-
+##########################################################################################
 ## @knitr data_cleaning
 
 my_100_dash_data <- read_csv("data/my_100_dash_data.csv") %>% 
@@ -81,6 +86,7 @@ my_100_dash_data <- read_csv("data/my_100_dash_data.csv") %>%
                                               
                                               ))
 
+##########################################################################################
 ## @knitr nas
 
 Amelia::missmap(my_100_dash_data)
@@ -95,14 +101,24 @@ sapply(my_100_dash_data, is.na) %>%
         
         mutate(prop_percent = missing / nrow(my_100_dash_data) * 100) %>% 
         
-        head(10)
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Missing Data") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
-
+##########################################################################################
 ## @knitr most_athletes_country
 
 my_100_dash_data %>% 
         
-        count(nat, sort = TRUE) 
+        count(nat, sort = TRUE) %>% 
+        
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "NUmber of Athletes by Nationality") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
 my_100_dash_data %>% 
         
@@ -112,52 +128,95 @@ my_100_dash_data %>%
         
         count(nat) %>% 
         
-        arrange(desc(n))
+        arrange(desc(n)) %>% 
+        
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Number of Distict Atletes by Nationality") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+##########################################################################################
 ## @knitr top_athletes_best_times
+
 my_100_dash_data %>% 
         
         select(competitor, mark) %>% 
         
         arrange(mark) %>% 
         
-        head(10)
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Top 10 Best Times in 100 Meters Dash") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+##########################################################################################
 ## @knitr top_all_time_best
+
 my_100_dash_data %>% 
         
         select(competitor, mark) %>% 
         
+        group_by(competitor) %>% 
+        
         arrange(mark) %>% 
         
-        select(competitor) %>% 
+        slice(1) %>% 
         
-        filter(!duplicated(.)) %>% 
+        ungroup() %>% 
         
-        head(10)
+        arrange(mark) %>% 
+        
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Top 10 100 Meters Athletes") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+##########################################################################################
 ## @knitr top_athlete_appearances
 
 my_100_dash_data %>% 
         
         count(competitor, sort = TRUE) %>% 
         
-        head(10)
+        head(10) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Most Appearances (Races) in the Top Sprinters List") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
-
+##########################################################################################
 ## @knitr age_structure_times
 
 my_100_dash_data %>% 
         
-        skim_without_charts(age_years, mark)
+        skim_without_charts(age_years, mark) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Summary Statistics for Athletes Age and Mark") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+##########################################################################################
 ## Youngest athlete 
-my_100_dash_data[which.min(my_100_dash_data$age_years), ]
 
+my_100_dash_data[which.min(my_100_dash_data$age_years), ] %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Youngest Athlete in the Dataset") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
+
+##########################################################################################
 ## Oldest athlete 
-my_100_dash_data[which.max(my_100_dash_data$age_years), ]
 
+my_100_dash_data[which.max(my_100_dash_data$age_years), ] %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Oldest Athlete in the Dataset") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+##########################################################################################
 ## @knitr data_vis
 ## Graph of the age structure
 
@@ -173,7 +232,9 @@ my_100_dash_data %>%
              
              title = "Histogram of Age of Top 100 Metres Male Sprinters")
 
-## Graph of best times 
+###########################################
+## Graph of best times
+
 my_100_dash_data %>% 
         
         ggplot(mapping = aes(x = mark)) + 
@@ -186,6 +247,7 @@ my_100_dash_data %>%
              
              title = "Histogram of Best Times of Top 100 Metres Male Sprinters")
 
+###############################################
 ## Evoluation of Usain Bolt
 
 my_100_dash_data %>% 
@@ -200,10 +262,16 @@ my_100_dash_data %>%
         
         ggthemes::theme_economist() +
         
-        theme(legend.position = "none") 
+        theme(legend.position = "none") +
+        
+        labs(x = "Year", y = "Mark/Time in Seconds", 
+             
+             title = "Usain  Bolt 100 Meters Races History 2007-2017")
 
-
+#####################################################
+## @knitr time_by_venues
 ## Times by venues
+
 my_100_dash_data %>%
         
         na.omit() %>% 
@@ -217,9 +285,30 @@ my_100_dash_data %>%
         arrange(numeric.mean)
 
 
-my_100_dash_data[my_100_dash_data$venue_country_name == "Kenya", ]  
+#######################################################
+## Improvements over time- best times per year
 
+my_100_dash_data %>% 
+        
+        group_by(year(date)) %>% 
+        
+        summarise(year_record = min(mark)) %>% 
+        
+        rename(year = `year(date)`) %>% 
+        
+        ggplot(mapping = aes(x = year, y = year_record)) +
+        
+        geom_line(col = "blue") +
+        
+        labs(x = "Year", y = "Mark/Best Time", 
+             
+             title = "Trend in 100 Meters Men Best Times") + 
+        
+        ggthemes::theme_economist()
+
+################################################################
 ## Mean and Median age of athletes over time
+
 my_100_dash_data %>% 
         
         group_by(year(date)) %>% 
@@ -241,6 +330,7 @@ my_100_dash_data %>%
 
 ##########################################################################################
 ## Number of races versus times posted
+
 races_vs_time <- my_100_dash_data %>% 
         
         group_by(competitor, year(date)) %>% 
@@ -257,7 +347,9 @@ races_vs_time <- my_100_dash_data %>%
                   
                   max_time = max(mark))
 
-## Races versus best/min times
+########################################
+## Number of Races versus best/min times
+
 races_vs_time %>% 
         
         ggplot(mapping = aes(x = races, y = best_time)) + 
@@ -266,7 +358,9 @@ races_vs_time %>%
         
         geom_smooth()
 
-## Races versus median times
+########################################
+## Number of Races versus median times
+
 races_vs_time %>% 
         
         ggplot(mapping = aes(x = races, y = median_time)) + 
@@ -275,7 +369,9 @@ races_vs_time %>%
         
         geom_smooth()
 
-## Races versus mean times
+##############################################
+## Number of Races versus mean times
+
 races_vs_time %>% 
         
         ggplot(mapping = aes(x = races, y = mean_time)) + 
@@ -284,7 +380,9 @@ races_vs_time %>%
         
         geom_smooth()
 
-## Races versus worst/max times 
+#########################################################
+## Number of Races versus worst/max times 
+
 races_vs_time %>% 
         
         ggplot(mapping = aes(x = races, y = max_time)) + 
@@ -293,3 +391,5 @@ races_vs_time %>%
         
         geom_smooth()
 ##########################################################################################
+
+

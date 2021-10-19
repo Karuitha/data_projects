@@ -1,14 +1,14 @@
 ---
-title: "Analyzing the 100 Metres Men's Sprint"
-runningheader: "100 Metres Men Best Times" # only for pdf output
-subtitle: "100 Metres Sprint Best Times, 1900 - Present" # only for html output
+title: "Who's the Fastest of All? Analyzing the 100 Metres Men's Sprint Data, 1958-2021"
+runningheader: "Analysis of 100 Metres Men's Race Best Times" # only for pdf output
+subtitle: "100 Metres Sprint Best Times, 1958 - Present" # only for html output
 author: "John King'athia Karuitha"
 date: "`r Sys.Date()`"
 output:
+  tufte::tufte_html: default
   tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
-  tufte::tufte_html: default
   tufte::tufte_handout:
     citation_package: natbib
     latex_engine: xelatex
@@ -25,6 +25,8 @@ library(janitor)
 library(lubridate)
 library(skimr)
 library(countrycode)
+library(kableExtra)
+library(Amelia)
 # invalidate cache when the tufte version changes
 knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
 
@@ -41,23 +43,23 @@ I use data from [World Athletics](https://www.worldathletics.org/records/all-tim
 read_chunk("code/sprints.R")
 ```
 
-The data consists of the following variables;
+The raw data consists of the following variables;
 
-- rank: Starting from the athlete that has posted the best time to date.
-- mark: The time (in seconds) posted by the athlete.
-- wind: The wind assist. Negative speeds indicate the athlete was running against the wind. 
-- competitor: The name of the athlete.
-- dob: Date of birth of the athlete.
-- nat: Nationality of the athlete.
-- pos: position of the athlete in the given race. 
-- venue: Venue of the race.
-- date: Date the race happened. 
-- results_score: The score of the athlete in the race by World Athletics. 
+- `rank`: Starting from the athlete that has posted the best time to date.
+- `mark`: The time (in seconds) posted by the athlete.
+- `wind`: The wind assist. Negative speeds indicate the athlete was running against the wind. 
+- `competitor`: The name of the athlete.
+- `dob`: Date of birth of the athlete.
+- `nat`: Nationality of the athlete.
+- `pos`: position of the athlete in the given race. 
+- `venue`: Venue of the race.
+- `date`: Date the race happened. 
+- `results_score`: The score of the athlete in the race by World Athletics. 
 
 
 ## **The Data**
 
-As noted, the data is available in the World Athletics website. This data spans two hundred and twenty four (224) web pages at the time of this write up. Hence, the first exercise is to scrap the data. Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. The steps in scrapping the data are outlined below. 
+As noted, the data is available in the World Athletics website. This data spans two hundred and twenty four (224) web pages at the time of this write up. Tellingly, it would take ages to copy-paste this data. Hence, the first exercise is to scrap the data. Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. The steps in scrapping the data are outlined below. 
 
 ### **Web Scrapping**
 
@@ -69,9 +71,9 @@ The scrapping process takes considerable time. For this reason, I have commented
 
 ```
 
-### **Data Cleaning and Feature Engineering**
+### **Feature Engineering**
 
-The data cleaning process involves converting the date of `birth` (dob) and `date` to date/ time format. After this, I did feature engineering, adding the following variables. 
+The resultant dataset has 22,400 rows and 14 columns. The data cleaning process involves converting the date of `birth` (dob) and `date` to date/ time format. After this, I did feature engineering, adding the following variables. 
 
 - Age of athletes at the time of the race in days.
 
@@ -89,7 +91,7 @@ The data cleaning process involves converting the date of `birth` (dob) and `dat
 
 Only 4 variables have missing data- wind, dob, age_days, age_years, and pos. However, the extent of missingness is not high as the proportion of missing data shows in the table below. 
 
-```{r nas}
+```{r nas, fig.cap = "Visualisation of Missing Data"}
 
 ```
 
@@ -97,6 +99,8 @@ Only 4 variables have missing data- wind, dob, age_days, age_years, and pos. How
 I examine the country with the most athletes that have posted the best times in the 100 metres dash. The United States leads as the table below shows. However, as noted ealier, the athletes are repeated given that one athlete may have posted multiple times. In table () I remove the duplicates to get the country with the most athletes which again is the United States. 
 
 ### Most Successful Countries
+
+The table below shows the countries with the highest number of athletes among the top sprinters. However, there is a lot of duplication as many athletes appear multiple times in different races. Table () shows the same information by removing duplicates meaning I count each athlete once. 
 
 ```{r most_athletes_country}
 
@@ -112,20 +116,29 @@ The table below shows the 10 athletes who have posted the best times in the 100 
 
 
 ## Top 10 100 Metres Dash Athletes
-It is common knowledge that Usain Bolt is the record holder. But who are the other top contenders. Usain Bolt holds the three best times in the dash. To deal with this duplication, I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are shown below. 
+It is common knowledge that Usain Bolt is the record holder. Usain Bolt holds the four of the ten best times in the dash. But who are the other top contenders? I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are shown below. 
 
 ```{r top_all_time_best}
 
 ```
 
-
-
-
 ### Athletes With the Most appearances in the Fastest Athletes List
 
-The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. Here, Michael Rodgers from the USA leads the way having run 267 races with some of the best times in the World. 
+The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. In other words, which athlete has had the most races that appear in the dataset of the fastest 100 meters athletes? Here, `Michael Rodgers` from the USA leads the way having participated in 267 races and posting some of the best times in the World that appear in this dataset. 
 
 ```{r top_athlete_appearances}
+
+```
+
+### The Age Structure of Athletes
+
+```{r age_structure_times}
+
+```
+
+### Data Visualisation
+
+```{r data_vis}
 
 ```
 
