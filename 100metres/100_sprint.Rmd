@@ -132,6 +132,8 @@ The issue here is to examine the athlete that has appeared in the list of elite 
 
 ### The Age Structure of Athletes
 
+This section examines the ages of the athletes featured the data. The mean age is 25.119 years while the median is 24.65, with a standard deviation of 3.835. The Nigerian sprinter `Chinedu ORIALA` is the youngest athlete in the dataset, while `Kim Collins` is the oldest at around 41 years. Note that age here refers to the calculation as per the date the athlete participated in a race and NOT the present age of the athlete. 
+
 ```{r age_structure_times}
 
 ```

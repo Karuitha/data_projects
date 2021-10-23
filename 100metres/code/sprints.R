@@ -37,9 +37,9 @@ scrapper <- function(x){
 
 
 ##########################################################################################
-my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
+#my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
 
-write_csv(my_100_dash_data, "my_100_dash_data.csv")
+#write_csv(my_100_dash_data, "my_100_dash_data.csv")
 
 ##########################################################################################
 ## @knitr data_cleaning
@@ -270,7 +270,7 @@ my_100_dash_data %>%
 
 #####################################################
 ## @knitr time_by_venues
-## Times by venues
+## Minimum Times by venues
 
 my_100_dash_data %>%
         
@@ -282,7 +282,9 @@ my_100_dash_data %>%
         
         select(-complete_rate, -n_missing) %>% 
         
-        arrange(numeric.mean)
+        arrange(numeric.p0) %>% 
+        
+        head(10)
 
 
 #######################################################
@@ -339,6 +341,8 @@ races_vs_time <- my_100_dash_data %>%
         
         summarise(races = n(),
                   
+                  age = age_years,
+                  
                   best_time = min(mark),
                   
                   median_time = median(mark),
@@ -347,6 +351,8 @@ races_vs_time <- my_100_dash_data %>%
                   
                   max_time = max(mark))
 
+head(races_vs_time)
+
 ########################################
 ## Number of Races versus best/min times
 
@@ -354,9 +360,15 @@ races_vs_time %>%
         
         ggplot(mapping = aes(x = races, y = best_time)) + 
         
-        geom_point(shape = 1, size = 4, alpha = 0.5) + 
+        geom_hex(alpha = 0.5) +
         
-        geom_smooth()
+        scale_fill_gradient(low = "grey", high = "red") +
+        
+        geom_point(shape = ".") + 
+        
+        geom_density_2d() + 
+        
+        geom_smooth(col = "green", lty = "dashed")
 
 ########################################
 ## Number of Races versus median times
@@ -391,5 +403,23 @@ races_vs_time %>%
         
         geom_smooth()
 ##########################################################################################
+## Age vs best times
+
+races_vs_time %>% 
+        
+        ggplot(mapping = aes(x = age, y = best_time)) + 
+        
+        geom_hex(alpha = 0.5) +
+        
+        scale_fill_gradient(low = "grey", high = "red") +
+        
+        geom_point(shape = ".") + 
+        
+        geom_density_2d() + 
+        
+        geom_smooth(col = "green", lty = "dashed")
 
 
+
+
+lm(best_time ~ age + races, data = races_vs_time)
