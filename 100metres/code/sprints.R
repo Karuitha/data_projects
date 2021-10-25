@@ -10,11 +10,13 @@ library(skimr)
 library(countrycode)
 library(kableExtra)
 library(Amelia)
+library(mgcv)
+library(stargazer)
 
 ##########################################################################################
 ## @knitr webscrap
-pages <- 1:225
 
+pages <- 1:225
 
 url <- "https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page="
 
@@ -34,7 +36,6 @@ scrapper <- function(x){
                 html_table()
         
 }
-
 
 ##########################################################################################
 #my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
@@ -353,12 +354,15 @@ races_vs_time <- my_100_dash_data %>%
 
 head(races_vs_time)
 
-########################################
-## Number of Races versus best/min times
+###################################################################
 
 races_vs_time %>% 
         
-        ggplot(mapping = aes(x = races, y = best_time)) + 
+        pivot_longer(-c("competitor", "year", "races", "age"),
+                     
+                     names_to = "perf", values_to = "time") %>% 
+        
+        ggplot(mapping = aes(x = races, y = time)) + 
         
         geom_hex(alpha = 0.5) +
         
@@ -368,58 +372,25 @@ races_vs_time %>%
         
         geom_density_2d() + 
         
-        geom_smooth(col = "green", lty = "dashed")
+        geom_smooth(col = "green", lty = "dashed") + 
+        
+        labs(x = "Races", y = "Best Time", 
+             
+             title = "No of Races per Year vs Worst/ Max Times",
+             
+             caption = "John Karuitha, 2021") + 
+        
+        facet_wrap(~ perf) + 
+        
+        ggthemes::theme_clean()
 
-########################################
-## Number of Races versus median times
+###################################################################
 
-races_vs_time %>% 
-        
-        ggplot(mapping = aes(x = races, y = median_time)) + 
-        
-        geom_point(shape = 1, size = 4, alpha = 0.5) + 
-        
-        geom_smooth()
+races_lm <- lm(best_time ~ age + races, data = races_vs_time)
+summary(races_lm)
 
-##############################################
-## Number of Races versus mean times
-
-races_vs_time %>% 
-        
-        ggplot(mapping = aes(x = races, y = mean_time)) + 
-        
-        geom_point(shape = 1, size = 4, alpha = 0.5) + 
-        
-        geom_smooth()
-
-#########################################################
-## Number of Races versus worst/max times 
-
-races_vs_time %>% 
-        
-        ggplot(mapping = aes(x = races, y = max_time)) + 
-        
-        geom_point(shape = 1, size = 4, alpha = 0.5) + 
-        
-        geom_smooth()
-##########################################################################################
-## Age vs best times
-
-races_vs_time %>% 
-        
-        ggplot(mapping = aes(x = age, y = best_time)) + 
-        
-        geom_hex(alpha = 0.5) +
-        
-        scale_fill_gradient(low = "grey", high = "red") +
-        
-        geom_point(shape = ".") + 
-        
-        geom_density_2d() + 
-        
-        geom_smooth(col = "green", lty = "dashed")
+races_gam <- gam(best_time ~ s(age) + s(races), data = races_vs_time)
+summary(races_gam)
 
 
-
-
-lm(best_time ~ age + races, data = races_vs_time)
+stargazer::stargazer(races_lm, races_gam)
