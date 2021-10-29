@@ -27,7 +27,7 @@ url_2 <- "&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20"
 
 scrapper <- function(x){
         
-        Sys.sleep(4)
+        Sys.sleep(2)
         
         read_html(paste0(url, x, url_2)) %>% 
                 

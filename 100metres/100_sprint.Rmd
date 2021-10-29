@@ -1,5 +1,5 @@
 ---
-title: "Who's the Fastest of All? Analyzing the 100 Metres Men's Sprint Data, 1958-2021"
+title: "Who's the Fastest of All? Analyzing the 100 Metres Men's Sprint Data"
 runningheader: "Analysis of 100 Metres Men's Race Best Times" # only for pdf output
 subtitle: "100 Metres Sprint Best Times, 1958 - Present" # only for html output
 author: "John King'athia Karuitha"
@@ -37,7 +37,9 @@ options(htmltools.dir.version = FALSE)
 
 # **Background**
 
-I use data from [World Athletics](https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20) on the best times posted by male athletes in the 100 metres sprint from 1900  to present  ^[The data is available on this link <https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20>]. Note that many athletes appear multiple times provided the times. For instance, Usain Bolt posted top 3 best times in different races. 
+I use data from [World Athletics](https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20) on the best times posted by male athletes in the 100 metres sprint from 1958  to present  ^[The data is available on this link <https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20>]. 
+
+Note that many athletes appear multiple times provided the times. For instance, Usain Bolt posted the top 3 best times in different races. 
 
 ```{r}
 read_chunk("code/sprints.R")
@@ -59,13 +61,13 @@ The raw data consists of the following variables;
 
 ## **The Data**
 
-As noted, the data is available in the World Athletics website. This data spans two hundred and twenty four (224) web pages at the time of this write up. Tellingly, it would take ages to copy-paste this data. Hence, the first exercise is to scrap the data. Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. The steps in scrapping the data are outlined below. 
+As noted, the data is available on the World Athletics website. This data spans two hundred and twenty-four (224) web pages at this write-up. Tellingly, it would take ages to copy-paste this data. Hence, the first exercise is to scrap the data. Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. I outline the steps in scrapping the data next. 
 
 ### **Web Scrapping**
 
 The scrapping process takes considerable time. For this reason, I have commented out the last two lines of code that do the scrapping. 
 
-*NOTE*: To repeat the scrapping process, just remove the # before the two lines of code. 
+*NOTE*: To repeat the scrapping process, remove the # before the two lines of code. 
 
 ```{r webscrap}
 
@@ -73,7 +75,7 @@ The scrapping process takes considerable time. For this reason, I have commented
 
 ### **Feature Engineering**
 
-The resultant dataset has 22,400 rows and 14 columns. The data cleaning process involves converting the date of `birth` (dob) and `date` to date/ time format. After this, I did feature engineering, adding the following variables. 
+The resultant dataset has 22,400 rows and 14 columns. The data cleaning process involves converting the date of `birth` (dob) and `date` to the date/ time format. After this, I did feature engineering, adding the following variables. 
 
 - Age of athletes at the time of the race in days.
 
@@ -89,14 +91,14 @@ The resultant dataset has 22,400 rows and 14 columns. The data cleaning process 
 
 ### Missing Data
 
-Only 4 variables have missing data- wind, dob, age_days, age_years, and pos. However, the extent of missingness is not high as the proportion of missing data shows in the table below. 
+Only four variables have missing data- wind, dob, age_days, age_years, and pos. However, the extent of missingness is not great, as the proportion of missing data shows in the table below. 
 
 ```{r nas, fig.cap = "Visualisation of Missing Data"}
 
 ```
 
 ## Exploratory Data Analysis
-I examine the country with the most athletes that have posted the best times in the 100 metres dash. The United States leads as the table below shows. However, as noted ealier, the athletes are repeated given that one athlete may have posted multiple times. In table () I remove the duplicates to get the country with the most athletes which again is the United States. 
+I examine the country with the most athletes that have posted the best times in the 100 metres dash. The United States leads, as the table below shows. However, as noted earlier, the athletes are repeated, given that one athlete may have posted multiple times. In table (), I remove the duplicates to get the country with the most athletes, the United States. 
 
 ### Most Successful Countries
 
@@ -108,7 +110,7 @@ The table below shows the countries with the highest number of athletes among th
 
 ### World Record Holders
 
-The table below shows the 10 athletes who have posted the best times in the 100 metres dash. Note that Usain Bolt appears in this list 4 times. 
+The table below shows the ten athletes who have posted the best times in the 100 metres dash. Note that Usain Bolt appears in this list four times. 
 
 ```{r top_athletes_best_times}
 
@@ -116,7 +118,7 @@ The table below shows the 10 athletes who have posted the best times in the 100 
 
 
 ## Top 10 100 Metres Dash Athletes
-It is common knowledge that Usain Bolt is the record holder. Usain Bolt holds the four of the ten best times in the dash. But who are the other top contenders? I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are shown below. 
+It is common knowledge that Usain Bolt is the record holder. Usain Bolt holds four of the ten best times in the dash. But who are the other top contenders? I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are in table () below. 
 
 ```{r top_all_time_best}
 
@@ -124,7 +126,7 @@ It is common knowledge that Usain Bolt is the record holder. Usain Bolt holds th
 
 ### Athletes With the Most appearances in the Fastest Athletes List
 
-The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. In other words, which athlete has had the most races that appear in the dataset of the fastest 100 meters athletes? Here, `Michael Rodgers` from the USA leads the way having participated in 267 races and posting some of the best times in the World that appear in this dataset. 
+The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. In other words, which athlete has had the most races that appear in the dataset of the fastest 100 meters athletes? Here, `Michael Rodgers` from the USA leads the way, having participated in 267 races and posting some of the best times in the World that appear in this dataset. 
 
 ```{r top_athlete_appearances}
 
@@ -132,7 +134,7 @@ The issue here is to examine the athlete that has appeared in the list of elite 
 
 ### The Age Structure of Athletes
 
-This section examines the ages of the athletes featured the data. The mean age is 25.119 years while the median is 24.65, with a standard deviation of 3.835. The Nigerian sprinter `Chinedu ORIALA` is the youngest athlete in the dataset, while `Kim Collins` is the oldest at around 41 years. Note that age here refers to the calculation as per the date the athlete participated in a race and NOT the present age of the athlete. 
+This section examines the ages of the athletes featured in the data. The mean age is 25.119 years, while the median is 24.65, with a standard deviation of 3.835. The Nigerian sprinter `Chinedu ORIALA` is the youngest athlete in the dataset, while `Kim Collins` is the oldest at around 41 years. Note that we are referring to the athlete's age when they participated in a race and NOT how old the athlete is currently. 
 
 ```{r age_structure_times}
 
