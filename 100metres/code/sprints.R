@@ -328,7 +328,9 @@ my_100_dash_data %>%
         
         geom_line() + 
         
-        ggthemes::theme_economist()
+        ggthemes::theme_economist() +
+        
+        scale_colour_manual(values = c("red", "blue"))
 
 
 ##########################################################################################
@@ -386,10 +388,18 @@ races_vs_time %>%
 
 ###################################################################
 
-races_lm <- lm(best_time ~ age + races, data = races_vs_time)
+races_lm <- lm(best_time ~ age + races, 
+               
+               data = races_vs_time)
+
 summary(races_lm)
 
-races_gam <- gam(best_time ~ s(age) + s(races), data = races_vs_time)
+races_gam <- gam(best_time ~ s(age) + s(races), 
+                 
+                 data = races_vs_time,
+                 
+                 family = gaussian)
+
 summary(races_gam)
 
 
