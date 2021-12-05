@@ -13,16 +13,6 @@ options(digits = 4)
 options(scipen = 999)
 theme_set(theme_clean())
 
-## @knitr loaddata
-loans <- readr::read_csv('data/loans.csv.gz') %>% 
-  
-  mutate(purpose = factor(purpose),
-         
-         not_fully_paid = factor(not_fully_paid, levels = c(0 , 1),
-                                 
-                                 labels = c("Fully Paid", "Not Fully paid")),
-         
-         credit_policy = factor(credit_policy))
 
 ## @knitr loandatastructure
 str(loans)
