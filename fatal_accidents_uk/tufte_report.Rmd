@@ -41,6 +41,17 @@ theme_set(theme_clean())
 options(knitr.kable.NA="-")
 ```
 
+# **Summary**
+
+In this project, I use data from the Department of Transport in the United Kingdom (UK) to derive insights to reduce fatalities from major accidents. Specifically, the project aims to identify factors associated with road accidents fatalities. The key findings are:
+
+- Accident casualties peak during weekends, Starting from Friday and falling on Sunday.
+- Accidents casualties vary by time of day.
+- Major accidents and accident casualties mainly happen when the weather is fine.
+- Major accidents and accident casualties mainly occur in road stretches with speed limits of 30 mph and 60 mph. 
+
+The project proceeds by laying out the background first, followed by exploratory data analysis. The project then delves into the data analysis to garner insights. The project then concludes.
+
 # **Background**
 
 The [World Health Organization (WHO)](https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries) estimates that approximately 1.3 million people globally die in road accidents every year. Road accidents occur in every country. However, about 93% of the accidents happen in low- and middle-income countries, with 60% of the total vehicles in the world. The monetary loss occasioned by these road accidents amounts to about 3% of the GDP of each country. Importantly, road accidents are the leading cause of death for children and young adults between 5-29 years [^1]. The social and economic costs associated with road accidents make it paramount to craft strategies to reduce the number of road accidents and, critically, the fatalities. Coincidentally, at the time of writing this article, the United Nations is leading the world in commemorating victims of [road accidents on Sunday, November 21, 2021](https://www.un.org/en/observances/road-traffic-victims-day), dubbed the `World Day of Remembrance for Road Traffic Victims` [^2].
