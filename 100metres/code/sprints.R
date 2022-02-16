@@ -13,6 +13,8 @@ library(kableExtra)
 library(Amelia)
 library(mgcv)
 library(stargazer)
+library(PerformanceAnalytics)
+library(performance)
 
 ################################################################################
 ## @knitr webscrap
@@ -45,7 +47,7 @@ scrapper <- function(x){
 ## You can uncomment to rerun the harvesting of data from the web.
 ################################################################################
 
-#my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
+# my_100_dash_data <- pages %>% map_dfr(~ scrapper(.x))
 
 #write_csv(my_100_dash_data, "my_100_dash_data.csv")
 
@@ -128,6 +130,7 @@ my_100_dash_data %>%
         
         kable_classic(full_width = FALSE, latex_option = "hold_position")
 
+############
 my_100_dash_data %>% 
         
         select(competitor, nat) %>% 
@@ -155,9 +158,26 @@ my_100_dash_data %>%
         
         head(10) %>% 
         
-        kbl(., booktabs = TRUE, caption = "Top 10 Best Times in 100 Meters Dash") %>% 
+        kbl(., booktabs = TRUE, 
+            
+            caption = "Top 10 Best Times in 100 Meters Dash") %>% 
         
         kable_classic(full_width = FALSE, latex_option = "hold_position")
+
+###########################################
+## @knitr best_times_graph
+
+my_100_dash_data %>% 
+        
+        ggplot(mapping = aes(x = mark)) + 
+        
+        geom_histogram(col = "black", fill = "skyblue", binwidth = 0.01) + 
+        
+        ggthemes::theme_economist() + 
+        
+        labs(x = "Mark", y = "Count", 
+             
+             title = "Histogram of Best Times of Top 100 Metres Male Sprinters")
 
 ################################################################################
 ## @knitr top_all_time_best
@@ -224,100 +244,7 @@ my_100_dash_data[which.max(my_100_dash_data$age_years), ] %>%
         
         kable_classic(full_width = FALSE, latex_option = "hold_position")
 
-################################################################################
-## @knitr data_vis
-## Graph of the age structure
-
-my_100_dash_data %>% 
-        
-        ggplot(mapping = aes(x = age_years)) + 
-        
-        geom_histogram(col = "black", fill = "skyblue", binwidth = 1) + 
-        
-        ggthemes::theme_economist() + 
-        
-        labs(x = "Age in Years", y = "Count", 
-             
-             title = "Histogram of Age of Top 100 Metres Male Sprinters")
-
-###########################################
-## Graph of best times
-
-my_100_dash_data %>% 
-        
-        ggplot(mapping = aes(x = mark)) + 
-        
-        geom_histogram(col = "black", fill = "skyblue", binwidth = 0.01) + 
-        
-        ggthemes::theme_economist() + 
-        
-        labs(x = "Mark", y = "Count", 
-             
-             title = "Histogram of Best Times of Top 100 Metres Male Sprinters")
-
-###############################################
-## Evoluation of Usain Bolt
-
-my_100_dash_data %>% 
-        
-        filter(competitor == "Usain BOLT") %>% 
-        
-        ggplot(mapping = aes(x = factor(year(date)), y = mark)) + 
-        
-        geom_boxplot(mapping = aes(fill = factor(year(date)))) + 
-        
-        geom_point() + 
-        
-        ggthemes::theme_economist() +
-        
-        theme(legend.position = "none") +
-        
-        labs(x = "Year", y = "Mark/Time in Seconds", 
-             
-             title = "Usain  Bolt 100 Meters Races History 2007-2017")
-
-################################################################################
-## @knitr time_by_venues
-## Minimum Times by venues
-
-my_100_dash_data %>%
-        
-        na.omit() %>% 
-        
-        group_by(venue_country_name) %>% 
-        
-        skim_without_charts(mark) %>% 
-        
-        select(-complete_rate, -n_missing) %>% 
-        
-        arrange(numeric.p0) %>% 
-        
-        head(10)
-
-
-################################################################################
-## Improvements over time- best times per year
-
-my_100_dash_data %>% 
-        
-        group_by(year(date)) %>% 
-        
-        summarise(year_record = min(mark)) %>% 
-        
-        rename(year = `year(date)`) %>% 
-        
-        ggplot(mapping = aes(x = year, y = year_record)) +
-        
-        geom_line(col = "blue") +
-        
-        labs(x = "Year", y = "Mark/Best Time", 
-             
-             title = "Trend in 100 Meters Men Best Times") + 
-        
-        ggthemes::theme_economist()
-
-################################################################################
-## Mean and Median age of athletes over time
+## @knitr mean_median_age_athletes_time
 
 my_100_dash_data %>% 
         
@@ -339,11 +266,87 @@ my_100_dash_data %>%
         
         scale_colour_manual(values = c("red", "blue"))
 
+################################################################################
+## @knitr age structure_data_vis
+
+my_100_dash_data %>% 
+        
+        ggplot(mapping = aes(x = age_years)) + 
+        
+        geom_histogram(col = "black", fill = "skyblue", binwidth = 1) + 
+        
+        ggthemes::theme_economist() + 
+        
+        labs(x = "Age in Years", y = "Count", 
+             
+             title = "Histogram of Age of Top 100 Metres Male Sprinters")
+
+###############################################
+## @knitr Evolution_of_Usain_Bolt
+
+my_100_dash_data %>% 
+        
+        filter(competitor == "Usain BOLT") %>% 
+        
+        ggplot(mapping = aes(x = factor(year(date)), y = mark)) + 
+        
+        geom_boxplot(mapping = aes(fill = factor(year(date)))) + 
+        
+        geom_point() + 
+        
+        ggthemes::theme_economist() +
+        
+        theme(legend.position = "none") +
+        
+        labs(x = "Year", y = "Mark/Time in Seconds", 
+             
+             title = "Usain  Bolt 100 Meters Races History 2007-2017")
+
+## @knitr usain_bolt_sds
+
+my_100_dash_data %>%
+        
+        filter(competitor == "Usain BOLT") %>% 
+        
+        group_by(year = lubridate::year(date)) %>% 
+        
+        summarise(median = median(mark, na.rm = TRUE), 
+                  
+                  sd = sd(mark, na.rm = TRUE)) %>% 
+        
+        arrange(desc(sd)) %>% 
+        
+        kbl(., booktabs = TRUE, 
+            
+            caption = "Median and Standard Deviation for USAIN BOLT") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
 ################################################################################
-## Number of races versus times posted
+## @knitr time_by_venues
+## Minimum Times by venues
 
-races_vs_time <- my_100_dash_data %>% 
+my_100_dash_data %>%
+        
+        na.omit() %>% 
+        
+        group_by(venue_country_name) %>% 
+        
+        skim_without_charts(mark) %>% 
+        
+        select(-complete_rate, -n_missing) %>% 
+        
+        arrange(numeric.p0) %>% 
+        
+        head(10)
+
+
+################################################################################
+################################################################################
+################################################################################
+## @knitr races_time_data
+
+races_time <- my_100_dash_data %>% 
         
         group_by(competitor, year(date)) %>% 
         
@@ -361,13 +364,9 @@ races_vs_time <- my_100_dash_data %>%
                   
                   max_time = max(mark))
 
-head(races_vs_time)
-
-################################################################################
-
-races_vs_time %>% 
-        
-        pivot_longer(-c("competitor", "year", "races", "age"),
+###############################################################################
+## @knitr races_time_plot
+races_time %>% pivot_longer(-c("competitor", "year", "races", "age"),
                      
                      names_to = "perf", values_to = "time") %>% 
         
@@ -394,21 +393,56 @@ races_vs_time %>%
         ggthemes::theme_clean()
 
 ################################################################################
+## @knitr regression_analysis
 
 races_lm <- lm(best_time ~ age + races, 
                
-               data = races_vs_time)
+               data = races_time)
 
-summary(races_lm)
+broom::tidy(races_lm) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Linear Model") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 
-races_gam <- gam(best_time ~ s(age) + s(races), 
+races_gam <- mgcv::gam(best_time ~ s(age) + s(races), 
                  
-                 data = races_vs_time,
+                 data = races_time,
                  
                  family = gaussian)
 
-summary(races_gam)
 
-
-stargazer::stargazer(races_lm, races_gam)
+broom::tidy(races_gam) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "The GAM") %>% 
+        
+        kable_classic(full_width = FALSE, latex_option = "hold_position")
 ################################################################################
+## @knitr reg_summary_stats
+stargazer::stargazer(performance::compare_performance(races_lm, races_gam))
+
+## @knitr reg_summary_plots
+plot(performance::compare_performance(races_lm, races_gam))
+
+
+################################################################################
+## @knitr records_over_time
+## Improvements over time- best times per year
+
+my_100_dash_data %>% 
+        
+        group_by(year = year(date)) %>% 
+        
+        summarise(year_record = min(mark)) %>% 
+        
+        ggplot(mapping = aes(x = year, y = year_record)) +
+        
+        geom_line(col = "blue") +
+        
+        labs(x = "Year", y = "Mark/Best Time", 
+             
+             title = "Trend in 100 Meters Men Best Times") + 
+        
+        ggthemes::theme_economist()
+
+
