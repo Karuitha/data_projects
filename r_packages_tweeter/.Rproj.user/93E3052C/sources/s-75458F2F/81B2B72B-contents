@@ -1,0 +1,350 @@
+## Review of R----
+## We have BASE R and others- you can add other functionality through packages.
+## base R functions are available to us any time we load R.
+## We can access additional functionality of R using packages.
+## You install these additional packages using the install.packages() function.
+## To use the functions in these additional packages, you must call them using
+## The library function:
+
+## Learning strategy
+## DO NOT MEMORIZE- JUST TAKE EVERY OPPORTUNITY TO PRACTICE
+## Use the R help system.
+?plot
+## Google where stuck
+## Visit or ask questions on stack overflow. 
+
+## Review of vectors, dataframes, lists ----
+### making a vector 
+### Use the `c` function.
+
+## A vector of numbers <- / =
+
+my_vector <-  c(1, 2, 3, 4, 5, 6, 7, 8)
+
+## Spaces for readability
+
+## OR
+
+my_other_vector <- 1:8
+
+## seq
+?seq
+seq(from = 1000, to = 1, by = -3)
+seq(from = 1, to = 1000, length.out = 100)
+
+## Random numbers 
+?rnorm
+?runinf
+rnorm(1000)
+rnorm(100, mean = 10, sd = 5)
+hist(rnorm(100, mean = 10, sd = 5))
+?runif
+runif(100, min = 0, max = 80)
+hist(runif(1000000, min = 0, max = 80))
+### A vector of characters 
+my_names_vector <- c("Susan", "Jane", "Paul", "Judith", "Nelly", "Sharon", 
+                     
+                     "Saul", "Judah")
+
+## YOUR TURN:
+## Lets make a vector of the age of these people.Make up the ages. 
+
+
+my_age_vector <- c(12, 25, 76, 43, 28, 17, 34, 56)
+
+## Logical vector 
+my_logicals <- c(TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE)
+
+### Accessing data from a vector
+### Given that a vector is uni-dimensional, we access any value using its index.
+### For instance in the age vector above, the item in position 3 is 76. 
+my_age_vector[3] ## Note we use SQUARE brackets to subset. 
+
+my_logicals[5]
+
+my_names_vector[8]
+
+## Exercise
+
+##Dataframes
+### Dataframes are just combination of vectors
+
+### In the example above, we can just wrap the three vectors
+### my_vector, my_names_vector, and my_age vector using the function data.frame
+### Ensure the vectors are of the same length before combining them. Its a data table. 
+
+my_ages_data_table <- data.frame(my_vector, my_names_vector, my_age_vector, my_logicals)
+
+my_ages_data_table
+
+View(my_ages_data_table)
+
+write.csv(my_ages_data_table, "my_data_table.csv")
+
+?write.csv
+
+## Exercise creating a vector ----
+create_vector <- 1:8
+vec2 <- c(T, F, F, F, T, T, F, T)
+my_dataframe <- data.frame(create_vector, vec2)
+
+## Accessing data from a data.frame ---- 
+### given that dataframes have two dimensions, rows and columns
+### We access dataframes by supplying a row dimension and a column dimension.
+### You use my_data[rows, columns]
+my_ages_data_table[2,3]  ## Note the square brackets.
+
+my_ages_data_table[2, ] ## gives second row and all columns of the dataset.
+
+my_ages_data_table[, 3] ##gives all rows of the 3rd column
+
+## Always start with row and then followed by columns. 
+## EXERCISE
+## get only the second column of the ages data table
+my_ages_data_table[,2]
+## get only the first row of the ages data table.
+my_ages_data_table[1,]
+
+## We can also access a whole column of a data table using the $ operator.
+my_ages_data_table$my_vector
+my_ages_data_table$my_names_vector
+my_ages_data_table$my_age_vector
+my_ages_data_table$my_logicals
+
+
+## Installing packages ----
+### We install packages using the function install.packages()
+#install.packages("tidyverse")
+library(tidyverse)
+
+## Note the quotation marks around the name of the package. 
+## You can get the list of packages from CRAN, GITHUB, GITLAB, ETC. 
+## What is CRAN?GITHUB?GITLAB?
+## EXERCISE
+## Install the package called `here`
+#install.packages("here")
+library(here)
+
+## To install many packages at once, simply wrap them inside the c function
+## and put them inside the install.packages function. 
+## For instance to install packages mice, lubridate, and Amelia
+
+#install.packages(c("mice", "lubridate", "Amelia"))
+library(mice)
+library(Amelia)
+
+## The spelling of the package matters. 
+
+## EXERCISE
+## Install the packages [vroom] and [data.table] together.
+installed.packages(c("vroom", "data.table"))
+library(vroom)
+library(data.table)
+
+
+## Lets go back to our age data table
+str(my_ages_data_table)
+head(my_ages_data_table) ## First six rows
+tail(my_ages_data_table)
+head(my_ages_data_table, 2)
+tail(my_ages_data_table, 4)
+
+my_ages_data_table[,2:3]
+my_ages_data_table[,c(2, 4)]
+my_ages_data_table[,c("my_names_vector", "my_logicals")]
+
+
+my_ages_data_table[,"my_age_vector"]
+x <- my_ages_data_table$my_age_vector
+
+mean(x)
+
+##################################################
+### Working with inbuilt datasets
+### R has many inbuilt datasets that you ca use to practice. Just type data()
+### To see the list of datasets.
+data()
+data("AirPassengers")
+
+## We shall use the mpg dataset for the exercises that follow. 
+## The mpg dataset has information about characteristics of vehicle models
+## The mpg dataset is in the tidyverse package.
+## We must load the tidyverse to access it.
+
+library(tidyverse)
+
+data(mpg)
+
+## lets explore the dataset 
+head(mpg) ## first six rows
+tail(mpg) ## last six rows
+head(mpg, 10) ## gives you the first 10 rows. 
+
+## Exercise: get the last 12 rows of the mpg dataset. 
+
+## The structure of the data 
+
+str(mpg)
+
+## Summarise the data
+summary(mpg)
+
+
+### Get the mean of the hwy column
+mean(mpg$hwy)
+
+## Execise: Get the mean of the cty column
+
+## Exercise: Get the median of the displ column: Use median function.
+
+
+## Exercise: Get the minimum of the cyl column: use the min function.
+
+## Exercise: Get the standard deviation of the displ column: the sd function. 
+sd(mpg$hwy)
+
+## NOTE: These functions may not woork where we have missing values
+## If your data has missing values, you must add na.rm = TRUE
+mean(mpg$hwy, na.rm = TRUE)
+?mean
+
+## Get the correlation between the hwy and cty columns. Use the cor function. 
+cor(mpg$hwy, mpg$cty)
+
+### PLOTTING
+## Base plotting is easy, just use the plot function and supply the data
+## For instance to plot hwy vs cty in the mpg dataset
+?plot
+plot(mpg$hwy, mpg$cty)
+
+## Exercise: Plot displ against hwy
+plot(mpg$displ, mpg$hwy)
+
+## To make a boxplot, use the boxplot function
+boxplot(factor(mpg$drv), mpg$cty) ## Note we must let R know that the character 
+## column is a factor. 
+
+## To make a histogram, use the histogram function
+hist(mpg$hwy, main = "Histogram of Highway", 
+     
+     xlab = "Highway", ylab = "Counts", col = "violet")
+
+## DO NOT memorise just learn to use the help 
+?plot
+?hist
+?sd
+
+## THE MASTER OF PLOTTING: THE GGPLOT PACKAGE
+## Base plot R is not very appealing.
+## ggplot, part of the tidyverse, is better.
+## The GG in ggplot stands for grammar of graphics. 
+## Developed by Hadley Wickham.
+## The idea is to apply linguistic principles to make graphs.
+## In learning language, you do not cram every sentence. Rather, you learn
+## language structure and words from which you can build many different sentences.
+
+## We use the ggplot function to make graphs.
+## Remember to load the tidyverse metapackage or ggplot package
+## As ggplot is not part of base R. 
+
+## ggplot expects
+## 1. data
+## 2. aesthetics: x and/or y mappings.
+## 3. geoms: what sort of graph you want. 
+
+## Additionally you also add titles, axis labels, etc. 
+## For now lets see how to do a simple plot. 
+## Lets do a scatter plot of hwy vs cty from the mpg dataset.
+
+library(tidyverse) ## so we can access the ggplot function.
+## Note you can load the ggplot package alone
+## library(ggplot) but better load the whole meta-package. 
+ggplot()
+ggplot(mpg, aes(x = hwy, y = cty))
+
+## Here we have supplied the data and the aesthetics (x/y).
+## Note the a and y must be inside the aes()
+
+## However, we have not told R the kind of graph we want. We use + to add geoms
+## A scatter plot is refered to as a point geom (geom_point())
+ggplot(mpg, aes(hwy, cty)) + geom_point()
+
+## Can we then add titles? Yes, we use + to add labels (labs)
+ggplot(mpg, aes(x = hwy, y = cty)) + geom_point() + 
+        
+        labs(x = "Highway", y = "City", title = "City versus Highway")
+
+## Note the way we just add layers as we do in language to make a more
+## Sophisticated plot. 
+
+## An important package that we use to make our graphs even more good looking is 
+## The ggthemes package
+## EXERCISE: Install the package ggthemes. 
+#install.packages("ggthemes")
+## EXERCISE: load the package ggthemes
+library(ggthemes)
+## EXERCISE: Copy and paste the code above down here.
+## use a + sign to add theme_economist()
+
+ggplot(mpg, aes(x = hwy, y = cty)) + geom_point() + 
+        
+        labs(x = "Highway", y = "City", title = "City versus Highway") +
+        
+        theme_economist()
+
+### EXERCISE
+## Plot the drv (x-axis) against hwy(y-axis) and add a box geom (geom_boxplot())
+## Add a title, an x and y label, and a caption with words "Source: Graph by me".
+names(mpg)
+
+ggplot(mpg, aes(x = drv, y = hwy)) + 
+        
+        geom_boxplot() + 
+        
+        labs(x = "Drive", y = "Highway", title = "Drive vs Highway", 
+             
+             caption = "Source: Authors' Construction") + 
+        
+        theme_fivethirtyeight()
+
+## Add ggthemes theme theme_fivethirtyeight()
+## Working with colors: General
+## Maybe you want to color the points red. Just add this to the geom argument
+## Example geom_boxplot(color = "red) or geom_point(color = "red)
+## Note for a point, you can only add color. A boxplot has both color and fill.
+## Color fills the outlines fill does fill the inside. 
+## EXERCISE: copy the code for the scatter plot above and change the color of points to
+## red.
+## EXERCISE: copy the code for the boxplot above and change the color of points to
+## red and fill to blue.
+
+
+## Working with colors: General
+## Maybe you want to know, which car models are represented by which points.
+## In this case you add color inside the aes argument and specify NOT the color but the 
+## Variable you want to color by. 
+
+
+
+### Scatter - make it better
+ggplot(mpg, aes(x = hwy, y = cty, col = manufacturer)) + 
+        
+        geom_point(size = 5, shape = 1, stroke = 4) + 
+        
+        labs(x = "Highway", y = "City", title = "City versus Highway") +
+        
+        theme_economist()
+
+
+### Make the boxplot better
+ggplot(mpg, aes(x = drv, y = hwy, col = factor(cyl), fill = factor(cyl))) + 
+        
+        geom_boxplot() + 
+        
+        labs(x = "Drive", y = "Highway", title = "Drive vs Highway", 
+             
+             caption = "Source: Authors' Construction") + 
+        
+        theme_fivethirtyeight()
+
+### Piping and the dplyr package ----

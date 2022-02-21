@@ -1,0 +1,4 @@
+"0","library(tufte)"
+"0","# invalidate cache when the tufte version changes"
+"0","knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))"
+"0","options(htmltools.dir.version = FALSE)"

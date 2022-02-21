@@ -1,0 +1,13 @@
+"0","## Install pacman"
+"0",""
+"0","if(!require(pacman)){"
+"0","  "
+"0","  install.packages(""pacman"")"
+"0","  "
+"0","}"
+"2","Loading required package: pacman
+"
+"0","## Load required packages- ensure internet connection to load the packages"
+"0","pacman::p_load(tidyverse, tidymodels, skimr, janitor, Amelia, knitr, kableExtra, "
+"0","               "
+"0","               pglm, baguette, rpart.plot)"

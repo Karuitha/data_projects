@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lib/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="lib/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="lib/kePrint-0.0.1/kePrint.js"></script>
+<link href="lib/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+</head>
+<body>
+<table class=" lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>Independent Variables</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> skim_variable </th>
+   <th style="text-align:right;"> numeric.mean </th>
+   <th style="text-align:right;"> numeric.sd </th>
+   <th style="text-align:right;"> numeric.p0 </th>
+   <th style="text-align:right;"> numeric.p25 </th>
+   <th style="text-align:right;"> numeric.p50 </th>
+   <th style="text-align:right;"> numeric.p75 </th>
+   <th style="text-align:right;"> numeric.p100 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> infra_index </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+   <td style="text-align:right;"> 0.9085647 </td>
+   <td style="text-align:right;"> -0.4701808 </td>
+   <td style="text-align:right;"> -0.4064351 </td>
+   <td style="text-align:right;"> -0.3251464 </td>
+   <td style="text-align:right;"> -0.1158849 </td>
+   <td style="text-align:right;"> 4.485926 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> transport_invest </td>
+   <td style="text-align:right;"> 0.9829726 </td>
+   <td style="text-align:right;"> 2.4573516 </td>
+   <td style="text-align:right;"> 0.0000908 </td>
+   <td style="text-align:right;"> 0.0520468 </td>
+   <td style="text-align:right;"> 0.1884312 </td>
+   <td style="text-align:right;"> 0.5139178 </td>
+   <td style="text-align:right;"> 14.905687 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> electricity_invest </td>
+   <td style="text-align:right;"> 5.6575235 </td>
+   <td style="text-align:right;"> 14.3728215 </td>
+   <td style="text-align:right;"> 0.0013178 </td>
+   <td style="text-align:right;"> 0.1495541 </td>
+   <td style="text-align:right;"> 0.6089139 </td>
+   <td style="text-align:right;"> 2.3695731 </td>
+   <td style="text-align:right;"> 88.429515 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ict_invest </td>
+   <td style="text-align:right;"> 2.8558644 </td>
+   <td style="text-align:right;"> 7.2741104 </td>
+   <td style="text-align:right;"> 0.0001807 </td>
+   <td style="text-align:right;"> 0.1146541 </td>
+   <td style="text-align:right;"> 0.6695169 </td>
+   <td style="text-align:right;"> 2.1571728 </td>
+   <td style="text-align:right;"> 70.985354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> water_invest </td>
+   <td style="text-align:right;"> 1.9211378 </td>
+   <td style="text-align:right;"> 3.1850498 </td>
+   <td style="text-align:right;"> 0.0146976 </td>
+   <td style="text-align:right;"> 0.2785261 </td>
+   <td style="text-align:right;"> 0.5765471 </td>
+   <td style="text-align:right;"> 2.0650996 </td>
+   <td style="text-align:right;"> 19.154820 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> stock_mkt_cap </td>
+   <td style="text-align:right;"> 10.2802022 </td>
+   <td style="text-align:right;"> 36.0435167 </td>
+   <td style="text-align:right;"> 0.7241040 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 328.361000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> human_di </td>
+   <td style="text-align:right;"> 0.4838609 </td>
+   <td style="text-align:right;"> 0.1074758 </td>
+   <td style="text-align:right;"> 0.2630000 </td>
+   <td style="text-align:right;"> 0.4120000 </td>
+   <td style="text-align:right;"> 0.4680000 </td>
+   <td style="text-align:right;"> 0.5485000 </td>
+   <td style="text-align:right;"> 0.797000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> exchange_rate </td>
+   <td style="text-align:right;"> 652.2826577 </td>
+   <td style="text-align:right;"> 1260.5619533 </td>
+   <td style="text-align:right;"> 0.8667643 </td>
+   <td style="text-align:right;"> 17.6843045 </td>
+   <td style="text-align:right;"> 370.4251100 </td>
+   <td style="text-align:right;"> 555.4500000 </td>
+   <td style="text-align:right;"> 9088.320000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rinterestrate </td>
+   <td style="text-align:right;"> 6.1573402 </td>
+   <td style="text-align:right;"> 9.0830600 </td>
+   <td style="text-align:right;"> -34.2103090 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 3.8272198 </td>
+   <td style="text-align:right;"> 9.2988998 </td>
+   <td style="text-align:right;"> 52.436821 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> percent_change_in_gfcf_public </td>
+   <td style="text-align:right;"> 0.3170261 </td>
+   <td style="text-align:right;"> 5.5788054 </td>
+   <td style="text-align:right;"> -33.0171620 </td>
+   <td style="text-align:right;"> -1.3669003 </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+   <td style="text-align:right;"> 1.5717645 </td>
+   <td style="text-align:right;"> 48.789712 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> fdi_gdp </td>
+   <td style="text-align:right;"> 4.9825751 </td>
+   <td style="text-align:right;"> 9.3207813 </td>
+   <td style="text-align:right;"> -6.3698773 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 2.5635350 </td>
+   <td style="text-align:right;"> 5.3448228 </td>
+   <td style="text-align:right;"> 103.337390 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> govenance_index </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+   <td style="text-align:right;"> 0.9842590 </td>
+   <td style="text-align:right;"> -1.7782380 </td>
+   <td style="text-align:right;"> -0.7445558 </td>
+   <td style="text-align:right;"> -0.0166953 </td>
+   <td style="text-align:right;"> 0.4886982 </td>
+   <td style="text-align:right;"> 2.688182 </td>
+  </tr>
+</tbody>
+</table> <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [["$","$"]]}})</script><script async src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

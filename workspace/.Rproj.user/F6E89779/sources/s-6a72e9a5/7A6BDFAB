@@ -1,0 +1,26 @@
+{
+    "id": "7A6BDFAB",
+    "path": "~/workspace/code/my_loan_script.R",
+    "project_path": "code/my_loan_script.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1629839530347.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "13,10",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1629840234,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1629840234783,
+    "read_only": false,
+    "read_only_alternatives": []
+}

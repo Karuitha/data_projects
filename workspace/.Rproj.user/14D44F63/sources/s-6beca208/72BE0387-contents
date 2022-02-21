@@ -1,0 +1,19 @@
+## @skimr load_packages
+## Analysing loans data
+## Load all the required packages
+library(skimr)
+library(tidyverse)
+library(GGally)
+
+## @skimr load_data
+loans <- readr::read_csv('data/loans.csv.gz')
+
+## @skimr loan_data_structure
+str(loans)
+
+## @skimr ggally_visual
+loans %>% 
+  skim_without_charts() %>% 
+  select(-(numeric.p0:numeric.p100)) %>%
+  select(-(complete_rate))
+

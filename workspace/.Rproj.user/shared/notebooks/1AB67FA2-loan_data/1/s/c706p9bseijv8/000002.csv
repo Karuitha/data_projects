@@ -1,0 +1,7 @@
+"0","loans %>% "
+"0","  "
+"0","  filter(fico > 700 & revol_util > 30) %>% "
+"0","  "
+"0","  ggplot(mapping = aes(x = inq_last_6mths)) + "
+"0","  "
+"0","  geom_histogram(bins = 30, col = ""black"", fill = ""skyblue"")"

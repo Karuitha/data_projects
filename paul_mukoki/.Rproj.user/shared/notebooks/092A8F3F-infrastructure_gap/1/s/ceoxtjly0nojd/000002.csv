@@ -1,0 +1,5 @@
+"0","mukoki_gap_data <- readxl::read_xlsx(""dataset_40_countries.xlsx"") %>% "
+"0","  "
+"0","  janitor::clean_names() %>% "
+"0","  "
+"0","  data.frame()"

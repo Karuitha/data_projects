@@ -1,0 +1,7 @@
+"0","infra_index_wide <- modelling_data %>% "
+"0","  "
+"0","  select(countries, year, infra_index) %>% "
+"0","  "
+"0","  pivot_wider(names_from = ""countries"", values_from = ""infra_index"") %>% "
+"0","  "
+"0","  as.matrix()"

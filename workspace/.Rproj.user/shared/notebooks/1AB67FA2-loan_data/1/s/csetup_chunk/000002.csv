@@ -1,0 +1,37 @@
+"0","knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)"
+"0",""
+"0","library(skimr)"
+"0","library(tidyverse)"
+"0","library(knitr)"
+"0","library(GGally)"
+"0","library(ggthemes)"
+"0","library(tibble)"
+"0","library(magrittr)"
+"0","library(gghalves)"
+"0","library(patchwork)"
+"0",""
+"0","options(digits = 4)"
+"0","options(scipen = 999)"
+"0","theme_set(theme_clean())"
+"0",""
+"0","## loaddata"
+"0","loans <- readr::read_csv('data/loans.csv.gz') %>% "
+"0","  "
+"0","  mutate(purpose = factor(purpose),"
+"0","         "
+"0","         not_fully_paid = factor(not_fully_paid, levels = c(0 , 1),"
+"0","                                 "
+"0","                                 labels = c(""Fully Paid"", ""Not Fully paid"")),"
+"0","         "
+"0","         credit_policy = factor(credit_policy))"
+"1","[1m[1mRows: [1m[22m[34m[34m9578[34m[39m [1m[1mColumns: [1m[22m[34m[34m14[34m[39m
+"
+"1","[36m──[39m [1m[1mColumn specification[1m[22m [36m──────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (1): purpose
+[32mdbl[39m (13): credit_policy, int_rate, installment, log_annual_inc, dti, fico,...
+"
+"1","
+[36mℹ[39m Use [38;5;251m[48;5;235m[38;5;251m[48;5;235m`spec()`[48;5;235m[38;5;251m[49m[39m to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set [38;5;251m[48;5;235m[38;5;251m[48;5;235m`show_col_types = FALSE`[48;5;235m[38;5;251m[49m[39m to quiet this message.
+"

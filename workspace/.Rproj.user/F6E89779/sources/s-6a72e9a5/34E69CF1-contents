@@ -1,0 +1,54 @@
+---
+title: "Analyzing Loan Data"
+author: "John Karuitha"
+date: "24/08/2021"
+output:
+  pdf_document: default
+  html_document: default
+subtitle: ''
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(skimr)
+library(tidyverse)
+library(knitr)
+```
+
+```{r, child = "text/Background.Rmd"}
+
+```
+
+```{r, child = "text/Objectives.Rmd"}
+
+```
+
+```{r, child = "text/Data.Rmd"}
+
+```
+
+# Exploratory Data Analysis
+In this section, I load the data and do exploratory data analysis, starting first with data visualisation followed by summary statistics aimed at uncovering the insights stated in the objectives section above. 
+
+```{r}
+knitr::read_chunk("code/my_loan_script.R")
+```
+
+```{r load_data}
+
+```
+
+
+```{r loan_data_structure}
+
+```
+
+## Data Visualization
+
+## Summarising the Data
+
+### Basic Modelling
+
+```{r, child = "text/Conclusion.Rmd"}
+
+```

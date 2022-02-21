@@ -1,0 +1,26 @@
+{
+    "id": "860972A5",
+    "path": "~/Desktop/projects/data_projects/web_scrapping_US_prison_pop/us_prisons_pop.R",
+    "project_path": "us_prisons_pop.R",
+    "type": "r_source",
+    "hash": "97226369",
+    "contents": "",
+    "dirty": false,
+    "created": 1628819586537.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "99,0",
+        "scrollLine": "78"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1628845415,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1628845415781,
+    "read_only": false,
+    "read_only_alternatives": []
+}

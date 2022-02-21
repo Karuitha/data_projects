@@ -1,0 +1,4 @@
+"0","BodyFat4 <- read_excel(""BodyFat4.xlsx"")"
+"0","BodyFat4 <- BodyFat4 %>% "
+"0","  "
+"0","  janitor::clean_names() "
