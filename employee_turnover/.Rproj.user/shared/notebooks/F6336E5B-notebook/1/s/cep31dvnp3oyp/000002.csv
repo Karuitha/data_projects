@@ -1,0 +1,5 @@
+"0","logistic_model <- logistic_reg() %>%"
+"0","  "
+"0","  set_engine(""glm"") %>%"
+"0","  "
+"0","  set_mode(""classification"")"
