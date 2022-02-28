@@ -51,6 +51,7 @@ I examine the following questions in this article.
 **Summary of Results**
 
 1. The United States has the most male athletes who have posted best times in the 100 meters sprint. Jamaica comes a distant second.
+2. Usain BOLT has ran the fastest 3 times in the 100 meters sprint. 
 2. Michael Rodgers from the United States has run the highest number of races while posting some of the best times.
 3. The peak performance age for male 100 meters sprinters is in the mid-20s.
 3. There appears to be a non-linear relationship between the number of races and times posted.
