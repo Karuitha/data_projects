@@ -1,0 +1,13 @@
+name: shiny_compare_africa
+title: shiny_compare_africa
+username:
+account: karuitha
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5806724
+bundleId: 5657272
+url: https://karuitha.shinyapps.io/shiny_compare_africa/
+when: 1646758390.12707
+lastSyncTime: 1646758390.12709
+asMultiple: FALSE
+asStatic: FALSE
