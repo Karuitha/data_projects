@@ -65,6 +65,7 @@ sapply(df, is.na) %>%
   
   arrange(desc(missing))
 ```
+
 ```{r}
 df %>%
   
@@ -148,7 +149,9 @@ df %>%
   
   kbl(., booktabs = TRUE, 
       
-      caption = "Summary Statistics for categorical Variables") %>% kable_classic(full_width = TRUE)
+      caption = "Summary Statistics for categorical Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
 ```
 
 
@@ -186,7 +189,7 @@ df %>%
 
 ## Which Variables Best Predict Staff Turnover?
 
-In this section I use statistical learning models to examine variables that best ptredict staff turnover. I proceed by first creating a training set and a testing set from the given data. Given that the data set has a problem of imbalance in the target (dependent) variable, `left`, I upsample the data. I then run the following models. 
+In this section I use statistical learning models to examine variables that best predict staff turnover. I proceed by first creating a training set and a testing set from the given data. Given that the data set has a problem of imbalance in the target (dependent) variable, `left`, I upsample the data. I then run the following models. 
 
 1. Logistic regression model. 
 2. Decision tree model.

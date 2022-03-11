@@ -1,7 +1,0 @@
-"0","sapply(df, is.na) %>%"
-"0","  "
-"0","  colSums() %>%"
-"0","  "
-"0","  tibble(variables = names(df), missing = .) %>%"
-"0","  "
-"0","  arrange(desc(missing))"
