@@ -91,14 +91,25 @@ final_marathon_data <- final_marathon_data %>%
                
                venue = str_remove_all(venue, "\\(.*\\)"),
                
-               date_of_race = year(date))
+               date_of_race = year(date)) %>% 
+        
+        mutate(nat_country_name = countrycode(nat,
+                                                
+                                                origin = "ioc",
+                                                
+                                                destination = "country.name")) %>% 
+        
+        relocate(nat_country_name, .after = nat) %>% 
+        
+        mutate(mark = hms(mark)) %>% 
+        
+        mutate(time_posted_seconds = hour(mark) * 3600 + 
+                       
+                       minute(mark) * 60 + second(mark))
         
 
 
 ## Explore the data
-head(final_marathon_data) 
-
-
 ## How many nationalities have won
 final_marathon_data %>% 
         
@@ -110,7 +121,9 @@ final_marathon_data %>%
 ## Venues countries where most marathons held
 final_marathon_data %>% 
         
-        count(venue_country_name, sort = TRUE, name = "count") %>% 
+        count(venue_country_name, sort = TRUE, 
+              
+              name = "count") %>% 
         
         mutate(prop = count / sum(count) * 100)
 
@@ -121,7 +134,73 @@ final_marathon_data %>%
         
         mutate(prop = count / sum(count) * 100)
 
-## DATA VISUALIZATION
+## Age distributions ----
+## Which age group is represented the most in the data 
+final_marathon_data$age_group <- cut(final_marathon_data$age_at_race, 
+                                     
+                                     breaks = 6)
+
 final_marathon_data %>% 
         
-        mutate()
+        na.omit() %>% 
+        
+        ggplot(mapping = aes(x = age_group, 
+                             
+                             y = time_posted_seconds)) + 
+        
+        geom_col()
+
+
+## DATA VISUALIZATION ----
+## Winners by country
+final_marathon_data %>% 
+        
+        count(nat_country_name, sort = TRUE, 
+              
+              name = "count") %>% 
+        
+        filter(!is.na(nat_country_name)) %>% 
+        
+        slice(1:10) %>% 
+        
+        ggplot(mapping = aes(x = fct_reorder(nat_country_name, count, max), 
+                             
+                             y = count)) + 
+        
+        geom_col() + 
+        
+        labs(x = "Country", y = "", title = "Marathon Winners by Country") + 
+        
+        theme(plot.title = element_text(face = "bold", 
+                                        
+                                        size = 20))
+
+
+## Age distribution 
+final_marathon_data %>% 
+        
+        ggplot(mapping = aes(x = age_at_race)) +
+        
+        geom_histogram(col = "black", binwidth = 1)
+
+
+## Times posted distribution 
+final_marathon_data %>% 
+        
+        ggplot(mapping = aes(x = time_posted_seconds)) + 
+        
+        geom_density(fill = "skyblue")
+
+## Times posted versus age
+final_marathon_data %>% 
+        
+        ggplot(mapping = aes(x = age_at_race, 
+                             
+                             y = time_posted_seconds)) + 
+        
+        geom_hex(show.legend = FALSE) + 
+        
+        geom_density2d()
+
+## 
+

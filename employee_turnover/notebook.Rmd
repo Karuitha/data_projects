@@ -41,7 +41,6 @@ library(glue)
 df <- readr::read_csv('./data/employee_churn_data.csv') %>%
   
   mutate(left = factor(left, levels = c("yes", "no")))
-head(df)
 ```
 
 
@@ -200,13 +199,17 @@ In this section I use statistical learning models to examine variables that best
 
 ### Creating the Training and Testing Sets. 
 
-In this step, I create a traing and testing set. The training set has 75% of the data, while the testing set has the remaning 25% of the data points. 
+In this step, I create a training and testing set. The training set has 75% of the data, while the testing set has the remaining 25% of the data points. 
 
 ```{r}
+## Max Kuhn is leading the tidymodels project
 library(tidymodels)
 
+set.seed(100, sample.kind = "Rounding")
 ## Create a split object consisting 75% of data
-split_object <- initial_split(df, prop = 0.75, strata = left)
+split_object <- initial_split(df, prop = 0.75, 
+                              
+                              strata = left)
 
 ## Generate the training set
 df_train <- split_object %>%
@@ -233,10 +236,16 @@ Next, I set up a recipe object that will allow for data pre-processing and featu
 ```{r}
 library(themis)
 
-df_recipe <- recipes::recipe(left ~ ., data = df_train) %>%
+df_recipe <- recipes::recipe(left ~ ., 
+                             
+                             data = df_train) %>%
   
   ## I upsample the data to balance the outcome variable
-  themis::step_upsample(left, over_ratio = 1, seed = 500) %>%
+  themis::step_upsample(left, 
+                        
+                        over_ratio = 1, 
+                        
+                        seed = 500) %>%
   
   ## I make all character variables factors
   step_string2factor(all_nominal_predictors()) %>%
@@ -244,10 +253,15 @@ df_recipe <- recipes::recipe(left ~ ., data = df_train) %>%
   ## I remove one in a pair of highly correlated variables
   ## The threshold for removal is 0.85 (absolute) 
   ## The choice of threshold is subjective. 
-  step_corr(all_numeric_predictors(), threshold = 0.85) %>%
+  step_corr(all_numeric_predictors(), 
+            
+            threshold = 0.85) %>%
   
   ## Train these steps on the training data
   prep(training = df_train)
+
+## multicollinearity 
+## Unstable coefficients. The model is not stable. 
 ```
 
 Finally, I apply these transformations to the training and testing data sets.
