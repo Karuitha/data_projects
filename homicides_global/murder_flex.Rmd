@@ -97,7 +97,7 @@ joint_world_murder_data <- map_data("world") %>%
 
 ###############################
 
-ggplotly(murders_map_plot <- joint_world_murder_data %>% 
+(murders_map_plot <- joint_world_murder_data %>% 
   
   filter(years == 2018) %>% 
   
