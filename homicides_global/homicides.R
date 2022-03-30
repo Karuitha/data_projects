@@ -207,7 +207,7 @@ ggplotly(murders_map_plot <- joint_world_murder_data %>%
   
   geom_polygon(show.legend = TRUE, color = "black") + 
   
-  scale_fill_gradient(low = "skyblue", high = "red") + 
+  scale_fill_gradient(low = "white", high = "red") + 
     
     labs(x = NULL, y = NULL, title = "Country Rankings by Intentional Homicides, 2018",
          

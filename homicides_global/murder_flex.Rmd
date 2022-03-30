@@ -13,7 +13,7 @@ library(flexdashboard)
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Chart A
+### Heat Map of Murder Rates
 
 ```{r}
 ## Load required packages ----
@@ -107,7 +107,7 @@ joint_world_murder_data <- map_data("world") %>%
   
   geom_polygon(show.legend = FALSE, color = "black") + 
   
-  scale_fill_gradient(low = "skyblue", high = "red") + 
+  scale_fill_gradient(low = "white", high = "red") + 
     
     labs(x = NULL, y = NULL, title = "Country Rankings: Homicides, 2018",
          
@@ -131,7 +131,7 @@ joint_world_murder_data <- map_data("world") %>%
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-### Chart B
+### Top 20 Countries in Homicides
 
 ```{r}
 ## Countries with highest homicide rates in 2018
@@ -156,7 +156,9 @@ Column {data-width=350}
   
   group_by(country_name) %>% 
   
-  mutate(murder_rate = replace_na(murder_rate, median(murder_rate, na.rm = TRUE))) %>% 
+  mutate(murder_rate = replace_na(murder_rate, 
+                                  
+                                  median(murder_rate, na.rm = TRUE))) %>% 
            
            ungroup() %>% 
   
@@ -191,7 +193,7 @@ Column {data-width=350}
 
 ```
 
-### Chart C
+### 20 Countries with the Lowest Murder Rates
 
 ```{r}
 ## Countries with lowest homicide rates in 2018
