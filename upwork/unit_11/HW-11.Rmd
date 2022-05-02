@@ -1,0 +1,203 @@
+---
+title: "HW week 11"
+author: "Kamaljeet Ghotra"
+subtitle: 'w203: Statistics for Data Science'
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output:
+  pdf_document:
+        toc: true
+        toc_depth: 3
+  html_document: default
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+## NB: This step requires internet connection
+## Load package manager. Download and install 
+## the package manager if it is not already installed.
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+        
+}
+
+
+## Load required packages ----
+pacman::p_load(tidyverse, skimr, ggthemes, GGally, 
+               
+               kableExtra, corrplot, Metrics, broom)
+
+```
+
+## Regression analysis of YouTube dataset
+
+In this project, I use regression analysis to explain how much the quality of a video affects the number of views it receives on social media. Note that this is  **This is a causal question.**
+
+I use a dataset created by Cheng, Dale and Liu at Simon Fraser University. It includes observations of about 9618 videos shared on YouTube. Please see [this link](http://netsg.cs.sfu.ca/youtubedata/) for details about how the data was collected.
+
+The data set contains the following variables:
+
+- views: the number of views by YouTube users.
+
+- rate: the average rating given by users.
+
+- length: the duration of the video in seconds.
+
+I start by reading the data into R and exploring its structure. 
+
+
+```{r}
+movies_data <- read_tsv("videos.txt")
+
+glimpse(movies_data)
+        
+head(movies_data) %>% 
+        
+        kbl(., booktabs = TRUE, 
+            
+            caption = "First 6 Rows of the Data") %>% 
+        
+        kable_classic(full_width = FALSE, latex_options = "hold_position", font_size = 8)
+```
+
+I check the data for missing values and duplicates. The variables `uploader`, `age`, `category`, `length`, `views`, `rate`, and `ratings` and `comments` have 9 missing values each. These missing values are not a significant number for a dataset with `r nrow(movies_data)`. 
+
+```{r}
+sapply(movies_data, is.na) %>% 
+        
+        colSums() %>% 
+        
+        tibble(variables = names(movies_data), missing = .) %>% 
+        
+        arrange(desc(missing)) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Missing Data") %>% 
+        
+        kable_classic(full_width = FALSE, latex_options = "hold_position", font_size = 8)
+```
+
+The data set has no duplicated observations. 
+
+```{r}
+movies_data %>% 
+        
+        filter(duplicated(.)) 
+```
+
+Next, I visualize the data in a pairs plot (Figure 1). 
+
+\blandscape
+
+```{r, fig.cap = "Pairs Plots of Variables", fig.width = 12, fig.height = 8, echo = FALSE}
+
+movies_data %>% 
+        
+        select(-video_id, -uploader) %>% 
+        
+        ggpairs(cardinality_threshold = 16) + 
+        
+        theme_fivethirtyeight() 
+```
+
+\elandscape
+
+What is notable is the high degree of skewness among the numeric variables and the substantial variations in correlation among the variables. 
+
+Figure 2 focuses on the correlation among the numeric variables in the data set. There is a high correlation between `ratings` and views of `0.72`. Other variables with significant correlation with views include `comments` (0.227), `age` (-0.221), and `rate` (0.104).  
+
+```{r, fig.cap = "Correlation Matrix: YouTube Videos Data", out.width = "100%"}
+movies_data %>% 
+        
+        select(where(is.numeric)) %>% 
+        
+        na.omit() %>% 
+        
+        cor() %>% 
+        
+        corrplot(type = "lower", diag = FALSE,
+                 
+                 title = NULL)
+```
+
+
+\newpage
+
+In the next section, I delve into the project questions. 
+
+## The Model and Project Questions
+
+I use the `rate` variable as a proxy for video quality while also include `length` as a control variable.  I estimate the following OLS regression:
+
+$$\text{views} =   789 +  2103    \text{ rate} +      3.00 \text{ length} $$
+
+
+### Question 1
+a. Name an omitted variable that you think could induce significant omitted variable bias. Argue whether the direction of bias is towards zero or away from zero.
+
+The variable `ratings` could significantly affect the regression model, yet it is absent from the model. First, there is a high and significant correlation between ratings and views (0.71), as Figure 1 and Figure 2 show. To see why this is the case, I also visualise video ratings against views in Figure 3 below. Hence, Ratings could have significant explanatory power over the number of views for a YouTube video.
+
+Omitted variables are one of the causes of `endogeneity` where the error term correlates highly with one or more independent or explanatory variables, violating the OLS assumptions. `Endogeneity` leads to inconsistent estimates and hence raises the absolute value of bias. Hence, the bias is likely to be away from zero as the model may have a weak predictive capability, especially when applied to a new dataset.
+
+\newpage
+
+```{r, fig.cap = "Video Ratings versus Views", fig.width = 12, fig.height = 8}
+
+movies_data %>% 
+        
+        ## Add a small number to eliminate zero ratings
+        mutate(ratings = ratings + 0.1) %>% 
+        
+        ggplot(mapping = aes(x = ratings, 
+                             
+                             y = views, 
+                             
+                             col = views)) + 
+        
+        geom_point(alpha = 0.5) + 
+        
+        ## Log both the X and Y scales
+        coord_trans(x = "log10", y = "log10") + 
+        
+        scale_color_gradient(low = "blue", high = "red") + 
+        
+        labs(x = "Ratings- Log Scale", y = "Views- Log Scale", 
+             
+             title = "Views versus Ratings of YouTube Videos") + 
+        
+        theme(legend.position = "bottom") + 
+        
+        scale_y_continuous(labels = scales::comma_format()) + 
+        
+        theme(axis.text.x = element_text(angle = 90))
+```
+
+
+\newpage
+
+### Question 2
+
+b. Provide a story for why there might be a reverse causal pathway (from the number of views to the average rating). Argue whether the direction of bias is towards zero or away from zero.
+
+Reverse causality refers to either a direction of causality that goes against common assumptions or a two-way loop-like causality [@guan2021does]. Even a substantial correlation between variables does not imply causation - that one variable causes the other. Nonetheless, in the case of our model, the average rating (`rate`), being one of the independent variables, should explain the number of video `views`. 
+
+However, the number of `views` that a video receives could also drive the average rating. Many recommendation engines will suggest to viewers videos of a particular genre that have received the highest number of views, a proxy for video popularity. There is a high likelihood that the YouTube recommendation engine will suggest to viewers videos that these viewers will like, further driving up or sustaining high average ratings. It is essential to have a basic understanding of how recommendation engines for social media sites such as `YouTube` work to grasp this issue properly.
+
+> A recommendation system suggests a good or service to a customer based on their previous revealed preferences. Recommendation systems come in three versions: `Collaborative filtering recommendation systems` make recommendations to users based on the activities of other similar users. `Content filtering recommendation Systems` suggest content based on the contents/characteristics of previous goods or services purchased. `Hybrid Systems` use both `collaborative filtering` and `content filtering` to make suggestions [@cui2020personalized].
+
+Thus, videos with many views are likely to be recommended to viewers who like such videos, which in turn sustains the high average ratings. A more viable possibility is the existence of simultaneity where high average ratings drive up views, and more views drive up average ratings. 
+
+I would argue that the bias is away from zero, noting that the actual and predicted values are close for a model with no bias. However, reverse causality causes models to be inaccurate due to endogeneity. Under endogeneity, the error terms for the model correlated with one or more independent variables, which in turn affects the model's predictive power. One primary cause of endogeneity is reverse causality/ simultaneity which leads to inconsistent estimates of model parameters [@stone2011social]. 
+
+### Question 3
+
+c. You are considering adding a new variable, `ratings`, which represents the total number of ratings.  Explain how this would affect your measurement goal.
+
+The model measurement goal would change, given that we are adding a new variable to the model. The new variable would contribute to predicting the number of views. In this case, the coefficients of the `ratings` variable would be interpreted as follows. Holding `rate` and `length` of videos constant, how much does a unit change in the number of ratings affect the number of views a video receives? Notably, adding the variable `ratings` could help improve the model. As shown in Figure 2, `ratings` have the highest correlation with views. However, as in the previous exercise, simultaneity and reverse causality are likely to lead to inconsistent model parameters that affect causal inference. 
+
+## References

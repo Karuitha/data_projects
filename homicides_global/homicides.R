@@ -218,4 +218,26 @@ ggplotly(murders_map_plot <- joint_world_murder_data %>%
     
     theme_fivethirtyeight())
 
-## Make the mapping ----
+## Make the mapping for Africa only ----
+
+ggplotly(murders_map_plot <- joint_world_murder_data %>% 
+           
+           filter(years == 2018 & continent == "Africa") %>% 
+           
+           ggplot(mapping = aes(x = long, y = lat, group = group, 
+                                
+                                fill = murder_rate)) + 
+           
+           geom_polygon(show.legend = TRUE, color = "black") + 
+           
+           scale_fill_gradient(low = "white", high = "red") + 
+           
+           labs(x = NULL, y = NULL, title = "Country Rankings by Intentional Homicides in Africa, 2018",
+                
+                subtitle = "Homicide Captured by Murders per 100,000 People",
+                
+                caption = "John Karuitha, 2022 Using Data from The World Bank.
+         Technology: R, Tidyverse, countrycode, janitor, & ggthemes") + 
+           
+           theme_fivethirtyeight())
+
