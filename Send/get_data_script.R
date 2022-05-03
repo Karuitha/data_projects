@@ -1,11 +1,13 @@
+## @knitr important_info
 ##################################################
 ## IMPORTANT
 ## Challenges that make code to break
-# Inconsistent formats xls, xlsx(see year 2017)
-# Some broken excel files in the data folder.
+# Inconsistent formats xls, xlsx(see year 2017). Convert to xlsx
+# Some broken excel files in the data folder. Delete them
 # Inconsistent file naming. eg march.xlsx, march2021.xlsx (see year 2021 relative to other years)
-# Data stacked up in one column that we sorted yesterday.
+# Data stacked up in one column.
 
+## @knitr load_packages
 ## Load required packages ----
 if(!require(pacman)){
         
@@ -13,8 +15,11 @@ if(!require(pacman)){
 }
 
 
-pacman::p_load(tidyverse, readxl, data.table)
+pacman::p_load(tidyverse, readxl, data.table, doParallel,
+               
+               tufte, tint, stevetemplates, rticles, GGally)
 
+## @knitr read_allfiles
 ## List files recursively, that is, including files in sub-folders
 my_files <- list.files(path = "Data", 
                        
@@ -22,13 +27,17 @@ my_files <- list.files(path = "Data",
                        
                        recursive = TRUE, 
                        
-                       full.names = TRUE)
+                      full.names = TRUE)
+
+## @knitr list_files
 ## Print all files
 my_files
 
+## @knitr parallel_computing
 ## Allow for parallel computing ----
 doParallel::registerDoParallel()
 
+## @knitr variables_each_sheet
 ## Uncomment this code to see number of variables in each sheet
 ## Check the number of variables in each excel workbook 
 # my_vars <- map_dfr(my_files, function(x){
@@ -49,6 +58,7 @@ doParallel::registerDoParallel()
 # })
 
 
+## @knitr function_data
 ## Write function to read in the data ----
 ## The function takes in file name (x) and country as inputs
 
@@ -79,7 +89,7 @@ get_data <- function(x, country){
                 ## Convert values to numeric
                 mutate(values = parse_number(values)) %>% 
                 
-                ## Extract month anf year from file names
+                ## Extract month and year from file names
                 mutate(year = str_extract(date, '[0-9]{4}'),
                        
                        month = str_extract(date, '[a-zA-Z]*\\.xlsx$'),
@@ -94,6 +104,9 @@ get_data <- function(x, country){
                 
                 relocate(month, year) %>% 
                 
+                ## Extract clouds(digit 1), wind direction(digit 2 & 3)
+                ## And wind speed (digit 4 and 5)
+                ## retain the original variable
                 extract(values, into = c("clouds", "wind_direction", 
                                          
                                          "speed"), 
@@ -102,8 +115,8 @@ get_data <- function(x, country){
                         
                         remove = FALSE) %>% 
                 
-                ## Extract values for cloud, wind direction and speed
-                mutate(##Convert the extracted variables to numerics
+                ## Convert the extracted variables to numerics
+                mutate(
                        clouds = parse_number(clouds),
                        
                        speed = parse_number(speed),
@@ -120,13 +133,19 @@ get_data <- function(x, country){
 }
 
 
-## Loop the function above over all files in the datqset
+## @knitr loop_over_data
+## Loop the function above over all files in the dataset
 final_joe_data <- map_dfr(my_files, get_data, country = "Zambia")
 
-## I am wrtiting the excel file to avoid running the
+## @knitr head_final_data
+head(final_joe_data)
+
+## @knitr Write_excel
+## I am writing the excel file to avoid running the
 ## files reading process as it takes a lot of time
 fwrite(final_joe_data, "final_joe_data.csv")
 
+## @knitr averages_data
 ## Finally I average the wind speed data by year, month 
 ## Them make it wide 
 ## I read in the data
@@ -171,10 +190,17 @@ final_joe_wide_data <- fread("final_joe_data.csv") %>%
         ## Arrange data by year
         arrange(year)
 
+
+## @knitr averages_data_wide
+
+head(final_joe_wide_data)
+
+## @knitr wide_data
 ## Write wide data in a csv file containg wind speed only
 fwrite(final_joe_wide_data, "final_joe_wide_data.csv")
 
 
+## @knitr long_data
 ## I repeat the same exercise to get long data ----
 final_joe_long_data <- fread("final_joe_data.csv") %>% 
         
@@ -210,9 +236,17 @@ final_joe_long_data <- fread("final_joe_data.csv") %>%
         )
 
 
+## @knitr final_joe_long_data
+head(final_joe_long_data)
 
+## @knitr final_data
 fwrite(final_joe_long_data, "final_joe_long_data.csv")
 
 # get_data("Data/2019/Sep/Sept.xlsx", country = "Zambia")
         
+## @knitr summary_graphs
+final_joe_data %>% 
         
+        select(where(is.numeric), -year, -values, -speed) %>% 
+        
+        GGally::ggpairs()
