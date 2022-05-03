@@ -1,6 +1,6 @@
 ---
 output: stevetemplates::html_article
-title: "Extracting Data from 200 Nested Excel Files Using R"
+title: "Extracting Data from 200 Nested Excel Files Using the R Programming Language"
 thanks: "Replication files are available on the author's Github account (http://github.com/Karuitha). **Current version**: `r format(Sys.time(), '%B %d, %Y')`; **Corresponding author**: jkaruitha@karu.ac.ke."
 author:
 - name: "**John Karuitha**"
@@ -13,9 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Background
 
-In this project, I demonstrate how to extract data from multiple excel files nested in different folders and sub-folders. Ordinarily, this data would require a person to open each folder and sub-folder. Next, open each Ms Excel file inside the folder or sub-folder, and then copy-paste the content of each of the Excel files to a master Excel file. 
+In this project, I demonstrate how to extract data from multiple excel files nested in different folders and sub-folders. Ordinarily, this data would require a person to open each folder and sub-folder. Next, open each Ms Excel file inside the folders or sub-folders, and then copy-paste the content of each of the Excel files to a master Excel file. 
 
-Even for a very efficient Ms Excel user, cutting and pasting data from 200 Ms Excel files to create one data set is a tall order. Fortunately, `R` programming language makes such tasks easy and fast. 
+Copy-pasting is viable when dealing with a few data files. However, even for a very efficient Ms Excel user, cutting and pasting data from 200 Ms Excel files to create one data set is a tall order. Fortunately, the `R` programming language makes such tasks easy and fast. 
 
 ```{r, echo = FALSE}
 knitr::read_chunk("get_data_script.R")
@@ -172,5 +172,5 @@ I summarise the cloud, wind_direction and wind_speed in Zambia.
 
 In this analysis, I have demonstrated how to read multiple Ms Excel files from a folder and techniques for cleaning such data. 
 
-Replication files are available on my Github account (http://github.com/Karuitha). **Corresponding author**jkaruitha@karu.ac.ke.
+Replication files are available on my Github account (https://github.com/Karuitha/data_projects/tree/master/Send). **Corresponding author**jkaruitha@karu.ac.ke.
 

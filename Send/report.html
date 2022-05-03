@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta name="generator" content="pandoc" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta property="og:title" content="Extracting Data from About 200 Nested Excel Files Using R" />
+<meta property="og:title" content="Extracting Data from 200 Nested Excel Files Using the R Programming Language" />
 <meta property="og:type" content="book" />
 
 
@@ -15,9 +15,9 @@
 
 
 
-<meta name="description" content="Extracting Data from About 200 Nested Excel Files Using R">
+<meta name="description" content="Extracting Data from 200 Nested Excel Files Using the R Programming Language">
 
-<title>Extracting Data from About 200 Nested Excel Files Using R</title>
+<title>Extracting Data from 200 Nested Excel Files Using the R Programming Language</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -378,28 +378,28 @@ div.level2 h2 {
 
 
 table {
-	margin: 0 auto 30px auto;
-	font-family: "PT Serif", "Palatino", "Palatino Linotype", serif;
+    margin: 0 auto 30px auto;
+    font-family: "PT Serif", "Palatino", "Palatino Linotype", serif;
 }
 
 table th, table td {
-	padding-left: 10px;
+    padding-left: 10px;
   padding-right: 10px;
-	padding-top: 5px;
-	padding-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 table caption {
-	font-family: "PT Serif", "Palatino", "Palatino Linotype", serif;
-	font-weight: bold;
+    font-family: "PT Serif", "Palatino", "Palatino Linotype", serif;
+    font-weight: bold;
 
 }
 
 table thead tr th {
-	font-weight: normal;
-	/* font-style: italic; */
-	border-top: 1px solid #000000;
-	border-bottom: 1px solid #000000;
+    font-weight: normal;
+    /* font-style: italic; */
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
 }
 
 table tbody tr:last-child td {
@@ -418,7 +418,7 @@ table td {
 
 .table table caption {
   font-family: "PT Serif", "Palatino", "Palatino Linotype", serif;
-	font-weight: bold;
+    font-weight: bold;
 }
 
 
@@ -432,8 +432,8 @@ table td {
 
 <!--bookdown:title:start-->
 <div id="header">
-<h1 class="title">Extracting Data from About 200 Nested Excel Files
-Using R</h1>
+<h1 class="title">Extracting Data from 200 Nested Excel Files Using the
+R Programming Language</h1>
 <h4 class="author"><strong>John Karuitha</strong></h4>
 <address class="author_afil">
 <strong><em>Karatina University, Kenya</em></strong><br></div>
@@ -446,14 +446,16 @@ Using R</h1>
 <div id="background" class="section level1">
 <h1>Background</h1>
 <p>In this project, I demonstrate how to extract data from multiple
-excel files nested in different folders. Ordinarily, this data would
-require a person to open each folder and subfolder. Next, open each Ms
-Excel file inside the folder or sub-folder, and then copy-paste the
-content of each of the Excel files to a master Excel file.</p>
-<p>Even for a very efficient Ms Excel user, cutting and pasting data
-from 200 Ms Excel files to create one data set is a tall order.
-Fortunately, <code>R</code> programming language makes such tasks easy
-and fast.</p>
+excel files nested in different folders and sub-folders. Ordinarily,
+this data would require a person to open each folder and sub-folder.
+Next, open each Ms Excel file inside the folders or sub-folders, and
+then copy-paste the content of each of the Excel files to a master Excel
+file.</p>
+<p>Copy-pasting is viable when dealing with a few data files. However,
+even for a very efficient Ms Excel user, cutting and pasting data from
+200 Ms Excel files to create one data set is a tall order. Fortunately,
+the <code>R</code> programming language makes such tasks easy and
+fast.</p>
 <p>I start by loading the required packages. Note that this step
 requires an internet connection.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load required packages ----</span></span>
@@ -909,7 +911,8 @@ the columns represent months, while the rows are the years.</p>
 <h2>Conclusion</h2>
 <p>In this analysis, I have demonstrated how to read multiple Ms Excel
 files from a folder and techniques for cleaning such data.</p>
-<p>Replication files are available on my Github account (<a href="http://github.com/Karuitha" class="uri">http://github.com/Karuitha</a>). **Corresponding <a href="mailto:author**jkaruitha@karu.ac.ke" class="email">author**jkaruitha@karu.ac.ke</a>.</p>
+<p>Replication files are available on my Github account (<a href="https://github.com/Karuitha/data_projects/tree/master/Send" class="uri">https://github.com/Karuitha/data_projects/tree/master/Send</a>).
+**Corresponding <a href="mailto:author**jkaruitha@karu.ac.ke" class="email">author**jkaruitha@karu.ac.ke</a>.</p>
 </div>
 </div>
 <!--bookdown:body:end-->
