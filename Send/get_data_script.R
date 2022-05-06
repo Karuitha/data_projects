@@ -37,6 +37,9 @@ my_files
 ## Allow for parallel computing ----
 doParallel::registerDoParallel()
 
+## @knitr sample_dataset
+head(readxl::read_xlsx("Data/2006/Aug/Aug.xlsx", col_names = FALSE), 10)
+
 ## @knitr variables_each_sheet
 ## Uncomment this code to see number of variables in each sheet
 ## Check the number of variables in each excel workbook 

@@ -44,10 +44,15 @@ The code chunk below hastens code execution.
 
 # Raw Data
 
-The data is as follows: One master folder named `Data` contains 16 sub-folders for the years 2006 to 2021. Each of the 16 sub-folders has 12 sub-folders, one for each month of a given year. Each of the 12 sub-folders contains one Ms Excel workbook with one sheet. Thus, we have `r 16 * 12` Ms Excel files. Note that all the data in Excel are in the same format. 
+The data is as follows: One master folder named `Data` contains 16 sub-folders for the years 2006 to 2021. Each of the 16 sub-folders has 12 sub-folders, one for each month of a given year. Each of the 12 sub-folders contains one Ms Excel workbook with one sheet. Thus, we have `r 16 * 12` Ms Excel files. Note that all the data in Excel are in the same format. A sample excel file, in this case that of August 2006, has data in the following format. 
+
+```{r sample_dataset, message=FALSE, warning=FALSE}
+
+```
+
 
 ## Expected Output
-The first task is to create a single data table from the 192 excel files. The second task is to clean the data in column F. Specifically; I extract each row in column F that contains a 5 number digit. Put another way, I drop all rows in column F that do not have a number with exactly five digits. 
+The first task is to create a single data table from the 192 excel files. The second task is to clean the data in column F. Specifically; I extract each row in column F (or column 6) that contains a 5 number digit. Put another way, I drop all rows in column F that do not have a number with exactly five digits. 
 
 Next, I break down the 5 number digit in column F into three components or variables.
 
@@ -65,9 +70,7 @@ tribble(~ cloud, ~ wind_direction, ~ wind_speed,
         knitr::kable()
 ```
 
-Next, I convert wind speed from knots to metres per second by multiplying the variable by 0.514. Finally, I extract the wind speed in metres per second and summarise (average) the variable by month and year. The final output will have the following format. 
-
-
+Next, I convert wind speed from knots to metres per second by multiplying the variable by 0.514. Finally, I extract the wind speed in metres per second and summarise (average) the variable by month and year.
 
 You can download the code used in this analysis from my [GitHub account](www.github.com/Karuitha), www.github.com/Karuitha. 
 
@@ -86,7 +89,7 @@ The code chunk below will list the names of all excel (.xlsx) files inside the `
 
 - `path = "Data"`: Indicates that our data is in the `Data` folder.
 - `pattern = "*.xlsx"`: This notation instructs R to extract all files that end in .xlsx.
-`recursive = TRUE`: This instruction tells R to check for excel files in the `Data` folder and the sub-folders inside the `Data` folder. If set to FALSE, R will only check for excel files inside the `Data` folder and miss the files inside the sub-folders.
+- `recursive = TRUE`: This instruction tells R to check for excel files in the `Data` folder and the sub-folders inside the `Data` folder. If set to FALSE, R will only check for excel files inside the `Data` folder and miss the files inside the sub-folders.
 - `full.names = TRUE`: This instruction tells R to extract the full file path of each excel file. The entire file path allows R to read files contained in the sub-folders. 
 
 Below is a listing of all the excel files detected. 
