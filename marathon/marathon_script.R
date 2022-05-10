@@ -10,9 +10,10 @@ pacman::p_load(tidyverse, rvest, countrycode,
                
                data.table, glue, lubridate,
                
-               readxl)
+               readxl, tidyquant, kableExtra)
 
-
+## Set theme for plots
+theme_set(theme_tq())
 ## Scraping functions ----
 scrapper <- function(x){
         
@@ -115,8 +116,11 @@ final_marathon_data %>%
         
         count(nat, sort = TRUE, name = "count") %>% 
         
-        mutate(prop = count / sum(count) * 100)
-
+        mutate(prop = count / sum(count) * 100) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Marathoner Nationality") %>% 
+        
+        kable_classic(full_width = FALSE)
 
 ## Venues countries where most marathons held
 final_marathon_data %>% 
@@ -134,6 +138,27 @@ final_marathon_data %>%
         
         mutate(prop = count / sum(count) * 100)
 
+## Marathoner with the most wins 
+
+final_marathon_data %>% 
+        
+        count(competitor) %>% 
+        
+        arrange(desc(n))
+
+## Marathoners with best times
+final_marathon_data %>% 
+        
+        arrange(time_posted_seconds) %>% 
+        
+        select(competitor, nat, venue, time_posted_seconds) %>% 
+        
+        mutate(time = time_posted_seconds / 3600) %>% 
+        
+        select(-time_posted_seconds) %>% 
+        
+        slice(1:10)
+
 ## Age distributions ----
 ## Which age group is represented the most in the data 
 final_marathon_data$age_group <- cut(final_marathon_data$age_at_race, 
@@ -150,6 +175,18 @@ final_marathon_data %>%
         
         geom_col()
 
+## Age group with the most winners
+final_marathon_data %>% 
+        
+        filter(pos == 1) %>% 
+        
+        na.omit() %>% 
+        
+        ggplot(mapping = aes(x = age_group, 
+                             
+                             y = time_posted_seconds)) + 
+        
+        geom_col()
 
 ## DATA VISUALIZATION ----
 ## Winners by country
@@ -191,16 +228,71 @@ final_marathon_data %>%
         
         geom_density(fill = "skyblue")
 
+## Distribution of times posted
+final_marathon_data %>% 
+        
+        mutate(time = time_posted_seconds / 3600) %>% 
+        
+        ggplot(mapping = aes(x = time)) + 
+        
+        geom_histogram(col = "black")
+
+## Distiribution of times posted
+final_marathon_data %>% 
+        
+        mutate(time = time_posted_seconds / 3600,
+               
+               
+               continent = countrycode(sourcevar = nat_country_name,
+                        
+                                       origin = "country.name",
+                                       
+                                       destination = "continent"
+                                       
+                                       )
+               ) %>% 
+        
+        ggplot(mapping = aes(x = time)) + 
+        
+        geom_density(col = "black", alpha = 0.5)
+
 ## Times posted versus age
 final_marathon_data %>% 
         
-        ggplot(mapping = aes(x = age_at_race, 
+        ggplot(mapping = aes(x = age_at_race %>% round(2), 
                              
                              y = time_posted_seconds)) + 
         
-        geom_hex(show.legend = FALSE) + 
+        geom_hex(show.legend = FALSE, alpha = 0.5) + 
         
-        geom_density2d()
+        geom_density2d() + 
+        
+        geom_point(shape = ".") +
+        
+        scale_fill_gradient(low = "green", high = "red")
 
-## 
+## Visualizing marathon maps
+map_data("world") %>% 
+        
+        mutate(code = countrycode(sourcevar = region, origin = "country.name",
+                                  
+                                  destination = "ioc")) %>% 
+        
+        left_join(final_marathon_data %>% 
+                          
+                          filter(pos %in% c(1, 2, 3)) %>% 
+                          
+                          count(nat) %>% 
+                          
+                          tibble(), by = c("code" = "nat")) %>% 
+        
+        ggplot(mapping = aes(x = long, y = lat, group = group, fill = n)) + 
+        
+        geom_polygon(show.legend = FALSE) +
+        
+        scale_fill_gradient(low = "green", high = "red") + 
+        
+        labs(title = "Top 3 Positions by Country in Olympics Marathons",
+             
+             caption = "Countries with Grey Highlight Have No data")
 
