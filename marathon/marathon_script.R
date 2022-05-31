@@ -12,8 +12,11 @@ pacman::p_load(tidyverse, rvest, countrycode,
                
                readxl, tidyquant, kableExtra)
 
+## @knitr theme_set
 ## Set theme for plots
 theme_set(theme_tq())
+
+## @knitr scrapper
 ## Scraping functions ----
 scrapper <- function(x){
         
@@ -54,9 +57,10 @@ all_web_pages <- glue::glue("{url}{pages}")
 # 
 #         fwrite("marathon.xlsx")
 
+## @knitr read_data
 ########################################################       
 ## Read in the data to avoid scrapping again
-final_marathon_data <- fread("marathon.xlsx")
+final_marathon_data <- fread("marathon.xlsx", na.strings = "")
 
 ## Clean the data 
 final_marathon_data <- final_marathon_data %>% 
@@ -65,20 +69,9 @@ final_marathon_data <- final_marathon_data %>%
                             
                             paste0("1 JAN", " ", 
                                    
-                            str_extract_all(dob, "^\\d{4}$")), dob)) %>% 
+                            str_extract(dob, "^\\d{4}$")), dob)) %>% 
         
-        mutate(dob = dmy(dob),
-               
-               date = dmy(date),
-               ) %>% 
-        
-        mutate(age_at_race = difftime(date, dob, units = "days"),
-               
-               age_at_race = age_at_race / 365.25,
-               
-               age_at_race = str_remove(age_at_race, "days"),
-               
-               age_at_race = parse_number(age_at_race)) %>% 
+        mutate(dob = na_if(dob, "")) %>% 
         
         mutate(venue_country_code = str_extract_all(venue, "\\(.*\\)"),
                
@@ -90,9 +83,7 @@ final_marathon_data <- final_marathon_data %>%
                                                 
                                                 destination = "country.name"),
                
-               venue = str_remove_all(venue, "\\(.*\\)"),
-               
-               date_of_race = year(date)) %>% 
+               venue = str_remove_all(venue, "\\(.*\\)")) %>% 
         
         mutate(nat_country_name = countrycode(nat,
                                                 
@@ -102,14 +93,36 @@ final_marathon_data <- final_marathon_data %>%
         
         relocate(nat_country_name, .after = nat) %>% 
         
+        mutate(dob = dmy(dob),
+               
+               date = dmy(date),
+               
+               date_of_race = year(date)
+        ) %>% 
+        
+        mutate(age_at_race = difftime(date, dob, units = "days"),
+               
+               age_at_race = age_at_race / 365.25,
+               
+               age_at_race = str_remove(age_at_race, "days"),
+               
+               age_at_race = parse_number(age_at_race)) %>% 
+        
         mutate(mark = hms(mark)) %>% 
         
         mutate(time_posted_seconds = hour(mark) * 3600 + 
                        
-                       minute(mark) * 60 + second(mark))
+                       minute(mark) * 60 + second(mark)) %>% 
         
+        tibble()
+## @knitr head_str
+names(final_marathon_data)<-make.names(names(final_marathon_data))
+dimnames(final_marathon_data)
+head(final_marathon_data)
+tail(final_marathon_data)
+glimpse(final_marathon_data)
 
-
+## @knitr explore_data
 ## Explore the data
 ## How many nationalities have won
 final_marathon_data %>% 
@@ -271,6 +284,7 @@ final_marathon_data %>%
         
         scale_fill_gradient(low = "green", high = "red")
 
+## @knitr map_visual
 ## Visualizing marathon maps
 map_data("world") %>% 
         
@@ -288,7 +302,7 @@ map_data("world") %>%
         
         ggplot(mapping = aes(x = long, y = lat, group = group, fill = n)) + 
         
-        geom_polygon(show.legend = FALSE) +
+        geom_polygon(show.legend = TRUE) +
         
         scale_fill_gradient(low = "green", high = "red") + 
         
@@ -296,3 +310,7 @@ map_data("world") %>%
              
              caption = "Countries with Grey Highlight Have No data")
 
+## Generalized additive model
+mgcv::gam(time_posted_seconds ~ s(age_at_race) + nat_country_name + venue_country_name, 
+          
+          data = final_marathon_data) %>% summary()

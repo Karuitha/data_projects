@@ -1,0 +1,72 @@
+---
+title: "Analysis of Men Olympics Marathon Data from IOC"
+subtitle: "Which Countries Do Better in Marathons?"
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+output: tint::tintHtml
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(tint)
+# invalidate cache when the package version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tint'))
+options(htmltools.dir.version = FALSE)
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, rvest, countrycode, 
+               
+               data.table, glue, lubridate,
+               
+               readxl, tidyquant, kableExtra, knitr)
+```
+
+## Background
+
+The `Marathon`, one of the initial olympics events covers a distance of 42.195 km. As one of the highlights of modern olympics, the race attracts millions of fans globally. In this article, I examine the performance of male athletes in olympics marathons. Specifically, I examine;
+
+- Which countries have produced the highest number of olympics male marathon winners.
+- What is the prime age for a marathoner.
+
+## Data
+
+I use data from the International Olympics Committee (IOC) from 1950 to 2022. I scrapped the data from the IOC [website](https://www.worldathletics.org/records/all-time-toplists/road-running/marathon/) on this link <https://www.worldathletics.org/records/all-time-toplists/road-running/marathon/>. 
+
+```{r, echo = FALSE}
+read_chunk("marathon_script.R")
+```
+
+```{r theme_set}
+
+```
+
+The data spans 48 web pages. I used the function below to scrap the data. 
+
+```{r scrapper}
+
+```
+
+The scrapping takes considerable time. Hence, I have saved the data in an excel sheet to save time. However, you can always scrap the data. 
+
+Here, I read in the data from the excel file. 
+
+```{r read_data}
+
+```
+
+The data has `r nrow(final_marathon_data)` rows and `r ncol(final_marathon_data)` columns.
+
+```{r head_str}
+
+```
+
+
+```{r map_visual}
+
+```
+

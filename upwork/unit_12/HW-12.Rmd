@@ -8,12 +8,14 @@ header-includes:
 - \newcommand{\blandscape}{\begin{landscape}}
 - \newcommand{\elandscape}{\end{landscape}}
 output:
-  html_document: 
-        theme: yeti
-        highlight: tango
   pdf_document:
         toc: true
         toc_depth: 3
+  html_document: 
+        theme: yeti
+        highlight: tango
+        code_folding: hide
+        number_sections: true
 bibliography: references.bib
 ---
 
@@ -27,7 +29,11 @@ if(!require(pacman)){
 }
 
 ## load required packages
-pacman::p_load(tidyverse, ggplot2, sandwich, stargazer, skimr, ggthemes, GGally, kableExtra, corrplot, Metrics, broom, patchwork, scales)
+pacman::p_load(tidyverse, sandwich, stargazer, skimr, ggthemes, GGally, kableExtra, corrplot, Metrics, broom, patchwork, scales, performance, datawizard)
+
+if(!require(easystats)){
+install.packages("easystats", repos = "https://easystats.r-universe.dev")
+}
 
 ## Theme set
 theme_set(theme_clean(base_size = 8))
@@ -237,5 +243,12 @@ qqnorm(het_data$`log(views)` - het_data$.fitted, pch = 1, frame = FALSE)
 qqline(het_data$`log(views)` - het_data$.fitted, col = "steelblue", lwd = 2)
 ```
 
+## Summary 
+
+In this project, I sought to to explain how much the quality of a video affects the number of views it receives on social media. The length and average rating of the movies are significant predictors of the number of views. The table below summarises the model diagnostics. The model fits the data reasonably well.
+
+```{r, fig.width = 12, fig.height = 8, fig.cap = "Model Diagnostics"}
+performance::check_model(model)
+```
 
 ## References
