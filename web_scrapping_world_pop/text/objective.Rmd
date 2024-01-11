@@ -1,0 +1,8 @@
+## **Objective and Caveats**
+
+In this article I aim to;
+
+1. Demonstrate the basics of scrapping data tables from a website using `R` and the `rvest` package from the `tidyverse`.
+2. Clean the data tables to generate an actionable set of data.
+
+In my analysis, I assume basic knowledge of the `R` programming language. Moreover, my article aims mainly at demonstrating web scrapping and not the analysis of the data. The data cleaning part is a natural extension of web scrapping as most data acquired through web scrapping is rarely clean and hence requires a substantial amount of pre-processing to be useful for analysis. 

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="John Karuitha">
+<meta name="dcterms.date" content="2023-01-29">
+<meta name="description" content="Independent Data Analysis Project">
+
+<title>Modeling House Prices</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="question1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="question1_files/libs/quarto-html/quarto.js"></script>
+<script src="question1_files/libs/quarto-html/popper.min.js"></script>
+<script src="question1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="question1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="question1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="question1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="question1_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="question1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="question1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="question1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="question1_files/libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<style>
+    .quarto-title-block .quarto-title-banner {
+      color: black;
+background-image: url(affordable_housing.jpg);
+background-size: cover;
+    }
+    </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><strong>Modeling House Prices</strong></h1>
+            <p class="subtitle lead"><em>Using Linear Regression and Random Forest Model to Predict House prices</em></p>
+                  <div>
+        <div class="description">
+          Independent Data Analysis Project
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <a href="www.linkedin.com/in/Karuitha">John Karuitha</a> 
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              <a href="www.karu.ac.ke">
+              Karatina University, Kenya
+              </a>
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 29, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#question-one" id="toc-question-one" class="nav-link active" data-scroll-target="#question-one"><span class="toc-section-number">1</span>  <strong>QUESTION ONE</strong></a>
+  <ul class="collapse">
+  <li><a href="#compute-the-correlation-table-for-all-variables-and-show-which-variables-has-the-strongest-positive-and-which-variable-has-the-strongest-positive-and-which-variable-has-the-strongest-negative-correlations-with-the-median-house-price-medv.-1-points" id="toc-compute-the-correlation-table-for-all-variables-and-show-which-variables-has-the-strongest-positive-and-which-variable-has-the-strongest-positive-and-which-variable-has-the-strongest-negative-correlations-with-the-median-house-price-medv.-1-points" class="nav-link" data-scroll-target="#compute-the-correlation-table-for-all-variables-and-show-which-variables-has-the-strongest-positive-and-which-variable-has-the-strongest-positive-and-which-variable-has-the-strongest-negative-correlations-with-the-median-house-price-medv.-1-points"><span class="toc-section-number">1.1</span>  <strong>Compute the correlation table for all variables and show which variables has the strongest positive and which variable has the strongest positive and which variable has the strongest negative correlations with the median house price (MEDV). (1 points)</strong></a></li>
+  <li><a href="#why-should-the-data-be-partitioned-into-training-and-validation-sets-what-will-the-training-set-be-used-for-what-will-the-validation-set-be-used-for-3-points" id="toc-why-should-the-data-be-partitioned-into-training-and-validation-sets-what-will-the-training-set-be-used-for-what-will-the-validation-set-be-used-for-3-points" class="nav-link" data-scroll-target="#why-should-the-data-be-partitioned-into-training-and-validation-sets-what-will-the-training-set-be-used-for-what-will-the-validation-set-be-used-for-3-points"><span class="toc-section-number">1.2</span>  <strong>Why should the data be partitioned into training and validation sets? What will the training set be used for? What will the validation set be used for? (3 points)</strong></a></li>
+  <li><a href="#partition-records-into-60-for-training-and-40-for-validation-sets.-then-fit-a-multiple-linear-regression-to-medv-as-a-function-of-crim-chas-and-rm-for-training-sets-and-show-the-summarized-regression-results.-based-on-your-regression-results-make-a-prediction-on-your-validation-sets.-be-sure-to-write-the-equation-for-predicting-the-median-house-price-from-the-predictors-in-the-model-and-interpret-your-regression-results.-8-points." id="toc-partition-records-into-60-for-training-and-40-for-validation-sets.-then-fit-a-multiple-linear-regression-to-medv-as-a-function-of-crim-chas-and-rm-for-training-sets-and-show-the-summarized-regression-results.-based-on-your-regression-results-make-a-prediction-on-your-validation-sets.-be-sure-to-write-the-equation-for-predicting-the-median-house-price-from-the-predictors-in-the-model-and-interpret-your-regression-results.-8-points." class="nav-link" data-scroll-target="#partition-records-into-60-for-training-and-40-for-validation-sets.-then-fit-a-multiple-linear-regression-to-medv-as-a-function-of-crim-chas-and-rm-for-training-sets-and-show-the-summarized-regression-results.-based-on-your-regression-results-make-a-prediction-on-your-validation-sets.-be-sure-to-write-the-equation-for-predicting-the-median-house-price-from-the-predictors-in-the-model-and-interpret-your-regression-results.-8-points."><span class="toc-section-number">1.3</span>  <strong>Partition records into 60% for training and 40% for validation sets. Then fit a multiple linear regression to MEDV as a function of CRIM, CHAS, and RM for training sets and show the summarized regression results. Based on your regression results, make a prediction on your validation sets. Be sure to write the equation for predicting the median house price from the predictors in the model and interpret your regression results. (8 points).</strong></a></li>
+  <li><a href="#fit-another-multiple-linear-regression-model-to-the-median-house-price-medv-as-a-function-of-lstat-indus-and-nox-for-training-sets-and-show-the-summarized-regression-results.-then-make-a-prediction-based-on-this-model-for-your-validation-sets.-5-points" id="toc-fit-another-multiple-linear-regression-model-to-the-median-house-price-medv-as-a-function-of-lstat-indus-and-nox-for-training-sets-and-show-the-summarized-regression-results.-then-make-a-prediction-based-on-this-model-for-your-validation-sets.-5-points" class="nav-link" data-scroll-target="#fit-another-multiple-linear-regression-model-to-the-median-house-price-medv-as-a-function-of-lstat-indus-and-nox-for-training-sets-and-show-the-summarized-regression-results.-then-make-a-prediction-based-on-this-model-for-your-validation-sets.-5-points"><span class="toc-section-number">1.4</span>  <strong>Fit another multiple linear regression model to the median house price (MEDV) as a function of LSTAT, INDUS, and NOX for training sets and show the summarized regression results. Then, make a prediction based on this model for your validation sets. (5 points)</strong></a></li>
+  <li><a href="#now-get-the-accuracy-metrics-for-these-two-predicted-models-and-show-their-accuracy-metrics-respectively.-based-on-their-accuracy-metrics-select-which-model-is-the-best-model-in-terms-of-the-accuracy-metrics-and-why.-8-points" id="toc-now-get-the-accuracy-metrics-for-these-two-predicted-models-and-show-their-accuracy-metrics-respectively.-based-on-their-accuracy-metrics-select-which-model-is-the-best-model-in-terms-of-the-accuracy-metrics-and-why.-8-points" class="nav-link" data-scroll-target="#now-get-the-accuracy-metrics-for-these-two-predicted-models-and-show-their-accuracy-metrics-respectively.-based-on-their-accuracy-metrics-select-which-model-is-the-best-model-in-terms-of-the-accuracy-metrics-and-why.-8-points"><span class="toc-section-number">1.5</span>  <strong>Now get the accuracy metrics for these two predicted models and show their accuracy metrics respectively. Based on their accuracy metrics, select which model is the best model in terms of the accuracy metrics, and why. (8 points)</strong></a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load required packages </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(pacman)){</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, janitor, skimr, corrplot, </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               Amelia, xtable, tidymodels)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Set theme and digits</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#theme_set(theme_few())</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Table formatting function</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>formatting_function <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">caption =</span> <span class="st">"Table 1"</span>, </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                                <span class="at">full_width =</span> <span class="cn">FALSE</span>){</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    data <span class="sc">%&gt;%</span> </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">kbl</span>(<span class="at">booktabs =</span> <span class="cn">TRUE</span>, <span class="at">caption =</span> caption) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">kable_classic</span>(<span class="at">full_width =</span> full_width,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                      <span class="at">latex_options =</span> <span class="st">"hold_position"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(firatheme)){</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"vankesteren/firatheme"</span>)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div style="page-break-after: always;"></div>
+<section id="question-one" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> <strong>QUESTION ONE</strong></h1>
+<p>Question 1: Predicting Boston Housing Prices. (25 points)</p>
+<p>The file BostonHousing.csv contains information by the US Bureau of the Census concerning housing in the area of Boston, Massachusetts. The dataset includes information on 506 census-housing tracts in the Boston area. The goal is to predict the median house price in new tracts based on information such as crime rate, pollution, and number of rooms. The dataset contains 13 predictors, and the response is the median house price (MEDV). Table 1 describes each of the predictors and the response.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="q1_variables.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">variables Description</figcaption><p></p>
+</figure>
+</div>
+<section id="compute-the-correlation-table-for-all-variables-and-show-which-variables-has-the-strongest-positive-and-which-variable-has-the-strongest-positive-and-which-variable-has-the-strongest-negative-correlations-with-the-median-house-price-medv.-1-points" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="compute-the-correlation-table-for-all-variables-and-show-which-variables-has-the-strongest-positive-and-which-variable-has-the-strongest-positive-and-which-variable-has-the-strongest-negative-correlations-with-the-median-house-price-medv.-1-points"><span class="header-section-number">1.1</span> <strong>Compute the correlation table for all variables and show which variables has the strongest positive and which variable has the strongest positive and which variable has the strongest negative correlations with the median house price (MEDV). (1 points)</strong></h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Q1.1</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Reading in the data </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>housing <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"BostonHousing.csv"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Get correlations between all variables</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>my_corr <span class="ot">&lt;-</span> housing <span class="sc">%&gt;%</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cor</span>() <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a correlation matrix</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>upper<span class="ot">&lt;-</span> my_corr</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>upper[<span class="fu">upper.tri</span>(my_corr)]<span class="ot">&lt;-</span><span class="st">""</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>upper<span class="ot">&lt;-</span><span class="fu">as.data.frame</span>(upper)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>upper</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         CRIM    ZN INDUS  CHAS   NOX    RM   AGE   DIS   RAD   TAX PTRATIO
+CRIM        1                                                              
+ZN       -0.2     1                                                        
+INDUS    0.41 -0.53     1                                                  
+CHAS    -0.06 -0.04  0.06     1                                            
+NOX      0.42 -0.52  0.76  0.09     1                                      
+RM      -0.22  0.31 -0.39  0.09  -0.3     1                                
+AGE      0.35 -0.57  0.64  0.09  0.73 -0.24     1                          
+DIS     -0.38  0.66 -0.71  -0.1 -0.77  0.21 -0.75     1                    
+RAD      0.63 -0.31   0.6 -0.01  0.61 -0.21  0.46 -0.49     1              
+TAX      0.58 -0.31  0.72 -0.04  0.67 -0.29  0.51 -0.53  0.91     1        
+PTRATIO  0.29 -0.39  0.38 -0.12  0.19 -0.36  0.26 -0.23  0.46  0.46       1
+LSTAT    0.46 -0.41   0.6 -0.05  0.59 -0.61   0.6  -0.5  0.49  0.54    0.37
+MEDV    -0.39  0.36 -0.48  0.18 -0.43   0.7 -0.38  0.25 -0.38 -0.47   -0.51
+        LSTAT MEDV
+CRIM              
+ZN                
+INDUS             
+CHAS              
+NOX               
+RM                
+AGE               
+DIS               
+RAD               
+TAX               
+PTRATIO           
+LSTAT       1     
+MEDV    -0.74    1</code></pre>
+</div>
+</div>
+<ul>
+<li><p>The average number of rooms per dwelling has the highest positive correlation with median house price (0.7).</p></li>
+<li><p>Percent lower status of the population has the highest negative correlation with median house price (-0.74).</p></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Plot the correlation matrix</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>housing <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cor</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">"circle"</span>, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">type =</span> <span class="st">"lower"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">diag =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="question1_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="why-should-the-data-be-partitioned-into-training-and-validation-sets-what-will-the-training-set-be-used-for-what-will-the-validation-set-be-used-for-3-points" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="why-should-the-data-be-partitioned-into-training-and-validation-sets-what-will-the-training-set-be-used-for-what-will-the-validation-set-be-used-for-3-points"><span class="header-section-number">1.2</span> <strong>Why should the data be partitioned into training and validation sets? What will the training set be used for? What will the validation set be used for? (3 points)</strong></h2>
+<p>We split the data into training and validation sets to allow us to train and tune a model on one set (the training set) and evaluate the model on a completely new set (the validation set) that has not been used in model development and selection. This technique allows us to select a model that would do best in the real world by limiting <code>overfitting</code>.</p>
+<p>The training set is useful for training and selecting appropriate machine learning model or models.</p>
+<p>We use the validation set to approximate our model’s unbiased accuracy in new settings. In other words the validation set allows us to evaluate how the model would perform given new data.</p>
+</section>
+<section id="partition-records-into-60-for-training-and-40-for-validation-sets.-then-fit-a-multiple-linear-regression-to-medv-as-a-function-of-crim-chas-and-rm-for-training-sets-and-show-the-summarized-regression-results.-based-on-your-regression-results-make-a-prediction-on-your-validation-sets.-be-sure-to-write-the-equation-for-predicting-the-median-house-price-from-the-predictors-in-the-model-and-interpret-your-regression-results.-8-points." class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="partition-records-into-60-for-training-and-40-for-validation-sets.-then-fit-a-multiple-linear-regression-to-medv-as-a-function-of-crim-chas-and-rm-for-training-sets-and-show-the-summarized-regression-results.-based-on-your-regression-results-make-a-prediction-on-your-validation-sets.-be-sure-to-write-the-equation-for-predicting-the-median-house-price-from-the-predictors-in-the-model-and-interpret-your-regression-results.-8-points."><span class="header-section-number">1.3</span> <strong>Partition records into 60% for training and 40% for validation sets. Then fit a multiple linear regression to MEDV as a function of CRIM, CHAS, and RM for training sets and show the summarized regression results. Based on your regression results, make a prediction on your validation sets. Be sure to write the equation for predicting the median house price from the predictors in the model and interpret your regression results. (8 points).</strong></h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Q1.3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Allows reproducibility</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">134</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a 60-40 split of the data</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>split_object <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(housing, <span class="at">prop =</span> <span class="fl">0.6</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>training_set <span class="ot">&lt;-</span> split_object <span class="sc">%&gt;%</span> <span class="fu">training</span>()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>testing_set <span class="ot">&lt;-</span> split_object <span class="sc">%&gt;%</span> <span class="fu">testing</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">##Regression of MEDV as a function of CRIM, CHAS, and RM</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">## MEDV as a function of CRIM, CHAS, and RM</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>my_first_reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(MEDV <span class="sc">~</span> CRIM <span class="sc">+</span> CHAS <span class="sc">+</span> RM, <span class="at">data =</span> training_set)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_first_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = MEDV ~ CRIM + CHAS + RM, data = training_set)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-24.09  -2.78  -0.20   2.23  39.19 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -30.7248     3.4044   -9.03  &lt; 2e-16 ***
+CRIM         -0.2371     0.0364   -6.51  3.1e-10 ***
+CHAS          2.1048     1.3466    1.56     0.12    
+RM            8.5918     0.5335   16.10  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.2 on 299 degrees of freedom
+Multiple R-squared:  0.547, Adjusted R-squared:  0.543 
+F-statistic:  121 on 3 and 299 DF,  p-value: &lt;2e-16</code></pre>
+</div>
+</div>
+<p>The estimated equation is as follows:</p>
+<p><span class="math inline">\(MEDV = -30.7248 - 0.2371CRIM + 2.1048CHAS + 8.5918RM + error_term\)</span></p>
+<p>There is an inverse relationship between <code>crime</code> and <code>median house prices</code>. Both Charles River dummy (CHAS) and number of rooms (RM) have a positive relationship with median house prices, ceteris paribus.</p>
+<p>Specifically, a unit increase in crime reduces median house prices by 237.10 holding all other variables constant. A house located in the Charles river is, on average US$ 2104.80 more expensive than a house not located there, all else remaining the same. An extra room raises prices by US$ 8591.80 all else remaining the same.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Predicting on the testing / validation test</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>my_first_reg_prediction <span class="ot">&lt;-</span> <span class="fu">predict</span>(my_first_reg, <span class="at">newdata =</span> testing_set)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="fit-another-multiple-linear-regression-model-to-the-median-house-price-medv-as-a-function-of-lstat-indus-and-nox-for-training-sets-and-show-the-summarized-regression-results.-then-make-a-prediction-based-on-this-model-for-your-validation-sets.-5-points" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="fit-another-multiple-linear-regression-model-to-the-median-house-price-medv-as-a-function-of-lstat-indus-and-nox-for-training-sets-and-show-the-summarized-regression-results.-then-make-a-prediction-based-on-this-model-for-your-validation-sets.-5-points"><span class="header-section-number">1.4</span> <strong>Fit another multiple linear regression model to the median house price (MEDV) as a function of LSTAT, INDUS, and NOX for training sets and show the summarized regression results. Then, make a prediction based on this model for your validation sets. (5 points)</strong></h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run a second regression</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>my_second_reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(MEDV <span class="sc">~</span> LSTAT <span class="sc">+</span> INDUS <span class="sc">+</span> NOX, <span class="at">data =</span> training_set)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(my_second_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = MEDV ~ LSTAT + INDUS + NOX, data = training_set)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+ -9.21  -4.29  -1.11   2.15  25.02 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  32.3136     2.0248   15.96   &lt;2e-16 ***
+LSTAT        -0.9395     0.0640  -14.69   &lt;2e-16 ***
+INDUS        -0.1464     0.0884   -1.66    0.099 .  
+NOX           6.7692     4.8808    1.39    0.167    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 6.2 on 299 degrees of freedom
+Multiple R-squared:  0.547, Adjusted R-squared:  0.542 
+F-statistic:  120 on 3 and 299 DF,  p-value: &lt;2e-16</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Make predictions on the second regression</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>my_second_reg_prediction <span class="ot">&lt;-</span> <span class="fu">predict</span>(my_second_reg, <span class="at">newdata =</span> testing_set)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The associated equation is as follows:</p>
+<p><span class="math inline">\(MEDV = 32.31360 - 0.93954LSTAT - 0.14641INDUS + 6.76920NOX + error_term\)</span></p>
+<p>Both the proportion of lower status population<code>LSTAT</code> and proportion of non-retail businesses <code>INDUS</code> have an inverse relationship with <code>median house prices</code>. Nitrogen Oxide (<code>NOX</code>) concentration has a positive relationship with median house prices, ceteris paribus.</p>
+<p>Ceteris paribus, a unit increase in low status population corresponds to a reduction in median house prices by US$ 939.54 on average. A unit increase in the proportion of non-retail businesses is associated with a rise in median house prices by an average of US$ 146.41. Finally, a unit rise in Nitrogen Oxide corresponds to an average increase in house prices by US$ 6769.20.</p>
+</section>
+<section id="now-get-the-accuracy-metrics-for-these-two-predicted-models-and-show-their-accuracy-metrics-respectively.-based-on-their-accuracy-metrics-select-which-model-is-the-best-model-in-terms-of-the-accuracy-metrics-and-why.-8-points" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="now-get-the-accuracy-metrics-for-these-two-predicted-models-and-show-their-accuracy-metrics-respectively.-based-on-their-accuracy-metrics-select-which-model-is-the-best-model-in-terms-of-the-accuracy-metrics-and-why.-8-points"><span class="header-section-number">1.5</span> <strong>Now get the accuracy metrics for these two predicted models and show their accuracy metrics respectively. Based on their accuracy metrics, select which model is the best model in terms of the accuracy metrics, and why. (8 points)</strong></h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create a data frame of actual values</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="do">## And predcitions from both models</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> testing_set <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(MEDV) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_cols</span>(my_first_reg_prediction) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_cols</span>(my_second_reg_prediction) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_names</span>(<span class="fu">c</span>(<span class="st">"median_price"</span>, <span class="st">"first_reg"</span>, <span class="st">"second_reg"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The root mean squared error for the first and second regression are as follows.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## First regression metrics</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((predictions<span class="sc">$</span>median_price <span class="sc">-</span> predictions<span class="sc">$</span>first_reg)<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6.2</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Second regression </span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((predictions<span class="sc">$</span>median_price <span class="sc">-</span> predictions<span class="sc">$</span>second_reg)<span class="sc">^</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6.2</code></pre>
+</div>
+</div>
+<p>The mean absolute error is as follows.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">## mean absolute error</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">abs</span>(predictions<span class="sc">$</span>median_price <span class="sc">-</span> predictions<span class="sc">$</span>first_reg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.3</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">abs</span>(predictions<span class="sc">$</span>median_price <span class="sc">-</span> predictions<span class="sc">$</span>second_reg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.4</code></pre>
+</div>
+</div>
+<p>In both cases, the first model that relates median house prices with CRIM, CHAS, and RM is better because it has lower RMSE and lower MSE. Also, the first model has higher <span class="math inline">\(R^{2}\)</span> and adjusted <span class="math inline">\(R^{2}\)</span>.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Other metrics</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(my_first_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 12
+  r.squared adj.r.squa…¹ sigma stati…²  p.value    df logLik   AIC   BIC devia…³
+      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1     0.547        0.543  6.19    121. 3.47e-51     3  -980. 1970. 1989.  11445.
+# … with 2 more variables: df.residual &lt;int&gt;, nobs &lt;int&gt;, and abbreviated
+#   variable names ¹​adj.r.squared, ²​statistic, ³​deviance</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(my_second_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 12
+  r.squared adj.r.squa…¹ sigma stati…²  p.value    df logLik   AIC   BIC devia…³
+      &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1     0.547        0.542  6.19    120. 4.55e-51     3  -980. 1971. 1989.  11466.
+# … with 2 more variables: df.residual &lt;int&gt;, nobs &lt;int&gt;, and abbreviated
+#   variable names ¹​adj.r.squared, ²​statistic, ³​deviance</code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

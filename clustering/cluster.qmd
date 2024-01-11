@@ -1,0 +1,32 @@
+---
+title: "**Clustering Analysis for Marketing**"
+author: "***John Karuitha***"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  message: false
+  warning: false
+---
+
+# **Background**
+
+In this analysis, we illustrate two clustering techniques;
+
+1.  K-Means clustering.
+
+2.  Hierarchical clustering
+
+We start by loading required packages.
+
+```{r}
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+p_load(tidyverse, janitor, skimr, GGally)
+```
+
+# **Data**
+
+We then load the data.

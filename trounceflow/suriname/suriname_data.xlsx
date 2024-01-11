@@ -1,0 +1,181 @@
+date,titles_english,titles,class,amount
+june 2017,Fixed Debt,Vaste_Schuld,A,1561.79
+sept 2017,Fixed Debt,Vaste_Schuld,A,1602.971
+dec 2017,Fixed Debt,Vaste_Schuld,A,1669.265
+march 2018,Fixed Debt,Vaste_Schuld,A,719.229
+june 2018,Fixed Debt,Vaste_Schuld,A,1654.318
+sept 2018,Fixed Debt,Vaste_Schuld,A,1652.958
+dec 2018,Fixed Debt,Vaste_Schuld,A,1715.446
+march 2019,Fixed Debt,Vaste_Schuld,A,1738.853
+june 2019,Fixed Debt,Vaste_Schuld,A,1745.101
+sept 2019,Fixed Debt,Vaste_Schuld,A,1772.69
+dec 2019,Fixed Debt,Vaste_Schuld,A,1987.183
+march 2020,Fixed Debt,Vaste_Schuld,A,1988.169
+june 2020,Fixed Debt,Vaste_Schuld,A,1995.091
+sept 2020,Fixed Debt,Vaste_Schuld,A,2023.8
+dec 2020,Fixed Debt,Vaste_Schuld,A,1998.109
+march 2021,Fixed Debt,Vaste_Schuld,A,1990.178
+june 2021,Fixed Debt,Vaste_Schuld,A,1973.837
+sept 2021,Fixed Debt,Vaste_Schuld,A,1924.771
+june 2017,Current Debt,Vlottende_Schuld,A,0
+sept 2017,Current Debt,Vlottende_Schuld,A,0
+dec 2017,Current Debt,Vlottende_Schuld,A,0
+march 2018,Current Debt,Vlottende_Schuld,A,0
+june 2018,Current Debt,Vlottende_Schuld,A,0
+sept 2018,Current Debt,Vlottende_Schuld,A,0
+dec 2018,Current Debt,Vlottende_Schuld,A,0
+march 2019,Current Debt,Vlottende_Schuld,A,0
+june 2019,Current Debt,Vlottende_Schuld,A,0
+sept 2019,Current Debt,Vlottende_Schuld,A,0
+dec 2019,Current Debt,Vlottende_Schuld,A,0
+march 2020,Current Debt,Vlottende_Schuld,A,15.723
+june 2020,Current Debt,Vlottende_Schuld,A,32.895
+sept 2020,Current Debt,Vlottende_Schuld,A,35.338
+dec 2020,Current Debt,Vlottende_Schuld,A,115.4
+march 2021,Current Debt,Vlottende_Schuld,A,60.623
+june 2021,Current Debt,Vlottende_Schuld,A,68.556
+sept 2021,Current Debt,Vlottende_Schuld,A,176.313
+june 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,0
+sept 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,4.377
+dec 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,3.881
+march 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,4.032
+june 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,3.229
+sept 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,3.263
+dec 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,2.661
+march 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,6.123
+june 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,5.678
+sept 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,2.044
+dec 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,5.097
+march 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,11.172
+june 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,11.006
+sept 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,5.036
+dec 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,4.757
+march 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,7.169
+june 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,6.919
+sept 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,A,6.945
+june 2017,Long Term Debt,wo_Lange_Termjin_Schuld,A,0
+sept 2017,Long Term Debt,wo_Lange_Termjin_Schuld,A,1598.594
+dec 2017,Long Term Debt,wo_Lange_Termjin_Schuld,A,1665.384
+march 2018,Long Term Debt,wo_Lange_Termjin_Schuld,A,1713.901
+june 2018,Long Term Debt,wo_Lange_Termjin_Schuld,A,1651.089
+sept 2018,Long Term Debt,wo_Lange_Termjin_Schuld,A,1649.695
+dec 2018,Long Term Debt,wo_Lange_Termjin_Schuld,A,1712.785
+march 2019,Long Term Debt,wo_Lange_Termjin_Schuld,A,1732.73
+june 2019,Long Term Debt,wo_Lange_Termjin_Schuld,A,1739.423
+sept 2019,Long Term Debt,wo_Lange_Termjin_Schuld,A,1770.646
+dec 2019,Long Term Debt,wo_Lange_Termjin_Schuld,A,1982.086
+march 2020,Long Term Debt,wo_Lange_Termjin_Schuld,A,1976.997
+june 2020,Long Term Debt,wo_Lange_Termjin_Schuld,A,1984.085
+sept 2020,Long Term Debt,wo_Lange_Termjin_Schuld,A,2018.764
+dec 2020,Long Term Debt,wo_Lange_Termjin_Schuld,A,1993.352
+march 2021,Long Term Debt,wo_Lange_Termjin_Schuld,A,1983.009
+june 2021,Long Term Debt,wo_Lange_Termjin_Schuld,A,1966.918
+sept 2021,Long Term Debt,wo_Lange_Termjin_Schuld,A,1917.826
+june 2017,Long Term Debt,subtotal_A,A,1561.79
+sept 2017,Long Term Debt,subtotal_A,A,1602.971
+dec 2017,Long Term Debt,subtotal_A,A,1669.265
+march 2018,Long Term Debt,subtotal_A,A,1719.229
+june 2018,Long Term Debt,subtotal_A,A,1654.318
+sept 2018,Long Term Debt,subtotal_A,A,1652.958
+dec 2018,Long Term Debt,subtotal_A,A,1715.446
+march 2019,Long Term Debt,subtotal_A,A,1738.853
+june 2019,Long Term Debt,subtotal_A,A,1745.101
+sept 2019,Long Term Debt,subtotal_A,A,1772.69
+dec 2019,Long Term Debt,subtotal_A,A,1987.183
+march 2020,Long Term Debt,subtotal_A,A,2003.892
+june 2020,Long Term Debt,subtotal_A,A,2027.986
+sept 2020,Long Term Debt,subtotal_A,A,2059.138
+dec 2020,Long Term Debt,subtotal_A,A,2113.509
+march 2021,Long Term Debt,subtotal_A,A,2050.801
+june 2021,Long Term Debt,subtotal_A,A,2042.393
+sept 2021,Long Term Debt,subtotal_A,A,2101.084
+june 2017,Current Debt,Vlottende_Schuld,B,282.68
+sept 2017,Current Debt,Vlottende_Schuld,B,469.794
+dec 2017,Current Debt,Vlottende_Schuld,B,488.222
+march 2018,Current Debt,Vlottende_Schuld,B,529.186
+june 2018,Current Debt,Vlottende_Schuld,B,569.57
+sept 2018,Current Debt,Vlottende_Schuld,B,593.846
+dec 2018,Current Debt,Vlottende_Schuld,B,593.936
+march 2019,Current Debt,Vlottende_Schuld,B,595.151
+june 2019,Current Debt,Vlottende_Schuld,B,595.605
+sept 2019,Current Debt,Vlottende_Schuld,B,603.496
+dec 2019,Current Debt,Vlottende_Schuld,B,625.974
+march 2020,Current Debt,Vlottende_Schuld,B,620.748
+june 2020,Current Debt,Vlottende_Schuld,B,279.501
+sept 2020,Current Debt,Vlottende_Schuld,B,287.761
+dec 2020,Current Debt,Vlottende_Schuld,B,323.401
+march 2021,Current Debt,Vlottende_Schuld,B,331.541
+june 2021,Current Debt,Vlottende_Schuld,B,381.836
+sept 2021,Current Debt,Vlottende_Schuld,B,223.807
+june 2017,Fixed Debt,Vaste_Schuld,B,779.45
+sept 2017,Fixed Debt,Vaste_Schuld,B,208.229
+dec 2017,Fixed Debt,Vaste_Schuld,B,212.305
+march 2018,Fixed Debt,Vaste_Schuld,B,174.86
+june 2018,Fixed Debt,Vaste_Schuld,B,187.083
+sept 2018,Fixed Debt,Vaste_Schuld,B,173.583
+dec 2018,Fixed Debt,Vaste_Schuld,B,178.716
+march 2019,Fixed Debt,Vaste_Schuld,B,271.785
+june 2019,Fixed Debt,Vaste_Schuld,B,369.646
+sept 2019,Fixed Debt,Vaste_Schuld,B,376.098
+dec 2019,Fixed Debt,Vaste_Schuld,B,358.075
+march 2020,Fixed Debt,Vaste_Schuld,B,329.539
+june 2020,Fixed Debt,Vaste_Schuld,B,1449.378
+sept 2020,Fixed Debt,Vaste_Schuld,B,1594.242
+dec 2020,Fixed Debt,Vaste_Schuld,B,1648.591
+march 2021,Fixed Debt,Vaste_Schuld,B,1616.451
+june 2021,Fixed Debt,Vaste_Schuld,B,1606.29
+sept 2021,Fixed Debt,Vaste_Schuld,B,943.754
+june 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,122.88
+sept 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,81.852
+dec 2017,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,120.051
+march 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,165.973
+june 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,207.069
+sept 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,205.674
+dec 2018,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,221.329
+march 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,223.473
+june 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,228.406
+sept 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,188.028
+dec 2019,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,251.513
+march 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,239.38
+june 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,243.546
+sept 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,365.16
+dec 2020,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,412.674
+march 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,271.347
+june 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,407.199
+sept 2021,Long Term Debt,wo_Middenlange_Termjin_Schuld,B,286.538
+june 2017,Long Term Debt,wo_Lange_Termjin_Schuld,B,656.57
+sept 2017,Long Term Debt,wo_Lange_Termjin_Schuld,B,387.942
+dec 2017,Long Term Debt,wo_Lange_Termjin_Schuld,B,368.171
+march 2018,Long Term Debt,wo_Lange_Termjin_Schuld,B,363.213
+june 2018,Long Term Debt,wo_Lange_Termjin_Schuld,B,362.501
+sept 2018,Long Term Debt,wo_Lange_Termjin_Schuld,B,388.172
+dec 2018,Long Term Debt,wo_Lange_Termjin_Schuld,B,372.61
+march 2019,Long Term Debt,wo_Lange_Termjin_Schuld,B,371.678
+june 2019,Long Term Debt,wo_Lange_Termjin_Schuld,B,367.199
+sept 2019,Long Term Debt,wo_Lange_Termjin_Schuld,B,415.468
+dec 2019,Long Term Debt,wo_Lange_Termjin_Schuld,B,374.461
+march 2020,Long Term Debt,wo_Lange_Termjin_Schuld,B,381.368
+june 2020,Long Term Debt,wo_Lange_Termjin_Schuld,B,1205.832
+sept 2020,Long Term Debt,wo_Lange_Termjin_Schuld,B,1229.082
+dec 2020,Long Term Debt,wo_Lange_Termjin_Schuld,B,1235.916
+march 2021,Long Term Debt,wo_Lange_Termjin_Schuld,B,1345.104
+june 2021,Long Term Debt,wo_Lange_Termjin_Schuld,B,1199.09
+sept 2021,Long Term Debt,wo_Lange_Termjin_Schuld,B,657.217
+june 2017,Long Term Debt,subtotal_B,B,1062.12
+sept 2017,Long Term Debt,subtotal_B,B,678.022
+dec 2017,Long Term Debt,subtotal_B,B,700.527
+march 2018,Long Term Debt,subtotal_B,B,704.046
+june 2018,Long Term Debt,subtotal_B,B,756.653
+sept 2018,Long Term Debt,subtotal_B,B,767.429
+dec 2018,Long Term Debt,subtotal_B,B,772.655
+march 2019,Long Term Debt,subtotal_B,B,866.936
+june 2019,Long Term Debt,subtotal_B,B,965.251
+sept 2019,Long Term Debt,subtotal_B,B,979.594
+dec 2019,Long Term Debt,subtotal_B,B,984.049
+march 2020,Long Term Debt,subtotal_B,B,950.287
+june 2020,Long Term Debt,subtotal_B,B,1728.879
+sept 2020,Long Term Debt,subtotal_B,B,1881.863
+dec 2020,Long Term Debt,subtotal_B,B,1971.991
+march 2021,Long Term Debt,subtotal_B,B,1947.992
+june 2021,Long Term Debt,subtotal_B,B,1988.125
+sept 2021,Long Term Debt,subtotal_B,B,1167.562

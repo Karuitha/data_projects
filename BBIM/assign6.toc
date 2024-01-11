@@ -1,0 +1,15 @@
+\contentsline {section}{\textbf {Loading required packages for the analysis}}{1}{section*.2}%
+\contentsline {section}{\textbf {Question 3: Stack Exchange topics and questions}}{1}{section*.3}%
+\contentsline {subsection}{Distribution of posts over the various topics}{2}{section*.4}%
+\contentsline {subsection}{Inspect a couple of question text bodies and report on your observations}{2}{section*.5}%
+\contentsline {subsubsection}{Discuss issues that need to be solved when cleaning the text later on.}{3}{section*.6}%
+\contentsline {section}{\textbf {Question 4: Preparation of the text}}{3}{section*.7}%
+\contentsline {subsection}{Use functions from package textclean to remove URLs and make other desired adjustments.}{3}{section*.8}%
+\contentsline {subsection}{Use package tm to build a corpus from the vector with cleansed text for each of your chosen Topic;}{4}{section*.9}%
+\contentsline {subsection}{Number of words and documents in the resulting corpus for each of your chosen Topic.}{4}{section*.10}%
+\contentsline {section}{\textbf {Question 5: Popular associates}}{4}{section*.11}%
+\contentsline {section}{\textbf {Question 6: Word clouds}}{5}{section*.12}%
+\contentsline {subsubsection}{World Cloud for Facebook Topic}{5}{section*.13}%
+\contentsline {subsubsection}{World Cloud for Security Topic}{6}{section*.15}%
+\contentsline {section}{\textbf {References}}{7}{section*.17}%
+\contentsline {section}{\textbf {Code Appendix}}{7}{section*.18}%

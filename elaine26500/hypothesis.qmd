@@ -1,0 +1,601 @@
+---
+title: "**Hypothesis Testing in R**"
+subtitle: "***Independent Data Analysis Project***"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957
+        city: Karatina
+        state: Nyeri, Kenya
+        postal-code: 10101
+      - name: University of the Witwatersrand, Johannesburg, School of Construction Economics \& Management
+      - address: 1 Jan Smuts Ave, Braamfontein
+      - city: Johannesburg
+      - state: Gauteng, South Africa
+      - postal-code: 2017
+format: 
+  html:
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-depth: 3
+editor: visual
+date: today
+date-modified: today
+code-fold: true
+date-format: long
+bibliography: references.bib
+execute: 
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup}
+## Load packages manager----
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+
+## Load the packages ---
+p_load(tidyverse, janitor, naniar, rio, gt, skimr,
+       doParallel, patchwork, ggside, performance,
+       ggridges, readxl)
+
+
+## Load themes for plots ----
+p_load_gh('datarootsio/artyfarty')
+
+## Set the options  ---
+options(digits = 3)
+options(scipen = 999)
+theme_set(theme_bain())
+
+## Hasten code execution by parallel computing ----
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makeCluster(all_cores)
+registerDoParallel(cl)
+
+
+```
+
+\newpage
+
+# **Project 1: Correlation Test**
+
+## **Background**
+
+In examining a dataset featuring exam scores and corresponding hours of study, this analysis endeavors to unravel the intricate relationship between academic performance and study efforts. The background underscores the critical role of study time in influencing exam outcomes and aims to delineate patterns that contribute to student success. The central questions to be addressed revolve around understanding the correlation between hours of study and exam scores. Specifically, the analysis seeks to determine if there exists a statistically significant relationship between the two variables and whether variations in study time can reliably predict variations in exam performance. Additionally, the investigation aims to identify any potential threshold of study hours associated with optimal academic achievement. This exploration into the dynamics of study habits and academic success holds implications for educational strategies and offers insights into factors contributing to student performance.
+
+## **Data**
+
+In this project, we analyse data from [Kaggle](https://www.kaggle.com/datasets/samira1992/student-scores-simple-dataset) that consists of maths scores and the hours of study [^1].
+
+[^1]: The data is available on this link, https://www.kaggle.com/datasets/samira1992/student-scores-simple-dataset
+
+```{r}
+## Project 1 -----
+## Read the data
+hours <- read_csv("hours.txt")
+head(hours) %>% 
+  gt()
+```
+
+## **Data Exploration**
+
+I start by doing a plot of the hours of study and the test scores.
+
+```{r}
+## Scatter plot- hours of study vs scores ----
+hours %>% 
+  ggplot(aes(x = Hours, y = Scores)) + 
+  geom_point(shape = 1, 
+             size = 4, 
+             stroke = 2) + 
+  labs(title = "Hours of Study vs Math Scores") + 
+  geom_xsidedensity(alpha = .3) + 
+  geom_ysidedensity(alpha = .3)
+```
+
+We see a substantial positive correlation (+0.976). This is the reason the plot is upward sloping and steep. But is it significant? To find out, we run a correlation test.
+
+## **Hypothesis Test**
+
+### **Hours vs Test Scores: Correlation Test**
+
+We run the correlation test has the following assumptions.
+
+-   Both variables are on an interval or ratio level of measurement.
+-   Data from both variables follow normal distributions.
+-   Your data have no outliers.
+-   Your data is from a random or representative sample.
+
+We test the following hypotheses.
+
+H0: True correlation is equal to 0
+
+H1: True correlation is not equal to 0
+
+```{r}
+## Correlation test for hours of study vs scores ----
+with(hours, cor.test(Hours, Scores))
+```
+
+The p-value is negligible. We reject the null hypothesis and go with the alternative hypothesis. True correlation is not equal to 0, and hence there is a statistically significant relationship between exam scores and hours of study.
+
+## **Conclusion**
+
+In this analysis, we examine the relationship between hours of study and test scores. We find that the correlation between the two variables is significant. Hours of study have a strong relationship with hours of study.
+
+\newpage
+
+# **Project 2: Chi Square, T-tests, Normality Tests, ANOVA, Regression Analysis and the F-test, and MANOVA**
+
+## **Background**
+
+This analysis aims to examine the associations between math scores and demographic/educational variables, including gender, race/ethnicity, parental education, lunch status, and completion of a test preparation course. The objective is to uncover patterns and disparities that may elucidate the impact of these factors on mathematical achievement. The study recognizes the multifaceted nature of educational outcomes and seeks to inform educational policies by identifying areas where targeted support or resources can enhance academic success among diverse student populations.
+
+## **Data**
+
+The data is available on [this link](http://roycekimmons.com/tools/generated_data/exams). I pick the data that has 1000 observations [^2].
+
+[^2]: See the data source here, http://roycekimmons.com/tools/generated_data/exams
+
+```{r}
+## Project 2 --------
+## Read in the data project 2
+exams <- read_csv('data/exams.csv') %>% 
+  clean_names()
+```
+
+specifically, the data `r ncol(exams)` variables and `r nrow(exams)` observations regarding exams scores. The following are the variables in the data.
+
+\newpage
+
+\blandscape
+
+```{r, fig.height=8, fig.width=12, fig.cap="Pairs Plot"}
+# Pairs plot for the data ----
+GGally::ggpairs(exams)
+```
+
+\elandscape
+
+\newpage
+
+I also examine the differences in maths scores and parents education. We see that parents with low levels of education tend to have kids with extremely low scores. The average score does not appear to be affected as these parents also tend to have kids with high math scores.
+
+```{r, fig.cap = "Maths Score vs Parents Level of Education"}
+## Math scores and parent level of education ----
+exams %>% 
+  ggplot(aes(x = parental_level_of_education,
+             color = parental_level_of_education,
+             y = math_score)) + 
+  geom_violin() + 
+  geom_jitter() + 
+  labs(x = "Parental Level of Education",
+       y = "Maths Score",
+       title = "Maths Score vs Parents Level of Education") + 
+  theme(legend.title = element_blank(),
+        legend.position = "top") + 
+  coord_flip()
+  
+```
+
+### **Race and Test Preparation: Chi-Square Test**
+
+To get a sense of people that take test preparation scores, I prepare a table. We see a clear difference in the number of people that take test preparation courses.
+
+```{r}
+## Summary of test preparation by race ----
+exams %>% 
+  count(race_ethnicity, test_preparation_course) %>% 
+  arrange(n) %>% 
+  gt()
+```
+
+To test whether this difference is significant, we do a chi-square test. Chi-Square test is a statistical method which used to determine if two categorical variables have a significant correlation between them. The two variables are selected from the same population. Furthermore, these variables are then categorised as Male/Female, Red/Green, Yes/No etc.
+
+We test the following hypotheses:
+
+H0: There is NO significant difference in the rate of taking test preparation scores by race.
+
+H1: There is a significant difference in the rate of taking test preparation scores by race.
+
+We now run the test.
+
+```{r}
+## Chi-square test for test prep by race ----
+chisq.test(table(exams$test_preparation_course, exams$race_ethnicity))
+```
+
+The p-value of 0.5 means that we go with the null hypothesis. There is no significant difference in the rates that different races and ethnicity take test preparation scores.
+
+### **Are Maths Scores Above/Below Average? One Sample T-test**
+
+In this section, we test the hypothesis that the average grade in the maths test was greater than 66.6 (the average score for the maths test is `r mean(exams$math_score)`). We run a one sample t-test that has the following assumptions.
+
+-   The dependent variable must be continuous (interval/ratio).
+-   The observations are independent of one another.
+-   The dependent variable should be approximately normally distributed.
+-   The dependent variable should not contain any outliers.
+
+I start by testing for normality using the Shapiro-Wilk test. The test has the following hypothesis [@razali2011power].
+
+H0: The data are not significantly different from normal.
+
+H1: The data are significantly different from normal.
+
+From the output, the p-value \< 0.05 implying that the distribution of the data are significantly different from normal distribution. In other words, we can assume the normality.
+
+```{r}
+## Test for normality ----
+shapiro.test(exams$math_score)
+```
+
+We run an outlier test that picks values that are greater than 1.5 times the IQR. We see that there are two values 24, and 23. To overcome the presence of outliers, we take the logarithms of the variables.
+
+```{r}
+## The outlier test ----
+boxplot.stats(exams$math_score)$out
+```
+
+In both cases, we solve the problem by taking the logarithm of the maths score. Now we test the hypothesis that the mean score is greater than 4.17 (the log of 66.6 is 4.17).
+
+We test the following hypothesis.
+
+H0: The average score in the maths test is NOT greater than 4.17.
+
+H1: The average score in the maths test is greater than 4.17.
+
+```{r}
+## T-test for maths scores greater than 4.17 ----
+exams %>% 
+  mutate(math_score = log(math_score)) %>% 
+  pull(math_score) %>%
+  t.test(mu = 4.17, 
+                   alternative = "greater")
+
+mean(log(exams$math_score))
+```
+
+Going by the p-value of 0.5, we accept the null hypothesis and do away with the alternative. The mean test of the maths score is not greater than 4.17 (score of 66.6).
+
+### **Test Preparation and Math Scores (T-test)**
+
+In this section, we test whether students who take test preparation courses do better in maths than those students that do not. There are 364 students that take the preparation course and 636 students that do not. Let us see the visualization of the scores for these groups
+
+```{r}
+# Maths score and test preparation ----
+(exams %>% 
+  ggplot(aes(x = test_preparation_course,
+             y = math_score,
+             color = test_preparation_course)) + 
+  geom_boxplot() + 
+  theme(legend.position = "top",
+        legend.title = element_blank()) + 
+  labs(x = "Test Preparation", y = "Math Score",
+       title = "Test Preparation vs Math Score") + 
+
+## Distribution of maths score. 
+exams %>% 
+  ggplot(aes(x = math_score, 
+             fill = test_preparation_course)) + 
+  geom_density(alpha = 0.5) + 
+  theme(legend.position = "top",
+        legend.title = element_blank()) + 
+  labs(x = "Math Score",
+       y = "",
+       title = "Distribution of Math Scores for\n People that Completed and\n Did not Complete Test Prep Course")
+  
+  )
+```
+
+We see from the graph that there is a difference in the median maths score, with the group that completed the test having a higher median math score. But is this difference statistically significant? We use a t-test, that has the following assumptions.
+
+-   The data are numeric.
+-   Observations are independent of one another (that is, the sample is a simple random sample and each individual within the population has an equal chance of being selected)
+-   The sample mean is normally distributed
+-   Equal variances between groups.
+
+The visualization above shows close to a normal distribution and roughly equal variances (238 vs 216), as shown below;
+
+```{r}
+## Variance for people completing the test prep ----
+exams %>% 
+  dplyr::filter(test_preparation_course == "completed") %>% summarise(var_with_prep = var(math_score))
+## Variance for people not completing the test prep ----
+exams %>% 
+  dplyr::filter(test_preparation_course == "none") %>%    summarise(var_no_prep <- var(math_score))
+
+
+```
+
+We test the following hypotheses.
+
+H0: There is no statistically significant difference in average test scores between students that take the test preparation score and those that do not.
+
+H1: There is a statistically significant difference in average test scores between students that take the test preparation score and those that do not.
+
+This is a 2-tailed test. I run a t-test below.
+
+```{r}
+## T-test of maths scores and test preparation ----
+t.test(math_score ~test_preparation_course, data = exams)
+```
+
+We see that the p-value of 0.000007, meaning that we reject the null hypothesis and go with the alternative. Test preparation scores seem to improve the average math score for the students.
+
+### **Maths Score vs Race: Analysis of Variance**
+
+Is there a relationship between race and ethnicity and the average math scores? We test this assertion using the analysis of variance (ANOVA). There are three primary assumptions in ANOVA:
+
+-   The responses for each factor level have a normal population distribution.
+
+-   These distributions have the same variance.
+
+-   The data are independent
+
+Specifically, we test the following hypotheses.
+
+H0: There is no significant difference in mean math scores between difference race and ethnic groups.
+
+H1: There is a significant difference in mean math scores between difference race and ethnic groups.
+
+We first look at the visual depicting math scores against race and ethnicity. We see a clear difference, especially race Group E has a much higher maths score. In our test, we want to see whether this difference is statistically significant. In the chart showing the distribution of the math score by race, there is no significant departure from the normal bell shape and hence the assumption of normality is realistic.
+
+```{r, fig.cap = "Box Plot of Math Scores by Race"}
+# Box plot of maths scores by race ----
+exams %>% 
+  ggplot(aes(x = race_ethnicity,
+             y = math_score,
+             color = race_ethnicity)) + 
+  geom_boxplot() + 
+  theme(legend.position = "top",
+        legend.title = element_blank()) + 
+  labs(x = "Race/Ethnicity", y = "Math Score",
+       title = "Race/Ethnicity vs Math Score")
+
+
+```
+
+```{r, fig.cap = "Distribution of Maths Scores by Race"}
+# Distribution of maths scores across race ----
+###############################################
+exams %>% 
+  ggplot(aes(x = math_score)) + 
+  geom_histogram() + 
+  facet_wrap(~race_ethnicity) + 
+  labs(title = "Distribution of Maths Scores by Race")
+```
+
+```{r}
+## Analysis of variance (ANOVA) ----
+aov(math_score ~ race_ethnicity, data = exams) %>% 
+  summary()
+```
+
+We see a p-value of close to zero. Hence, we reject the null hypothesis and go with the alternative hypothesis. There is a significant difference in mean math scores between difference race and ethnic groups.
+
+## **Regression Analysis and the F-test**
+
+In this section, I examine the factors that have a significant relationship with maths scores in test using regression analysis.
+
+> The null hypotheses are that each of the coefficients is zero. The alternative hypotheses are that the coefficients are significantly different from zero.
+
+We see from the regression table that kids with a parent with an associate degree have a higher test scores on average. Likewise, kids with high scores in reading and writing tend to have higher test scores, on average, compared to kids with low test scores in reading and writing. Kids on a standard meal have higher test scores on average compared to kids on a free meal. This could reflect the socio-economic background of the kids. In terms of explanatory power, the model has an $R^{2}$ of 0.85. This means that the model can explain 85% of the variation in maths scores.
+
+The **F-statistic** is also important in this case. Being significant, we see that the model explains the variation in maths scores better than a model with no independent variables. The null hypothesis is that the model does no better than a null model- a model with no variables. The alternative hypothesis states that the model is significantly better than a null model.
+
+The model diagnostics in the figure below shows how well the model fits the data. The goal of the posterior predictive check is to drive intuitions about the qualitative manner in which the model succeeds or fails, and about what sort of novel model formulation might better capture the trends in the data [@kruschke2014doing]. We see that the model fits the data pretty well. Again, in panel 2, we see that the relationship between dependent and independent variables is approximately linear. Panel 3 shows that the model does not have a serious heteroscedasticity issue. Again, there are no extreme values that could skew the regression (see the influential observations panel). There was very high correlation between the reading and writing score which raised the risk of multi-collinearity (and the resultant unstable coefficients). Hence I drop the writing score. Finally, the residuals appear relatively flat and within the line, meaning that the model could be useful for making predictions.
+
+```{r, results='asis'}
+## Regression model and output ----
+model <- lm(math_score ~ test_preparation_course + parental_level_of_education + gender + reading_score + lunch, data = exams)
+
+```
+
+```{r, results='asis'}
+## Regresion model output ----
+stargazer::stargazer(model, 
+                     type = "html", 
+                     header = FALSE)
+```
+
+\newpage
+
+\blandscape
+
+```{r, fig.width=12, fig.height=8, fig.cap="Model Diagnostics"}
+# Check for model performance ----
+performance::check_model(model)
+```
+
+\elandscape
+
+\newpage
+
+## **Multivariate Analysis of Variance**
+
+In this case, we look at a situation where we give two treatments (test preparation and lunch) to two groups of students, and we are interested in the math score and reading score of the students. In that case, the math score and reading score of students are two dependent variables, and our hypothesis is that both together are affected by the difference in treatment (test preparation vs provision of lunch). A multivariate analysis of variance could be used to test this hypothesis [@moser1992homogeneity].
+
+The MANOVA test can be used in certain conditions:
+
+-   The dependent variables should be normally distribute within groups (multivariate normality).
+
+-   Homogeneity of variances across the range of predictors.
+
+-   Linearity between all pairs of dependent variables, all pairs of covariates, and all dependent variable-covariate pairs in each cell
+
+We test for each condition:
+
+The data appears normally distributed among reading and math scores.
+
+```{r}
+## Histograms to check for maths and reading scores normality ----
+(exams %>% 
+  ggplot(mapping = aes(x = reading_score)) + 
+  geom_histogram() |
+
+exams %>% 
+  ggplot(mapping = aes(x = math_score)) + 
+  geom_histogram())
+```
+
+To test for the homogeneity of variance we conduct the F-test for homogeneity of variance.
+
+The statistical hypotheses are:
+
+Null hypothesis (H0): the variances of the two groups are equal.
+
+Alternative hypothesis (H1): the variances are different.
+
+We use the variance test for homogeneity of variance.
+
+We start with the test whether the two groups- the group that had a test preparation course and the one that did not have equal variance for the maths score. We see that the p-value is 0.5. Hence, we accept the null hypothesis that the two variances are the same.
+
+```{r}
+# Homogeneity of variance for maths score (var test) ----
+var.test(math_score ~ test_preparation_course, 
+              data = exams)
+```
+
+Next, test whether the two groups- the group that had a test preparation course and the one that did not have equal variance for the reading score. We see that the p-value is 0.5. Hence, we accept the null hypothesis that the two variances are the same.
+
+```{r}
+## Homogeneity of variance for reading score ----
+var.test(reading_score ~ test_preparation_course, 
+              data = exams)
+
+```
+
+lastly, we check for approximate linearity between the reading score and maths score. We see an approximate linear pattern from the graph below.
+
+```{r}
+# Linearity of reading and maths scores
+exams %>% 
+  ggplot(mapping = aes(x = math_score, 
+                       y = reading_score)) + 
+  geom_point(shape = 1) + 
+  labs(x = "Math Score", y = "Reading score",
+       title = "Reading Score vs Maths Score",
+       subtitle = "We see an approximate Linear Pattern")
+```
+
+## **Conclusion**
+
+In this analysis, I have run a series of statistical tests examining the relationship between tests in reading, writing, and maths and a host of factors that are presumed to have a relationship with the former. We find that test preparation is significantly associated with test scores. Gender and reading scores also have a significant relationship with maths scores. The findings have an implication for test preparation.
+
+\newpage
+
+# **Project 3: Mann-Whitney U-test/ Wilcoxon rank sum test**
+
+## **Background**
+
+In the context of cognitive studies, understanding the impact of aids on test recall rates is crucial for informing educational practices and cognitive support strategies. This research delves into the comparison of test recall rates between individuals who utilize aids during examinations and those who do not. The motivation behind this inquiry stems from the need to ascertain whether the presence of aids significantly influences recall performance. To address this question, a statistical approach, the Mann-Whitney U test, is employed to rigorously examine any potential differences in recall rates between the two groups. The findings of this investigation bear significance for educational interventions and the design of assessment environments, shedding light on the efficacy of aids in the context of test recall.
+
+## **Data**
+
+The data is divided into two groups: the retrieval group (R) and the non-retrieval group (N). The retrieval group recalled information without any assistance, whereas the non-retrieval group used aids for recall. In both scenarios, both groups underwent testing after 5 days and then again after 35 days.
+
+```{r}
+## project 3 ----
+## Load the data ----
+recall <- readxl::read_xlsx("data/Dataset_3_Pilot_study_data.xlsx",
+                      na = "Absent") %>% 
+  clean_names() %>% 
+  mutate(recall_day_5 = as.numeric(recall_day_5))
+
+## View the data ---
+recall %>% 
+  head() %>% 
+  gt()
+```
+
+## **Data Exploration**
+
+I start by visualizing the missing data. We see that our data has 6% missing, mostly students that were absent in taking one or both the tests. We shall drop this data during analysis.
+
+\newpage
+
+\blandscape
+
+```{r, fig.cap="Missing Data", fig.height=8, fig.width=12}
+## Missing data ----
+recall %>% 
+  vis_miss()
+```
+
+\elandscape
+
+\newpage
+
+The summary provided outlines the recall rates on day 5 and day 35 for both the retrieval and non-retrieval groups. It is evident that the retrieval group outperforms the non-retrieval group across all measurement metrics. Additionally, it is noteworthy that the retrieval group displays a greater variation (standard deviation) in the recall rates. The question is whether the observed difference is statistically significant.
+
+```{r}
+## Summary of Numeric Variables by Group ----
+recall %>% 
+  group_by(group) %>% 
+  skim_without_charts() %>% 
+  dplyr::filter(skim_type == "numeric") %>% 
+  dplyr::select(-starts_with("character")) %>% 
+  gt(caption = "Summary of Numeric Variables by Group")
+```
+
+We examine the distribution of the recall rates on day 5 and day 35, respectively. We find that the data are not normally distributed.
+
+```{r}
+## Distribution of recall rates, day5 ----
+recall %>% 
+  ggplot(aes(x = recall_day_5, fill = group)) + 
+  geom_density(alpha = 0.5) + 
+  labs(title = "Recall Rates in Day 5",
+       x = "Recall Rate, Day 5")
+```
+
+```{r}
+## Distribution of recall rates, day35 ----
+recall %>% 
+  ggplot(aes(x = recall_day_35, fill = group)) + 
+  geom_density(alpha = 0.5) + 
+  labs(title = "Recall Rates in Day 35",
+       x = "Recall Rate, Day 35")
+
+
+```
+
+## **Hypothesis Test**
+
+Due to the non-normal distribution of the data, the Mann-Whitney U-test, also known as the Wilcoxon rank-sum test, is employed for comparing differences between two independent samples when their distributions aren't normal, and the sample sizes are small (n \< 30). This nonparametric test serves as an alternative to the two-sample independent t-test.
+
+Assumptions for the Mann-Whitney U Test include having a continuous variable, a non-Normal distribution of data, similar data shapes across groups, independence of the two samples, and a sufficient sample size (typically more than 5 observations in each group). In our case, all conditions are met, as the scores are approximately comparable between the retrieval and non-retrieval groups [@mcknight2010mann].
+
+Moving on to the hypothesis test, the null hypothesis (H0) posits no difference in recall rates between the two groups, while the alternative hypothesis (HA) suggests a significant difference. Analyzing recall rates on day 5, the obtained p-value of 1 indicates no significant difference in recall rates between the retrieval and non-retrieval groups.
+
+```{r}
+## Man Whitney test for day 5 ----
+retrieval <- recall %>% pull(recall_day_5)
+non_ret <- recall %>% pull(recall_day_5)
+wilcox.test(retrieval, non_ret)
+```
+
+We conduct the same test for recall rates in day 35. We also fins no evidence of a difference in recall rates in day 35.
+
+```{r}
+## Man Whitney test for day 35 ----
+retrieval35 <- recall %>% pull(recall_day_35)
+non_ret35 <- recall %>% pull(recall_day_35)
+wilcox.test(retrieval35, non_ret35)
+
+
+```
+
+## Conclusion
+
+In this study, we investigated the disparity in test recall rates between individuals utilizing an aid and those not employing any assistance. Utilizing a statistical analysis method known as the Mann-Whitney U test, we discerned that there is no statistically significant difference between the recall rates of the two groups.
+
+# **References** {.unnumbered}

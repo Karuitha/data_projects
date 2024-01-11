@@ -1,0 +1,259 @@
+---
+title: "Natural language Processing in R: Sentiment Analysis of Kenya's Star Newspaper on `r format(Sys.Date(), format = '%A %B %d, %Y')`"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    toc_depth: 2
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE, echo = TRUE, message = FALSE, warning = FALSE)
+
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, topicmodels, rvest, kableExtra, tidytext, 
+               
+               ggthemes, wordcloud)
+
+theme_set(theme_fivethirtyeight())
+```
+
+# Background
+In this analysis, I scrap data from the Star Newspaper for `r format(Sys.Date(), format = '%A %B %d, %Y')` and evaluate the sentiment and topics that dominate the news. 
+
+# Data
+
+The data will include all the article titles. I start by scrapping the data. 
+
+```{r}
+star_titles <- read_html("https://www.the-star.co.ke/") %>% 
+  
+  html_nodes(".article-card-title") %>% 
+  
+  html_text() %>% 
+  
+  tibble() %>% 
+  
+  set_names("my_titles") %>% 
+  
+  mutate(id = row_number()) %>% 
+  
+  relocate(id) %>% 
+  
+  filter(!str_detect(my_titles, "[Rr]ecipe")) %>% 
+  
+  mutate(my_titles = str_remove(my_titles, "^.*:"))
+```
+
+We view the first few news stories of the newspaper.
+
+```{r}
+head(star_titles) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Top News Stories") %>% 
+  
+  kable_classic(bootstrap_options = "striped")
+```
+
+Next, we examine the most commonly occuring words in the news today. Here, we use the tidy data principles, converting every word to a row of data, as follows. 
+
+```{r}
+star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  head(7) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Unnesting Words") %>% 
+  
+  kable_classic(bootstrap_options = "striped")
+```
+
+However, some words while useful in writing, do not carry inherent meaning. The words tend to dominate most of our writing. Let us see the most common words in our text. 
+
+```{r}
+star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  count(word) %>% 
+  
+  arrange(desc(n))
+```
+
+We see that `to`, `in` and `for` are the most common words. However, they have little meaning on their own. Hence, we shall remove such words to retain meaningful words. Fortunately, `R` provides tools to remove `stopwords`. 
+
+```{r}
+star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  anti_join(stop_words) %>% 
+  
+  count(word) %>% 
+  
+  arrange(desc(n)) %>% 
+  
+  head(7)
+```
+# Word Frequency
+
+In this section, we examine the words that appear most frequently in the data set. Wr visualise this data using a column chart and a word cloud. We start with the column chart of the top 10 most common words in todays newspaper titles. 
+
+```{r}
+star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  anti_join(stop_words) %>% 
+  
+  count(word) %>% 
+  
+  arrange(desc(n)) %>% 
+  
+  slice(1:10) %>% 
+  
+  mutate(word2 = fct_reorder(word, n)) %>% 
+  
+  ggplot(aes(x = word2, y = n)) + 
+  
+  geom_col() + 
+  
+  coord_flip() + 
+  
+  labs(
+    
+    title = "Analysis of Star Newspaper Titles, July 15, 2022",
+    
+    subtitle = "Which Words or Names are most Frequently Appearing in the News?",
+    
+    x = NULL,
+    
+    y = NULL
+  )
+```
+
+The word cloud gives an even better shot of the common words. 
+
+```{r}
+word_freq <- star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  anti_join(stop_words) %>% 
+  
+  count(word)
+
+wordcloud(words = word_freq$word, freq = word_freq$n, 
+          
+          min.freq = 3, col = 'red')
+```
+
+There appears to be quite a furore over the World Championships (Omanyala never got a visa in time), land (presumably the Kenyatta University land saga), and, understandably Raila (Odinga) and (William) Ruto.
+
+# Getting Average Sentiment
+
+In this section, we estimate the average sentiment or emotional content of words in the Star newspaper. There are several tools that allow for the estimation of sentiment. In `R`, the common sentiment analysis dictionaries are:
+
+- Bing
+- Afinn
+- Loughran
+- NRC
+
+Please refere to the literature for each of these sentiment measures. In this case, we use the `nrc` dictionary. The `nrc` dictionary has 10 classes of sentiment listed below. Most English words have carefully been allocated to each of these sentiments. However, there is still room for error. Also, people may use words that may not neccesarily correspond with the sentiment. A case in point is when using sarcasm. This occurence is relatively rare in written speech.
+
+```{r}
+get_sentiments("nrc") %>% 
+  
+  count(sentiment) %>% 
+  
+  pull(sentiment)
+```
+
+We join the `nrc` dictionary with our data so that each word in our data set has a corresponding sentiment. 
+
+Overall, the news appears to be positive. This conclusion could change if we analysed political news alone. 
+
+```{r}
+star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  anti_join(stop_words) %>%
+  
+  inner_join(get_sentiments("nrc")) %>% 
+  
+  filter(sentiment %in% c("positive", "negative")) %>% 
+  
+  count(sentiment) %>% 
+  
+  arrange(desc(n)) %>% 
+  
+  mutate(prop = n / sum(n))
+```
+
+# Topic Modelling
+
+Approximately how many topics are covered in the Star Newspaper today. This question is very subjective. However, we can estimate this using a technique called the [Latent Dirichlet allocation (LDA)](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation). Please refer to <https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation> for more details on the LDA technique. 
+
+We start by creating a document term matrix:
+
+```{r}
+star_dtm <- star_titles %>% 
+  
+  unnest_tokens(word, my_titles) %>% 
+  
+  anti_join(stop_words) %>%
+  
+  count(id, word) %>% 
+  
+  mutate(id = as.character(id)) %>% 
+  
+  cast_dtm(term = word, document = id, value = n)
+  
+glimpse(star_dtm)
+```
+
+We then run an LDA analysis, as follows.
+
+```{r}
+my_star_lda <- LDA(
+  star_dtm,
+  k = 3,
+  method = "Gibbs",
+  control = list(seed = 42)
+)
+
+glimpse(my_star_lda)
+my_star_lda_tidy <- tidy(my_star_lda, matrix = "beta") %>% arrange(desc(beta))
+```
+
+```{r}
+my_star_lda_tidy %>% 
+  
+  group_by(topic) %>% 
+  
+  top_n(3, beta) %>% 
+  
+  mutate(term2 = fct_reorder(term, beta)) %>% 
+  
+  ggplot(aes(x = term, y = beta, fill = factor(topic))) + 
+  
+  geom_col() + 
+  
+  facet_wrap(~ topic, scales = "free") + 
+  
+  coord_flip()
+```
+
+However, deciding the optimal number of topics is subjective. In our case, we appear to have a topic on politics, another topic on world issues and yet another dealing with women and general issues. 
+
+# Conclusion
+
+In this article, we have examined the basics of natural language processing using R. The write up covered sentiment analysis and the basics of topic modelling. You can find more about these courses on [datacamp](https://app.datacamp.com/) or from a book by Julie Silge titled [`Text Mining with R`](https://www.tidytextmining.com/). 

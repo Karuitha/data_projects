@@ -1,0 +1,186 @@
+---
+title: "Consumer Segmentation Using Cluster Analysis"
+subtitle: "Grouping Consumers of Office Equipment for Targeted Marketing"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output: 
+        tint::tintHtml:
+                toc: true
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+## Install and load package manager
+## NB: This section requires an internet connection
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+        
+}
+
+## Load required packages, installing them if not available
+pacman::p_load(tidyverse, ggthemes, GGally, janitor, skimr, kableExtra, 
+               
+               huxtable, flextable, knitr, rmarkdown, officedown, 
+               
+               officer, corrplot, dendextend, flexclust, NbClust,
+               
+               here, questionr, ggmosaic, OddsPlotty, tidymodels,
+               
+               lift, data.table,  dfidx, mlogit, lmtest, officedown,
+               
+               markdown, devtools, remotes, mosaic, thematic, tint
+               
+               )
+
+## Install bbplot
+if(!require(bbplot)){
+ devtools::install_github('bbc/bbplot')       
+}
+
+## Set theme for plots
+theme_set(bbplot::bbc_style())
+
+## Set number of significant digits
+options(digits = 2)
+# invalidate cache when the package version changes
+knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tint'), message = FALSE,
+                      
+                      warning = FALSE)
+
+options(htmltools.dir.version = FALSE)
+```
+
+## Background
+
+When procuring goods and services, consumers have a plethora of options. For instance, which vendor would best meet the consumer demands? Where should the consumers procure the goods and services? In this project, we examine the choice of vendor using `cluster analysis`. Specifically, we will use data from a survey of 200 respondents regarding the importance of several store attributes when choosing where to buy office equipment.
+
+## Objectives 
+
+
+## Summary of Results
+
+
+## Data
+
+We start by reading the data into `R` and examining the first few rows.  
+
+```{r}
+## Read the data
+office <- read_csv("office (2).csv") %>% 
+        
+        clean_names()
+
+```
+
+```{r}
+office %>% 
+        
+        head() %>% 
+        
+        kbl(., booktabs = TRUE, caption = "First Six Observations of the Data") %>% 
+        
+        kable_classic(full_width = TRUE)
+```
+
+
+The data has `r nrow(office)` rows and `r ncol(office)` columns. Critically, The data has no missing observations and no duplicate rows. Table () describes the variables. 
+
+```{r, echo=FALSE}
+## variables description
+tribble(~ Variable, ~ Description,
+        
+        "respondent_id", "An identifier for our observations",
+        
+        "variety_of_choice", "Importance to customers of having a variety of choice in a store on a 0-10 scale",
+        
+        "electronics", "Importance of this attribute on a 0-10 scale",
+        
+        "furniture", "Importance furniture to consumers of on a 0-10 scale",
+        
+        "quality_of_services", "Importance of this attribute on a 0-10 scale",
+        
+        "low_prices", "Importance of this attribute on a 0-10 scale",
+        
+        "return_policy", "Importance of this attribute on a 0-10 scale",
+        
+        "professional", "Whether the respondent is a professional or not (e.g., student)", 
+        
+        "income", "Gross annual income expressed in thousands of pound sterling",
+        
+        "age", "Respondents’ age in years") %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Variables Description") %>% 
+        
+        kable_classic(full_width = TRUE)
+```
+
+
+## Data Visualisation
+
+In this section e visualise the data and run correlation analysis. Figure 1 shows the pairs plot for all the variables in the data set. Some of the variables have very high correlation, for instance, `age` and `income` at 0.74 and `variety of choices` and `furniture` at 0.66. The main diagonal of the pairs plot shows that the variables are highly skewed. 
+
+```{r, fig.width = 10, fig.height = 8, fig.cap = "Pairs Plots of Variables", fig.fullwidth = TRUE, cache=TRUE}
+## Pairs plots for all variables
+office %>% 
+        
+        select(-respondent_id) %>% 
+        
+        relocate(professional, .after = age) %>% 
+        
+        ggpairs(title = "Pairs Plots of Variables") + 
+        
+        theme(axis.text = element_text(size = 2))
+```
+
+Figure 2 shows a visualisation of the correlations, showing the high degree of collinearity between some of the variables. 
+
+```{r, fig.cap = "Correlation Matrix", fig.margin=TRUE, fig.width=5, fig.height=5, cache=TRUE}
+office %>% 
+        
+        select(where(is.numeric), -respondent_id) %>% 
+        
+        cor() %>% 
+        
+        corrplot(type = "lower", diag = FALSE)
+```
+
+## Summary Statistics
+
+```{r}
+## Summary Statistics for numeric variables
+office %>% 
+        
+        select(where(is.numeric), -respondent_id) %>% 
+        
+        skim_without_charts() %>% 
+        
+        select(-skim_type, -n_missing) %>% 
+        
+        rename(Variable = skim_variable, mean = numeric.mean,
+               
+               SD = numeric.sd, Min = numeric.p0,
+               
+               Q1 = numeric.p25, Median = numeric.p50, 
+               
+               Q3 = numeric.p75, Max = numeric.p100) %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Summary Statistics for Numeric Variables") %>% 
+        
+        kable_classic(full_width = TRUE)
+```
+
+
+```{r}
+office %>% 
+        
+        select(where(is.character)) %>% 
+        
+        skim() %>% 
+        
+        kbl(., booktabs = TRUE, caption = "Summary of Character Variables") %>% 
+        
+        kable_classic(full_width = TRUE)
+```

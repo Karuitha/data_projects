@@ -1,0 +1,67 @@
+% Packages
+\usepackage{bm,booktabs,animate,ragged2e,multicol,microtype,hyperref}
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+
+% Figures
+\graphicspath{{figs/}}
+\def\full#1{\vspace*{0.15cm}\centerline{\includegraphics[width=12.8cm,height=8.3cm,keepaspectratio=true]{#1}}}
+
+% Fonts
+\fontsize{12}{14}\sf
+\usepackage[scale=0.85]{sourcecodepro}
+\DisableLigatures{encoding = T1, family = tt*}
+\setbeamerfont{title}{series=\bfseries,parent=structure,size=\fontsize{17}{19}}
+\usepackage{fontawesome}
+
+% title page
+\setbeamerfont{title}{series=\bfseries,parent=structure,size={\fontsize{24}{26}}}
+\setbeamertemplate{title page}
+{\placefig{-0.01}{-0.01}{width=1.01\paperwidth,height=1.01\paperheight}{nairobi.jpg}
+
+\begin{textblock}{10.5}(.9,.9)\fontsize{20}{22}\sf
+{\color[RGB]{0, 0, 0}\raggedright\usebeamerfont{title}\par Time Series Analysis \& Forecasting Using R}
+\end{textblock}
+%color blind: 213,94,0, my color: 152, 0, 50
+
+\begin{textblock}{7.5}(.7,5.3)
+{\fontsize{15}{15}\sf\color[RGB]{255, 255, 255}\raggedright{\inserttitle}}
+\end{textblock}
+\begin{textblock}{7.5}(.7,7.3)
+{\fontsize{15}{15}\sf\color[RGB]{255, 255, 255}\raggedright{\insertauthor}}
+\end{textblock}
+}
+% color blind: 86,180,233, my color: 255, 255, 255
+
+% Colors
+\setbeamercolor{description item}{fg=Orange}
+\definecolor{MonashBlue}{RGB}{152, 0, 50}
+% My definitions
+
+\def\E{\text{E}}
+\def\V{\text{Var}}
+\def\up#1{\raisebox{-0.3cm}{#1}}
+\def\pred#1#2#3{\hat{#1}_{#2|#3}}
+\def\damped{$_\text{d}$}
+\def\h+{h_{m}^{+}}
+\def\st#1{\rlap{#1}\textcolor{red}{\rule{1cm}{0.1cm}}}
+
+\def\fullwidth#1{\vspace*{-0.0cm}\par\centerline{\includegraphics[width=12.8cm]{#1}}}
+\def\fullheight#1{\vspace*{0.02cm}\par\centerline{\includegraphics[height=8.4cm]{#1}}}
+
+
+\usepackage{tikz}
+
+\usetikzlibrary{trees,shapes,arrows,matrix}
+\tikzstyle{decision} = [diamond, draw, fill=blue!20,
+    text width=4.5em, text badly centered, node distance=4cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20,
+    text width=5cm, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, thick, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em, text centered]
+\tikzstyle{connector} = [->,thick]
+
+
+% gt dependencies
+\usepackage{longtable,caption,setspace}
+\captionsetup{font={small,stretch=0.80}}

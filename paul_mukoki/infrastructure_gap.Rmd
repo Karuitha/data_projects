@@ -1,0 +1,319 @@
+---
+title: "Infrastructure Gap"
+author: "Paul Mukoki"
+date: "8/6/2021"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    code_folding: hide
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1,T2A]{fontenc}
+- \usepackage{amsmath}
+- \usepackage{dcolumn}
+mainfont: palatino
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+## Download packages if not available
+if(!require(pacman)){
+  
+  install.packages("pacman")
+  
+}
+
+
+## All the required packages
+pacman::p_load("tidyverse", "janitor", "kableExtra", 
+                      
+                      "knitr", "rmarkdown", "plm", "stargazer",
+               
+               "skimr", "GGally", "kableExtra", "corrplot", "plm", 
+               
+               "punitroots")
+
+options(scipen = 999)
+```
+
+## Preliminary: Read in the data
+Here I load the dataset
+
+```{r}
+mukoki_gap_data <- readxl::read_xlsx("dataset_40_countries.xlsx") %>% 
+  
+  janitor::clean_names() %>% 
+  
+  data.frame()
+```
+
+## Dependent and Independent Variables
+
+I select the dependent and independent variables
+
+```{r}
+modelling_data <- mukoki_gap_data %>% 
+  
+  select(countries, country, state, year, 
+         
+         income_group_2009, income_2009,
+         
+         overall_index, infra_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap, overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  tibble()
+```
+
+\newpage
+
+\blandscape
+
+### Dependent Variables
+
+```{r}
+
+modelling_data %>% 
+  
+  select(income_2009,
+         
+         overall_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap) %>% 
+  
+  na.omit() %>% 
+  
+  skim_without_charts() %>% 
+  
+  select(-n_missing, -complete_rate, -skim_type) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Independent Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
+  
+  
+```
+
+\elandscape
+
+\newpage
+
+
+\newpage
+
+\blandscape
+
+```{r, fig.width = 12, fig.height = 8}
+modelling_data %>% 
+  
+  select(income_2009,
+         
+         overall_index, infra_index, 
+         
+         transport_gap, electricity_gap,
+         
+         ict_gap, water_gap) %>% 
+  
+  na.omit() %>% 
+  
+  ggpairs()
+```
+
+\elandscape
+
+\newpage
+
+
+### Independent Variables
+
+\newpage
+
+\blandscape
+
+We examine the independent variables. Please confirm that these are correct before I go ahead and run the regressions. I am especially keen on overall index and its meaning. What variable in the data stands for `Public-Private Partnerships (PPP) investment in Aggregate/overall infrastructure`? I dont think its the overall index. 
+
+
+```{r}
+
+modelling_data %>% 
+  
+  select(infra_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  skim_without_charts() %>% 
+  
+  select(-n_missing, -complete_rate, -skim_type) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Independent Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
+  
+  
+```
+
+\elandscape
+
+\newpage
+
+```{r}
+modelling_data %>% 
+  
+  select(infra_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  drop_na(percent_change_in_gfcf_public) %>% 
+  
+  cor() %>% 
+  
+  corrplot(method = "number", type = "lower", 
+           
+           diag = FALSE, number.digits = 2, 
+           
+           title = "Correlation Matrix for Dependent Variables")
+```
+
+\newpage
+
+\blandscape
+
+```{r, fig.width = 12, fig.height = 8}
+modelling_data %>% 
+  
+  select(overall_index,
+         
+         transport_invest, electricity_invest,
+         
+         ict_invest, water_invest, water_invest,
+         
+         stock_mkt_cap, human_di, exchange_rate, 
+         
+         rinterestrate, percent_change_in_gfcf_public, 
+         
+         fdi_gdp, govenance_index) %>% 
+  
+  drop_na(percent_change_in_gfcf_public) %>% 
+  
+  ggpairs()
+```
+
+\elandscape
+
+\newpage
+
+
+## The Fixed Effects Model
+Write a regression function to run fixed and random effects  models 
+
+```{r}
+model_fixed <- plm(overall_index ~ transport_invest + electricity_invest +
+         
+         ict_invest + water_invest + water_invest +
+         
+         stock_mkt_cap + human_di + exchange_rate + 
+         
+         rinterestrate + percent_change_in_gfcf_public + 
+         
+         fdi_gdp + govenance_index, data = modelling_data, 
+    
+    effect = "twoways", model = "within", index = c("country", "year"))
+
+summary(model_fixed)
+```
+
+## The Random Effects Model
+
+```{r}
+model_random <- plm(overall_index ~ transport_invest + electricity_invest +
+         
+         ict_invest + water_invest + water_invest +
+         
+         stock_mkt_cap + human_di + exchange_rate + 
+         
+         rinterestrate + percent_change_in_gfcf_public + 
+         
+         fdi_gdp + govenance_index, data = modelling_data, 
+    
+    effect = "twoways", model = "random", index = c("country", "year"))
+
+summary(model_random)
+```
+
+### The Hausmann Test
+Given that the test is significant, then we should use the fixed effects model .
+
+```{r}
+phtest(model_fixed, model_random)
+```
+
+## Cross-Sectional Dependence
+
+The model shows the presence of cross sectional dependence. Thus, the unit roots tests have to consider the presence of cross sectional dependence in the panels. 
+
+```{r}
+pcdtest(model_fixed, method = "cd")
+```
+
+
+## Panel unit root tests in the Presence of Cross-Sectional Dependence
+
+The main unit root tests implemented in  R's plm and punitroots, namely the tests proposed in Maddala and Wu (1999), Choi (2001), Levin, Lin, and Chu (2002), Im, Pesaran, and Shin (2003) (plm); Deme-
+trescu, Hassler, and Tarcolea (2006), Hanck (2008), Costantini and Lupi (2011) (punitroots).
+The first four tests assume that the series under scrutiny are cross-sectionally independent:
+the last three allow for cross-dependence across the panel units.
+
+```{r}
+infra_index_wide <- modelling_data %>% 
+  
+  select(countries, year, infra_index) %>% 
+  
+  pivot_wider(names_from = "countries", values_from = "infra_index") %>% 
+  
+  as.matrix()
+```
+
+
+```{r}
+my_matrix_csd <- as.matrix(modelling_data[, c("transport_invest", "electricity_invest", "ict_invest", "water_invest", "water_invest", "stock_mkt_cap", "human_di", "exchange_rate", "rinterestrate",  "percent_change_in_gfcf_public", "fdi_gdp", "govenance_index")], nrow = 640, ncol = 12)
+
+punitroots::pCADFtest(Y = infra_index_wide[,-1], type = "drift", max.lag.y = 5, criterion = "AIC", crosscorr=0.10)
+```
+

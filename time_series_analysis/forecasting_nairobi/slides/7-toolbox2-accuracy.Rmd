@@ -1,0 +1,596 @@
+---
+title: "The forecasters' toolbox-Part 2"
+author: "Bahman Rostami-Tabar"
+date: ""
+toc: true
+colortheme: monashwhite
+output:
+  binb::monash:
+    fig_width: 7
+    fig_height: 3.5
+    includes:
+      in_header: header.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE, warning = FALSE, error = FALSE)
+library(tidyverse)
+library(fpp3)
+library(lubridate)
+library(gt)
+options(width=50)
+# Re-index based on trading days
+google_stock <- gafa_stock %>%
+  filter(Symbol == "GOOG") %>%
+  mutate(day = row_number()) %>%
+  update_tsibble(index = day, regular = TRUE)
+google_2015 <- tsibbledata::gafa_stock %>%
+   filter(Symbol == "GOOG", year(Date) == 2015) %>%
+   mutate(trading_day = row_number()) %>% 
+   update_tsibble(index = trading_day, regular = TRUE)
+
+antidiabetic_drug_sale <- PBS %>% filter(ATC2 == "A10") %>%
+  summarise(Cost = sum(Cost)/1e6) %>% filter_index("2000"~.)
+```
+
+# Residual diagnostics
+## Forecasting residuals
+
+\begin{block}{}
+\textbf{Residuals in forecasting:} difference between observed value and its fitted value: $e_t = y_t-\hat{y}_{t|t-1}$.
+\end{block}
+
+\pause\fontsize{12}{15}\sf
+
+\alert{Assumptions}
+
+  1. $\{e_t\}$ uncorrelated. If they aren't, then information left in  residuals that should be used in computing forecasts.
+  2. $\{e_t\}$ have mean zero. If they don't, then forecasts are biased.
+
+\pause
+
+\alert{Useful properties} (for prediction intervals)
+
+  3. $\{e_t\}$ have constant variance.
+  4. $\{e_t\}$ are normally distributed.
+
+<!-- ## Example: Google stock price -->
+<!-- \fontsize{10}{10}\sf -->
+
+<!-- ```{r goog-create, echo=TRUE} -->
+<!-- google_2015 <- tsibbledata::gafa_stock %>% -->
+<!--   filter(Symbol == "GOOG", year(Date) == 2015) %>% -->
+<!--   mutate(trading_day = row_number()) %>% -->
+<!--   update_tsibble(index = trading_day, regular = TRUE) -->
+<!-- ``` -->
+<!-- ```{r, echo = FALSE} -->
+<!-- google_2015 -->
+<!-- ``` -->
+
+<!-- ## Example: Google stock price -->
+<!-- \fontsize{10}{10}\sf -->
+
+<!-- ```{r dj3, echo = TRUE} -->
+<!-- google_2015 %>% -->
+<!--   autoplot(Close) + -->
+<!--     xlab("Day") + ylab("Closing Price (US$)") + -->
+<!--     ggtitle("Google Stock (daily ending 6 December 2015)") -->
+<!-- ``` -->
+
+<!-- ## Example: Google stock price -->
+
+<!-- \alert{Na\"{\i}ve forecast:} -->
+
+<!-- \[\hat{y}_{T|T-1}= y_{T-1}\]\pause -->
+<!-- \[e_T = y_T-\hat{y}_{T|T-1}=y_T-y_{T-1}\]\pause -->
+
+<!-- \begin{alertblock}{} -->
+<!-- Note: $e_t$ are one-step-forecast residuals -->
+<!-- \end{alertblock} -->
+
+## Example: Antidiabetic drug sales
+\fontsize{10}{10}\sf
+
+```{r dj4, echo=FALSE, warning=FALSE, fig.align='center'}
+fit <- antidiabetic_drug_sale %>% model(NAIVE(Cost))
+augment(fit) %>%
+  ggplot(aes(x = Month)) +
+    geom_line(aes(y = Cost, colour = "Data")) +
+    geom_line(aes(y = .fitted, colour = "Fitted")) +
+    xlab("Month") + ylab("Sales (US$)") +
+    ggtitle("Antidiabetic drug sales")
+```
+
+## Example: Antidiabetic drug sales
+\fontsize{10}{10}\sf
+
+```{r dj5, echo=TRUE, warning = FALSE}
+augment(fit) %>%
+  autoplot(.resid) + xlab("Month") + ylab("") +
+    ggtitle("Residuals from naïve method")
+```
+
+## Example: Antidiabetic drug sales
+\fontsize{11}{11}\sf
+
+```{r dj6, warning=FALSE}
+augment(fit) %>%
+  ggplot(aes(x = .resid)) +
+    geom_histogram(bins = 30) +
+    ggtitle("Histogram of residuals")
+```
+
+## Example: Antidiabetic drug sales
+\fontsize{11}{11}\sf
+
+```{r dj7}
+augment(fit) %>% ACF(.resid) %>%
+  autoplot() + ggtitle("ACF of residuals")
+```
+
+## ACF of residuals
+
+* We assume that the residuals are white noise (uncorrelated, mean zero, constant variance). If they aren't, then there is information left in  the residuals that should be used in computing forecasts.
+
+* So a standard residual diagnostic is to check the ACF of the residuals of a forecasting method.
+
+* We *expect* these to look like white noise.
+
+## Portmanteau tests
+
+Consider a *whole set* of $r_{k}$  values, and develop a test to see whether the set is significantly different from a zero set.\pause
+
+\begin{block}{Box-Pierce test\phantom{g}}
+\centerline{$\displaystyle
+Q = T \sum_{k=1}^h r_k^2$}
+where $h$  is max lag being considered and $T$ is number of observations.
+\end{block}
+
+  * If each $r_k$ close to zero, $Q$ will be **small**.
+  * If some $r_k$ values large (positive or negative), $Q$ will be **large**.
+
+## Portmanteau tests
+
+Consider a *whole set* of $r_{k}$  values, and develop a test to see whether the set is significantly different from a zero set.
+
+\begin{block}{Ljung-Box test}
+\centerline{$\displaystyle
+ Q^* = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$}
+where $h$  is max lag being considered and $T$ is number of observations.
+\end{block}
+
+* Preferences: $h=10$ for non-seasonal data, $h=2m$ for seasonal data.
+* Better performance, especially in small samples.
+
+\vspace*{10cm}
+
+## Portmanteau tests
+\fontsize{13}{15}\sf
+
+  * If data are WN, $Q^*$ has $\chi^2$ distribution with  $(h - K)$ degrees of freedom where $K=$ no.\ parameters in model.
+  * When applied to raw data, set $K=0$.
+
+\fontsize{11}{12}\sf
+
+```{r dj9, echo=TRUE}
+augment(fit) %>% features(.resid, ljung_box, lag=10,dof=0)
+```
+
+## `gg_tsresiduals` function
+
+\fontsize{11}{12}\sf
+
+```{r dj10, echo=TRUE, fig.height=4, warning = FALSE}
+fit %>%
+  gg_tsresiduals()
+```
+
+# Evaluating point forecast accuracy
+
+<!-- ## Evaluating the accuracy  -->
+
+<!-- * In order to evaluate a forecasting model, we calculate its forecast  accuracy. -->
+<!-- * Forecast accuracy is compared by measuring errors based on the test set. -->
+<!-- * Ideally it should allow comparing benefits from improved accuracy with the cost of obtaining the improvement. -->
+
+<!-- ## Evaluating the accuracy  -->
+
+<!-- * We should be choosing forecast models to lead to the maximum benefits on the bottom line.  -->
+<!--     - least staffing costs, least inventory, fastest response, least change in planing,  for example. -->
+<!-- * However, this is not always easy to obtain, therefore we might simply use methods that provide the most accurate forecast. -->
+
+<!-- ## Good fit versus forecast accuracy -->
+
+<!-- \fullwidth{good_fit} -->
+
+## Evaluate forecast accuracy
+
+* Residual diagnostic is not a reliable indication of forecast accuracy
+* A model which fits the training data well will not necessarily forecast well
+* A perfect fit can always be obtained by using a model with enough parameters
+* Over-fitting a model to data is just as bad as failing to identify a systematic pattern in the data
+
+## Fitting
+
+\fullwidth{overfit}
+
+## Evaluate forecast accuracy
+   
+ \begin{alertblock}{}
+The accuracy of forecasts can only be determined by considering how well a model performs on new data that were not used when fitting the model
+\end{alertblock}
+
+## Forecast accuracy evaluation using test sets
+
+ ```{r traintest, fig.height=1, echo=FALSE, cache=TRUE}
+# train = 1:18
+# test = 19:24
+# par(mar=c(0,0,0,0))
+# plot(0,0,xlim=c(0,26),ylim=c(0,2),xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
+# arrows(0,0.5,25,0.5,0.05)
+# points(train, train*0+0.5, pch=19, col="blue")
+# points(test,  test*0+0.5,  pch=19, col="red")
+# text(29,0.5,"time")
+# text(10,1,"Train data",col="blue")
+# text(27,1,"Test data",col="red")
+ ```
+
+* We mimic the real life situation
+* We pretend we don't know some part of data(new data)
+* It must not be used for *any* aspect of model training
+* Forecast accuracy is based only on the test set
+
+# Time Series Cross Validation (TSCV)
+
+## Training and test series
+
+```{r split_fig, echo=FALSE}
+knitr::include_graphics("figs/f_test.jpg")
+```
+
+## Split the data
+
+Use functions in `dplyr` and `lubridate` such as `filter`, `filter_index`, `slice`
+
+\fontsize{12}{14}\sf
+
+```{r split_in_r}
+# Filter the year of interest
+antidiabetic_drug_sale %>%
+  filter_index("2006"~.)
+antidiabetic_drug_sale %>%
+  slice((n()-4):n())
+
+```
+
+## Forecast errors
+
+Forecast "error": the difference between an observed value and its forecast
+
+$$
+  e_{T+h} = y_{T+h} - \hat{y}_{T+h|T},
+$$
+where the training data is given by $\{y_1,\dots,y_T\}$
+
+- Unlike residuals, forecast errors on the test set involve multi-step forecasts.
+- These are *true* forecast errors as the test data is not used in computing $\hat{y}_{T+h|T}$.
+
+<!-- ## Measures of forecast accuracy -->
+
+<!-- ```{r google_fc, echo=FALSE, fig.height=4} -->
+<!-- test_2008 <- antidiabetic_drug_sale %>% filter_index("2008 Jan" ~ .) -->
+<!-- # A better way using a tsibble to determine the forecast horizons -->
+<!-- train_till_2008 <- antidiabetic_drug_sale %>% -->
+<!--   filter_index(~ "2007 Dec") -->
+<!-- drug_fit <- train_till_2008 %>% -->
+<!--   model( -->
+<!--     mean = MEAN(Cost), -->
+<!--     naive = NAIVE(Cost), -->
+<!--     snaive = SNAIVE(Cost) -->
+<!--   ) -->
+<!-- # Produce forecasts for the 19 trading days in January 2016 -->
+<!-- #google_fc <- google_fit %>% forecast(h = 19) -->
+<!-- # A better way using a tsibble to determine the forecast horizons -->
+<!-- drug_fc <- drug_fit %>% forecast(test_2008) -->
+
+<!-- drug_fc %>% autoplot(antidiabetic_drug_sale, level=NULL) -->
+<!-- ``` -->
+
+## Measures of forecast accuracy
+
+\begin{tabular}{rl}
+$y_{T+h}=$ & $(T+h)$th observation, $h=1,\dots,H$ \\
+$\pred{y}{T+h}{T}=$ & its forecast based on data up to time $T$. \\
+$e_{T+h} =$  & $y_{T+h} - \pred{y}{T+h}{T}$
+\end{tabular}
+
+\begin{align*}
+\text{MAE} &= \text{mean}(|e_{T+h}|) \\[-0.2cm]
+\text{MSE} &= \text{mean}(e_{T+h}^2) \qquad
+&&\text{RMSE} &= \sqrt{\text{mean}(e_{T+h}^2)} \\[-0.1cm]
+\text{MAPE} &= 100\text{mean}(|e_{T+h}|/ |y_{T+h}|)
+\end{align*}\pause
+
+  * MAE, MSE, RMSE are all scale dependent
+  * MAPE is scale independent but is only sensible if $y_t\gg 0$ for all $t$, and $y$ has a natural zero.
+
+## Measures of forecast accuracy
+
+\begin{block}{Mean Absolute Scaled Error}
+$$
+\text{MASE} = \text{mean}(|e_{T+h}|/Q)
+$$
+where $Q$ is a stable measure of the scale of the time series $\{y_t\}$.
+\end{block}
+
+For non-seasonal time series,
+$$
+  Q = (T-1)^{-1}\sum_{t=2}^T |y_t-y_{t-1}|
+$$
+works well. Then MASE is equivalent to MAE relative to a naïve method.
+
+\vspace*{10cm}
+
+## Measures of forecast accuracy
+
+\begin{block}{Mean Absolute Scaled Error}
+$$
+\text{MASE} = \text{mean}(|e_{T+h}|/Q)
+$$
+where $Q$ is a stable measure of the scale of the time series $\{y_t\}$.
+\end{block}
+
+For seasonal time series,
+$$
+  Q = (T-m)^{-1}\sum_{t=m+1}^T |y_t-y_{t-m}|
+$$
+works well. Then MASE is equivalent to MAE relative to a seasonal naïve method.
+
+
+<!-- ## Test set accuracy -->
+
+<!-- \fontsize{12}{14}\sf -->
+
+<!-- ```{r beer-test-accuracy, results = 'hide', dependson="google_fc"} -->
+
+<!-- accuracy(google_fc, google_stock) -->
+<!-- ``` -->
+
+<!-- \fontsize{10}{11}\sf -->
+
+<!-- ```{r google-test-table, echo=FALSE, dependson="google_fc"} -->
+<!-- accuracy(drug_fc, antidiabetic_drug_sale) %>% -->
+<!--   mutate(Method = paste(.model, "method")) %>% -->
+<!--   select(Method, RMSE, MAE, MASE) %>% -->
+<!--   gt::gt() %>% -->
+<!--   gt::as_latex() -->
+<!-- ``` -->
+
+## Poll: true or false?
+
+  1. Good point forecast models should have normally distributed residuals.
+  2. A model with small residuals will give good forecasts.
+  3. The best measure of forecast accuracy is MAPE.
+  4. Always choose the model with the best forecast accuracy as measured on the test set.
+
+## Issue with train/test split without time series cross-validation
+
+```{r t_evl, echo=FALSE, out.width='90%'}
+knitr::include_graphics("figs/f_test.jpg")
+```
+
+\pause
+
+```{r traintest2, fig.height=1, echo=FALSE, cache=TRUE}
+train = 1:18
+test = 19:24
+par(mar=c(0,0,0,0))
+plot(0,0,xlim=c(0,26),ylim=c(0,2),xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
+arrows(0,0.5,25,0.5,0.05)
+points(train, train*0+0.5, pch=19, col="blue")
+points(test,  test*0+0.5,  pch=19, col="red")
+text(26,0.5,"time")
+text(10,1,"Training data",col="blue")
+text(21,1,"Test data",col="red")
+```
+
+## Time series cross-validation {-}
+
+```{r split_cv, echo=FALSE}
+knitr::include_graphics("figs/f_future.jpg")
+```
+
+## Time series cross-validation {-}
+
+**Time series cross-validation**
+
+```{r cv1, cache=TRUE, echo=FALSE, fig.height=4}
+par(mar=c(0,0,0,0))
+plot(0,0,xlim=c(0,28),ylim=c(0,1),
+       xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
+i <- 1
+for(j in 1:10)
+{
+  test <- (16+j):26
+  train <- 1:(15+j)
+  arrows(0,1-j/20,27,1-j/20,0.05)
+  points(train,rep(1-j/20,length(train)),pch=19,col="blue")
+  if(length(test) >= i)
+    points(test[i], 1-j/20, pch=19, col="red")
+  if(length(test) >= i)
+    points(test[-i], rep(1-j/20,length(test)-1), pch=19, col="gray")
+  else
+    points(test, rep(1-j/20,length(test)), pch=19, col="gray")
+}
+text(28,.95,"time")
+```
+
+\pause
+
+ * Forecast accuracy averaged over test sets.
+ * Also known as "evaluation on a rolling forecasting origin"
+
+ \vspace*{10cm}
+
+## Creating the rolling training sets 
+
+\fontsize{13}{14}\sf
+
+There are three main rolling types which can be used.
+
+* Stretch: extends a growing length window with new data.
+* Slide: shifts a fixed length window through the data.
+* Tile: moves a fixed length window without overlap.
+
+Three functions to roll a tsibble: `stretch_tsibble()`, `slide_tsibble()`,
+and `tile_tsibble()`.
+
+For time series cross-validation, stretching windows are most commonly used.
+
+## Time series cross-validation {-}
+
+\fontsize{12}{13}\sf
+
+Stretch with a minimum length of 24, growing by 1 each step.
+
+```{r google-stretch, cache=TRUE, dependson="split_in_r"}
+forecast_horizon <- 12
+
+test <- antidiabetic_drug_sale %>% filter_index(as.character(max(antidiabetic_drug_sale$Month)-round(0.2*nrow(antidiabetic_drug_sale))) ~ .)
+
+train <- antidiabetic_drug_sale %>%
+  filter_index(. ~ as.character(max(antidiabetic_drug_sale$Month)-round(0.2*nrow(antidiabetic_drug_sale))))
+drug_sale_tcsv <-  train %>% slice(1:(n()-forecast_horizon)) %>% 
+  stretch_tsibble(.init = 24, .step = 1)
+```
+
+\fontsize{10}{11}\sf
+```{r stretch-print, echo = FALSE}
+drug_sale_tcsv %>% print(n = 4)
+```
+
+## Time series cross-validation {-}
+
+\small
+
+Estimate RW w/ drift models for each window.
+
+```{r google-fit, cache = TRUE}
+drug_fit_tr <- drug_sale_tcsv %>% 
+  model(snaive=SNAIVE(Cost))
+```
+
+\fontsize{10}{11}\sf
+```{r google-fit-print, echo = FALSE}
+print(drug_fit_tr, n = 4)
+```
+
+## Time series cross-validation {-}
+
+\small
+
+Produce 8 step ahead forecasts from all models.
+
+```{r google-fc, cache = TRUE}
+drug_fc_tr <- drug_fit_tr %>% 
+  forecast(h=forecast_horizon) %>%
+  group_by(.id,.model) %>% 
+  mutate(h=row_number()) %>% 
+  as_fable(response="Cost",distribution="Cost") |> 
+  ungroup()
+```
+
+\fontsize{10}{11}\sf
+```{r google-fc-print, echo = FALSE}
+drug_fc_tr %>% print(n = 4)
+```
+
+## Time series cross-validation {-}
+
+\small
+
+```{r google-accuracy, cache = TRUE, results = 'hide', eval = FALSE}
+# Cross-validated
+drug_fc_tr %>% 
+  accuracy(antidiabetic_drug_sale)
+```
+
+# Evaluating prediction interval accuracy
+
+## Winkler score
+
+Winkler proposed a scoring method to enable comparisons between prediction intervals:
+
+- it takes account of both coverage and width of the intervals.
+
+\begin{block}{Winkler score}
+\begin{align*}
+  W(l_t,u_t,y_t) =
+    \begin{cases}
+      u_t-l_t & \text{if $l_t < y_t <u_t$}\\
+      (u_t-l_t)+ \frac{2}{\alpha}(l_t-y_t) & \text{if $y_t < l_t$}\\
+      (u_t-l_t) + \frac{2}{\alpha}(y_t-u_t) & \text{if $y_t > u_t$}
+    \end{cases}       
+\end{align*}
+\end{block}
+
+## Prediction interval accuracy
+
+\fontsize{11}{12}\sf
+```{r winker-accuracy, options}
+  # Compute interval accuracy
+ drug_fc_tr %>% 
+  accuracy(antidiabetic_drug_sale, 
+   measures = interval_accuracy_measures) %>% 
+   mutate(Method = paste(.model, "method")) %>%
+  select(Method, winkler) %>%
+  gt::gt() %>%
+  gt::as_latex()
+```
+
+# Lab session 6
+
+## Lab session 6
+\fontsize{12}{12}
+
+1. use `filter_index()` function to subset data into train and test
+
+2. Create folds/windows for time series cross validation
+  * **Hint:** use `stretch_tsibble(.init = 4*365, .step = 1)`
+
+3. Specify model and train model on each fold/window
+
+4. Forecast for 42 days
+
+5. Compute RMSE and MAE to evaluate point forecast
+    8.1 compute overall accuracy
+    8.2 compute accuracy over each forecast horizon
+    8.3 compute accuracy for each .id
+    
+6. Evaluate the prediction intervals using Winkler score
+
+7. Which model is the most accurate one?
+
+8. Apply the most accurate model to all time series
+
+## Recap
+
+\fontsize{12}{12}\sf
+
+1. First, import your data and prepare them using `tsibble` function. 
+2. Visualise and see wether your series contains key features
+3. Determine how much of your data you want to allocate to training, and how much to testing; the sets should not overlap.
+4. Subset the data to create a training set, which you will use as an argument in your forecasting function(s). Optionally, you can also create a test set to use later.
+5. Compute forecasts of the training set using whichever forecasting function(s) you choose, and set h equal to the number of values you want to forecast.
+
+## Recap
+
+\fontsize{12}{12}\sf
+
+6. Use residual diagnostic based on residuals in the training set to see whether all information is captured by models.
+7. Create different windows to evaluate forecast accuracy using time series cross validation
+8. Train model to each window
+5. To calculate the forecast accuracy, use the accuracy() function with the `fable` as the first argument and original data  as the second.
+6. Pick a measure in the output to evaluate the forecast(s); a smaller error indicates higher accuracy.
+
+7. Finally, produce forecast using the selected approach for real future.

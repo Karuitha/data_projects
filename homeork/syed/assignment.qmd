@@ -1,0 +1,341 @@
+---
+title: "Assignment: Regression Analysis and Machine Learning"
+author: "Syed Furquan Bokhari"
+format: pdf
+editor: visual
+execute: 
+  echo: true
+  warning: false
+  message: false
+---
+
+## **Q1: Regression output:**
+
+```{r}
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, janitor, tidymodels, randomForest, rpart, 
+               rpart.plot, gam, caTools, e1071, class, GGally, ggthemes,
+               tinytex)
+
+
+theme_set(theme_minimal())
+```
+
+This question uses the IMDB movies ratings data from class 13 (with some observations removed at random). Below is R output from a regression of IMDbScore on Budget, DirectorFacebookLikes, CastFacebookLikes, AvgDirectorScore, and AvgActorScore. Use this output to answer the questions below.
+
+![Regression Output](head.png)
+
+### a.  What is the SE on DirectorFacebookLikes?
+
+The t-value is the estimate divided by standard error (SE).
+
+In this case:
+
+```{r}
+0.489321/5.73
+```
+
+### b.  What is the t-value on AvgDirectorScore?
+
+Again, the t-value is the estimate divided by standard error (SE).
+
+```{r}
+0.286065/0.067569
+```
+
+### c.  What is the p-value on Budget?
+
+This is a 2 tailed test, hence we multiply the probability by two and toggle the `lower.tail` argument to false.
+
+```{r}
+2 * pt(0.39, df = 280, lower.tail = FALSE)
+```
+
+## **Q2: A/B Testing**
+
+The file AdSmartAB.csv contains data from an experiment done by an advertising agency in which users were randomized into either being shown a particular ad, or not, and then their behavior was tracked and recorded. The data has 8077 rows and 9 columns. The only two columns you need to know about are:
+
+-   experiment: Factor with two values: "control" & "exposed". "exposed" means user was shown the ad. "control" means that user was not shown the ad.
+
+-   yes: 0-1 variable that equals 1 if the user pressed the "Yes" button after seeing the ad, and 0 otherwise
+
+Is there strong evidence in this data that seeing the ad led more users to click "Yes"? What is the p-value from your hypothesis test? In words, what does the p-value mean in this test? What do you conclude?
+
+Given that we have two groups, that are categorical then the he chi-square test of independence will suffice. We start by reading the data and preview the first few rows of the data.
+
+```{r}
+ads <- read_csv("AdSmartAB(1).csv", show_col_types = FALSE)
+
+head(ads)
+```
+
+We then do a chi-square test.
+
+```{r}
+chisq.test(ads$yes, ads$experiment)
+```
+
+At 1% confidence level, the output means that showing the advert has no effect on whether or not the users click "Yes". This observation means that adverts have no effect on consumer choice. However, at 5% and beyond, we can safely conclude that adverts do affect the likelihood that a consumer clicks "Yes".
+
+## **Q3: Earnings regression**:
+
+The nls.csv dataset contains 929 rows where each row is a worker in the US. The data has the following columns:
+
+-   luwe = log weekly wages
+
+-   educ = years of eduction
+
+-   exper = job-market experience in years
+
+Using this dataset, answer the following questions:
+
+```{r}
+nls <- read_csv("nls(1).csv")
+head(nls)
+```
+
+### a.  What are the average years of education and average years of job-market experience in this dataset? The average years of education are `r mean(nls$educ, na.rm = TRUE)` while the average experience is `r mean(nls$exper, na.rm = TRUE)` years.
+
+```{r}
+mean(nls$educ, na.rm = TRUE)
+mean(nls$exper, na.rm = TRUE)
+```
+
+### b.  Run a linear regression of luwe on exper. What is the interpretation of the coefficient on exper in terms of the relationship of job-market experience to weekly wages?
+
+The model shows a negative relationship between wages and experience. Specifically, a unit increase in experience reduces wages by an average of  0.007115 USD, all else remaining the same. However, at 1% and 5% significance level, the relationship is not significant meaning that experience has no material impact on wages.
+
+```{r}
+job_reg <- lm(luwe ~ exper, data = nls)
+summary(job_reg)
+```
+
+### c.  Now run a linear regression of luwe on educ and exper. Provide a 95% confidence interval for the effect of exper on luwe computed from this regression.
+
+We compute the confidence interval using the confint function in R.
+
+```{r}
+job_reg_ext <- lm(luwe ~ educ + exper, data = nls)
+summary(job_reg_ext)
+confint(job_reg_ext, level = 0.95)
+```
+
+### d.  What is the correlation of exper and educ in the data? Suggest an explanation for the direction of this correlation.
+
+The correlation between education and experience is `r cor(nls$educ, nls$exper)`. This is a high level of correlation that could result in collinearity in the regression. Specifically, because education affects experience. The more years spent in school implies less years of work experience. Again, there is a circular relationship between wages, experience, and education that makes the model unstable.
+
+```{r}
+
+cor(nls$educ, nls$exper)
+
+```
+
+### e.  Explain the difference between the estimated coefficient on exper in the regression in (b) versus that in the regression in (c).
+
+There is a problem of **collinearity** between education and experience. Specifically, collinearity results in unstable coefficients or coefficients that are non-intuitive that may even go against theory. Specifically, because education affects experience, there is a circular relationship between wages, experience, and education that makes the model unstable. Hence the change in the sign of the coefficient.
+
+### f.  Create a new variable called expersq that equals the square of exper. Run a linear regression of luwe on educ, exper, and expersq. Test the null hypothesis that the true coefficient on expersq is zero. Report the p-value. Do you reject the null hypothesis at the 1% significance level?
+
+At the 1% level, the coefficient of expersq is zero given the p-value of 0.03057 is greater than 0.01 (1%) significance level. This observation means that expersq is not a significant driver of wages.
+
+```{r}
+nls$expersq = nls$exper^2
+
+final_reg <- lm(luwe ~ educ + exper + expersq, data = nls)
+
+summary(final_reg)
+```
+
+## **Q4: AirBnB**
+
+The dataset airbnb.csv contains data on airbnb listings in several major cities in the US. We will use this dataset to create a prediction model for the variable price. (NOTE: be sure to load in the data with the "stringsAsFactors=TRUE" option!)
+
+There are 57129 rows and 19 columns in the data. The columns are:
+
+-   price: price per night in dollars
+
+-   property type: Factor noting property type (e.g., "Apartment")
+
+-   room type: Factor noting room type (e.g., "Entire home/apt")
+
+-   accomodates: Number of people that the property accomodates
+
+-   bathrooms: Number of bathrooms
+
+-   bed type: Factor noting bed type (e.g. "Airbed")
+
+-   cancellation policy: Factor noting cancellation policy (e.g., "flexible")
+
+-   cleaning fee: True/False
+
+-   city: Factor noting the city (e.g. "Boston")
+
+-   host has profile pic: True/False/Unknown
+
+-   host identity verified: True/False/Unknown
+
+-   host response rate: Factor (e.g., "10%")
+
+-   instant bookable: True/False
+
+-   neighbourhood: Factor noting neighborhood (e.g., "16th Street Heights")
+
+-   number of reviews: Number of reviews
+
+-   review scores rating: Avg review rating (0-100)
+
+-   zipcode: Factor with 716 levels (e.g., "02108")
+
+-   bedrooms: Number of bedrooms
+
+-   beds: Number of beds
+
+### a.  Plot a histogram of price with 200 bins. Does price look normally distributed? Why or why not?
+
+The histogram is shown in figure 1 below.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+
+air <- read_csv("airbnb(2).csv")
+
+# ggplot(data = air, aes(x = price)) + geom_histogram(bins = 200)
+
+air %>% 
+  ggplot(mapping = aes(x = price)) + 
+  geom_histogram(bins = 200)
+```
+
+### b.  The variable host response rate is stored incorrectly as a factor instead of a number (eg., "10%" or "100%" vs 10 or 100). Clean this variable so that host response rate is stored as a number from 0-100. What is the mean of the cleaned variable? For how many rows is host response rate missing?
+
+In this case, I use the str_remove variable in the package `stringr` which is part of the tidyverse. The package has the functions `str_remove` and `str_remove_all` that take in an input and a pattern to be removed.
+
+```{r}
+## str_remove is from the tidyverse--stringr
+air <- air %>% 
+  ## Remove the pattern %
+  mutate(host_response_rate = str_remove(host_response_rate, "%"),
+         ## Convert to numeric
+         host_response_rate = as.numeric(host_response_rate))
+head(air)
+```
+
+### c.  Set your random seed to 2022 and then randomly partition the data into a 80% training data set and a 20% test data set. Compute the mean and standard deviation of the variable price in both the training set and the test set.
+
+```{r}
+set.seed(2022)
+
+## I use tidymodels to split 
+
+air_split <- initial_split(air, prop = 0.8, strata = price)
+
+air_training <- air_split %>% training() ## training(air_split)
+
+air_testing <- air_split %>% testing() ## testing(air_split)
+```
+
+### d.  Run a regression ("Model 1") on the training data set to predict price using bedrooms, beds, bathrooms, number of reviews, review scores rating, and city and report the output. What is the test set RMSE for Model 1?
+
+The RMSE on the test set is 158.1632.
+
+```{r}
+
+air_train_model <- lm(price ~ bedrooms + beds + bathrooms + number_of_reviews + review_scores_rating + city, data = air_training)
+
+summary(air_train_model)
+```
+
+```{r}
+## RMSE- Root mean squared error ----
+sqrt(mean((air$price - predict(air_train_model, newdata = air_testing))^2))
+```
+
+### e.  What is the interpretation of the coefficient on bedrooms in Model 1?
+
+The number of bedrooms are a significant driver of the price of housing. Specifically, all other variables held constant a unit increase in bedrooms raises the price of a house by 46.31638 USD on average.
+
+### f.  What is the interpretation of the coefficient on "cityChicago" in Model 1?
+
+The interpretation here is in reference to the city of Boston. Holding all other factors constant, a house in chicago is, on average 46.84653 USD cheaper than an equivalent house in Boston.
+
+### g.  What is the interpretation of the coefficient on number of reviews in Model 1? Provide a possible explanation for why this coefficient has the sign that it does.
+
+The number of reviews is inversely related to the price of a house. It is likely that houses with most reviews happen to have the most complaints from customers. Hence, more reviews could signal poor quality and hence the lower price. 
+
+### h.  Plot the residuals from Model 1 and comment on any patterns you see.
+
+The model residuals deviate significantly from normality. This means that the model may not be very reliable for forecasting. Again, the outliers show a significant existence of outliers in the data that affect model performance. 
+
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+
+## R Markdown
+## Quarto
+
+par(mfrow = c(1, 2))
+hist(resid(air_train_model), main = "Histogram: Model Residuals")
+
+#create Q-Q plot for residuals
+qqnorm(resid(air_train_model))
+
+#add a straight diagonal line to the plot
+qqline(resid(air_train_model)) 
+
+par(mfrow = c(1, 1))
+```
+
+#### i.  Try running the same regression as Model 1 using the log of price instead of price. Plot the residuals. Are the residuals from this model better, worse, or equally good/bad to those in part (h)?
+
+The residuals in this model are better than those of the model in part (h). This means that this model can better predict prices.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+
+par(mfrow = c(1, 2))
+air_train_log_model <- lm(log(price) ~ bedrooms + beds + bathrooms + number_of_reviews + review_scores_rating + city, data = air_training)
+
+summary(air_train_log_model)
+
+hist(resid(air_train_log_model), main = "Histogram: Log Model Residuals")
+
+
+#create Q-Q plot for residuals
+qqnorm(resid(air_train_log_model))
+
+#add a straight diagonal line to the plot
+qqline(resid(air_train_log_model)) 
+
+par(mfrow = c(1, 1))
+```
+
+#### ii. Find a better prediction model for price (not log of price!) that has a lower test set RMSE than Model 1. Your grade will depend in part on how low the test set RMSE is for your proposed model.
+
+In this section, I train a random forest model and include the variable `host_identity_verified` and ` accommodates`. The RMSE is 88.2339 compared to 158.1632 for the linear model.
+
+```{r}
+air_training %>% 
+  drop_na() %>% 
+  select(where(is.numeric)) %>% 
+  cor() %>% 
+  corrplot::corrplot(method = "number", type = "lower")
+```
+
+```{r}
+set.seed(200)
+
+# head(air_training)
+# 
+# names(air_training)
+air %>% select(where(is.character))
+
+
+better_model <- randomForest(price ~ bedrooms + beds + bathrooms + number_of_reviews + review_scores_rating + city + host_identity_verified + accommodates, data = air_training %>% drop_na())
+
+sqrt(mean((air_testing$price - predict(better_model, newdata = air_testing))^2, na.rm = TRUE))
+```

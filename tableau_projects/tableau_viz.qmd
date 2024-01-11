@@ -1,0 +1,89 @@
+---
+author: "John Karuitha"
+title: "When to Use Which Visualization"
+subtitle: "Guidelines for Effective Data Visualization"
+title-block-banner: "grey"
+title-block-banner-color: "black"
+---
+
+# Guidelines for Making Effective Visuals
+
+To be able to make effective visuals, the following guide maybe useful. 
+
+1. Know what you want to say.
+2. Don't get lost in the details.
+3. Note that a good visualization has a clear purpose. 
+4. Be selective about what to include in the visualization. 
+
+# How do You Know if Your Visual Has a Purpose?
+
+- Know your audience.
+- What are the questions your audience wants answered? Ask them.
+- What information do you want them to know?
+- What other questions might your visualization inspire?
+- What idea will your audience take away after using your visualization?
+- Choose the right chart type. 
+
+# Choice of Chart Types
+
+Choose a chart that conveys the specific insights of interest to your audience. Not all charts are fit for all purposes. 
+
+## Bar Charts 
+Bar charts are the most frequently used charts. They are useful for numeric data that splits nicely into several categories. It is quick to compare data uncovering highs and lows and trends in the data at a glance. 
+
+Examples of bar charts use cases include. 
+
+- Volumes of shirts by different sizes.
+- Website traffic by origination site.
+- Percent of spending by department.
+
+Bar charts are very effective in combination with maps. The user will click on a geographic region and the bar graph reacts and changes accordingly. Putting bars on both sides of an axis shows both positive and negative trends. 
+
+## Line Charts
+
+Line charts connect individual numeric data points to visualise a sequence of values. These charts are useful for visualising trends. Potential use cases include;
+
+- Changing stock prices over time.
+- Website views per month.
+- Quarterly revenue growth. 
+
+## Pie Charts
+
+Pie charts are useful for showing proportions or percentages. The use cases can include;
+
+- Percent of budget spent by department.
+- Breakdown of how Kenyans spend their leisure time. 
+
+That said use pie charts sparingly. Limit wedges to 6 and can overlay them to maps to highlight important disparities. 
+
+## Maps
+
+Maps are useful for visualising any sort of location data. Visualise any geo-coded data using a map. Examples of use cases for maps include;
+
+- Insurance claims by county.
+- Product export or imports by country.
+- Auto accidents by postal code.
+- Custom sales territories. 
+
+Overlaying bubble charts on a map help show data concentration. 
+
+## Scatter plots
+
+Scatter plots show trends, concentration, outliers and relatiohsips between two numeric variables. Always condider a trend line and filters to drill down. 
+
+## Gannt Charts
+
+Gannt charts are useful for depicting time lapses, start, finish, milestones, and accomplishments over time. They are often used in project management and resource planning. They can be used in the following cases;
+
+- Display a project schedule.
+- Show deliverables, owners, and deadlines.
+- Resource availability and lifespan. 
+
+## Bubbles
+
+
+
+
+
+
+

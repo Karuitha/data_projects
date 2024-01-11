@@ -1,0 +1,52 @@
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & math\_score \\ 
+\hline \\[-1.8ex] 
+ test\_preparation\_coursenone & 2.080$^{***}$ \\ 
+  & (0.432) \\ 
+  & \\ 
+ parental\_level\_of\_educationbachelor's degree & 0.215 \\ 
+  & (0.746) \\ 
+  & \\ 
+ parental\_level\_of\_educationhigh school & $-$1.460$^{**}$ \\ 
+  & (0.660) \\ 
+  & \\ 
+ parental\_level\_of\_educationmaster's degree & $-$0.270 \\ 
+  & (0.861) \\ 
+  & \\ 
+ parental\_level\_of\_educationsome college & $-$1.080$^{*}$ \\ 
+  & (0.620) \\ 
+  & \\ 
+ parental\_level\_of\_educationsome high school & $-$1.220$^{*}$ \\ 
+  & (0.650) \\ 
+  & \\ 
+ gendermale & 12.000$^{***}$ \\ 
+  & (0.418) \\ 
+  & \\ 
+ reading\_score & 0.917$^{***}$ \\ 
+  & (0.015) \\ 
+  & \\ 
+ lunchstandard & 4.760$^{***}$ \\ 
+  & (0.438) \\ 
+  & \\ 
+ Constant & $-$6.570$^{***}$ \\ 
+  & (1.310) \\ 
+  & \\ 
+\hline \\[-1.8ex] 
+Observations & 1,000 \\ 
+R$^{2}$ & 0.826 \\ 
+Adjusted R$^{2}$ & 0.824 \\ 
+Residual Std. Error & 6.340 (df = 990) \\ 
+F Statistic & 522.000$^{***}$ (df = 9; 990) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 

@@ -1,0 +1,201 @@
+---
+title: "Introduction to Tidy Finance"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '')`"
+output:
+  pdf_document: default
+  html_document: default
+subtitle: Book Reading
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
+
+# Load required packages 
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, tidyquant, quantmod, xts, ggtheme)
+
+theme_set(ggthemes::theme_economist(base_size = 8))
+```
+
+## Download prices using the `tidyquant` package
+
+I download the data for APPLE from 2010 to 2022.
+
+```{r}
+prices <- tq_get("AAPL", get = "stock.prices", 
+       
+       from = "2010-01-01", 
+       
+       to = "2022-07-16")
+
+head(prices)
+tail(prices)
+```
+
+Next I plot adjusted prices over time.
+
+```{r}
+prices %>% 
+  
+  ggplot(mapping = aes(x = date, y = adjusted)) + 
+  
+  geom_line() + 
+  
+  labs(title = "Trends in Adjusted Prices of Apple Stock, 2010-2022",
+       
+       subtitle = "Prices in USD Adjusted for Dividends and Stock Splits",
+       
+       x = NULL, y = NULL,
+       
+       caption = "Data source: Yahoo Finance
+       John Karuitha, 2022")
+```
+
+Next, I compute returns and then plot them over time. 
+
+```{r}
+returns <- prices %>% 
+  
+  arrange(date) %>% 
+  
+  mutate(returns = adjusted / lag(adjusted) - 1) %>% 
+  
+  select(symbol, date, returns) %>% 
+  
+  drop_na(returns)
+```
+
+Next I plot these returns
+
+```{r}
+returns %>% 
+  
+  ggplot(mapping = aes(x = date, y = returns * 100)) + 
+  
+  geom_line() + 
+  
+  labs(title = "Returns of Apple Stock, 2010-2022",
+       
+       subtitle = "Adjusted for Dividends and Stock Splits",
+       
+       x = NULL, y = NULL,
+       
+       caption = "Data source: Yahoo Finance
+       John Karuitha, 2022")
+```
+
+A histogram will also do. 
+
+```{r}
+
+returns %>% 
+  
+  ggplot(mapping = aes(x = returns * 100)) + 
+  
+  geom_histogram(bins = 100, col = "black") + 
+  
+  geom_vline(xintercept = quantile(returns$returns * 100, probs = 0.05),
+             
+             color = "red", linetype = "dashed") +
+  
+  labs(title = "Distribution of Returns of Apple Stock, 2010-2022",
+       
+       subtitle = "Adjusted for Dividends and Stock Splits",
+       
+       x = NULL, y = NULL,
+       
+       caption = "Data source: Yahoo Finance
+       John Karuitha, 2022")
+```
+
+I summarise the data, getting the minimum, maximum, mean and median.
+
+```{r}
+returns %>% 
+  
+  mutate(ret = returns * 100) %>% 
+  
+  summarise(across(ret, .fns = list(
+    
+    daily_mean = mean,
+    
+    daily_median = median,
+    
+    daily_min = min,
+    
+    daily_max = max
+  
+    
+  )))
+```
+
+We also summarise the data by year. 
+
+```{r}
+returns %>% 
+  
+  mutate(ret = returns * 100) %>% 
+  
+  group_by(year_ret = year(date)) %>% 
+  
+  summarise(across(ret, .fns = list(
+    
+    daily_mean = mean,
+    
+    daily_median = median,
+    
+    daily_min = min,
+    
+    daily_max = max
+  )))
+```
+
+We could capture this yearly returns summary in a boxplot.
+
+```{r}
+returns %>% 
+  
+  mutate(ret = returns * 100, 
+         
+         year_ret = year(date)) %>% 
+  
+  ggplot(mapping = aes(x = year_ret, y = ret, 
+                       
+                       group = year_ret)) + 
+  
+  geom_boxplot()
+```
+
+## Taking it to the Next Level
+
+In this section, we download the data for firms that make up the DOW JONES INDUSTRIAL INDEX (DJIA). The following code does the trick. 
+
+```{r}
+ticker <- tq_index("DOW")
+head(ticker)
+
+index_prices <- tq_get(ticker,
+  get = "stock.prices",
+  from = "2000-01-01",
+  to = "2022-06-30"
+)
+
+head(index_prices)
+```
+
+Now, let us plot the trends in the prices over time. 
+
+```{r}
+index_prices %>% 
+  
+  ggplot(mapping = aes(y = adjusted, x = date, 
+                       
+                       color = symbol)) + 
+  
+  geom_line(show.legend = FALSE)
+```
+

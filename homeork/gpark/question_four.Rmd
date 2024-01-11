@@ -1,0 +1,137 @@
+---
+title: "Q4: Association Rules for Cosmetics"
+author: "G Park"
+date: '`r format(Sys.Date(), format = '')`'
+always_allow_html: true
+reference_docx: Advanced_Business_Application_Development_Final_Exam_Fall_2022.docx
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+subtitle: '*Fall, 2022*'
+---
+
+```{r setup, include=FALSE}
+## Load the required packages 
+###################################################
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, KableExtra, 
+               rpart, rpart.plot,  arules, arulesViz, gt)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+```
+
+# Question 4: Cosmetics Purchase (20 points) 
+
+The file Cosmetics.csv contains 1000 transaction information about cosmetics (1: purchased; 0: no purchased)  
+
+## Draw an item frequency plot and answer which two are the most popular items. (2 points)
+
+The 2 most popular items are foundation and lip gross. 
+
+```{r}
+## read in the data 
+cosmetics <- read_csv("Cosmetics.csv") %>% 
+    clean_names() %>% 
+    mutate(invoice_number = paste0("c", 1:nrow(.))) %>% 
+    pivot_longer(cols = -invoice_number, 
+                 names_to = "item", 
+                 values_to = "bought") %>% 
+    filter(bought == 1) %>% 
+    mutate(invoice_number = factor(invoice_number)) %>% 
+    group_by(invoice_number) %>% 
+    filter(!duplicated(item)) %>% 
+    ungroup()
+
+## Split the data by invoice number
+my_bundles <- split(cosmetics$item, cosmetics$invoice_number)
+my_bundles <- sapply(my_bundles, unique)
+```
+
+
+I build an item frequency plot to show the most popular items. 
+
+```{r}
+trans <- as(my_bundles, "transactions")
+summary(trans)
+```
+
+
+```{r, fig.cap = "Most Frequently Bought Items"}
+itemFrequency(trans)
+itemFrequencyPlot(trans, topN = 10)
+```
+
+
+
+## Build an association rule model and set the support value as 0.01 and the confidence value as 0.1. Based on your association rule results, show the first eight rules and sort by their lift values and ensure to interpret your results. (9 point)  
+
+
+```{r}
+my_rules <- apriori(data = trans, 
+                    parameter = list(support = 0.01, 
+                                   confidence = 0.8,
+                                   minlen=2))
+summary(my_rules)
+```
+
+
+
+```{r}
+as(my_rules, "data.frame") %>% 
+    arrange(desc(lift)) %>% 
+    head(8) %>% 
+    gt(caption = "Top Rules by Lift")
+#inspect(sort(my_rules, by = "lift"))
+```
+
+I use the first rule to illustrate the meaning of these rules. 
+
+**Support:** First bronzer,eyeliner,lip_liner,mascara,nail_polish => brushes constitute 3% of sales. 
+
+**Confidence:** When a customer buys bronzer, eyeliner, lip_liner, mascara, nail_polish, there is a 96% chance of buying brushes brushes. 
+
+**Lift:** Having bronzer, eyeliner, lip_liner, mascara, nail_polish in the shopping basket raises the probability that a customer will buy brushes by a factor of 6.2. 
+
+
+## Now, in your 4.2 results, you can see “support”, “confidence”, and “lift”. Please explain the meaning of support, confidence, and lift and discuss their implications in the setting of association rules. (9 point)  
+
+Support: 
+
+Support is the percentage of groups that contain all of the items listed in the association rule. In the first rule above, the support is 0.03, meaning that 3% of the transactions contained the items listed on the right (bronzer,eyeliner,lip_liner,mascara,nail_polish => brushes). 
+
+Implication of support: The support shows the volume of transactions that a product or groups of products as a percent of total transactions. When combined with other confidence and lift, we can focus on selling products that generate biggers sales. In other words, support allows us to filter for meaningful rules. It would not be very useful to have a confidence of 99% but that constitutes only0.001% of sales. 
+
+Confidence: 
+
+Confidence is the proportion of times that a customer buys item X given that she/he buys item Y. In our first rule, given that the customer buys bronzer,eyeliner,lip_liner,mascara,nail_polish => brushes then that customer bought brushes 96% of the time. 
+
+The implication of confidence: We can target customers buying bronzer,eyeliner,lip_liner,mascara,nail_polish ith bushes as they have a 96% chance of buying. Alternatively, in a store, these products could be placed close to each other. 
+
+Lift: 
+
+The lift value captures rule importance. Usually, its the confidence of a rule divided by the support of a product. It is the rise in probability of the purchase of product Y once we know that product X is in the basket. Again, the implication is that it helps managers decide on product placements in stores. 
+

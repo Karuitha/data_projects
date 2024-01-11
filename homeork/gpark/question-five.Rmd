@@ -1,0 +1,275 @@
+---
+title: "**Q5: Department Store Sales Time-Series Analysis**"
+author: "G Park"
+date: '`r format(Sys.Date(), format = '')`'
+always_allow_html: true
+reference_docx: template.docx
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+subtitle: '*Fall, 2022*'
+bibliography: ref.bib
+---
+
+```{r setup, include=FALSE}
+## Load the required packages 
+###################################################
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, KableExtra, 
+               rpart, rpart.plot,  arules, arulesViz, 
+               forecast, fpp2, fpp3, gt, ggthemes)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+## plots themes
+theme_set(theme_clean())
+
+```
+
+# Question 5: Department Store Sales Time-Series (35 points) 
+
+The file `DepartmentStorSales.csv` contains data on the quarterly sales for a department store over a 6-year period from 2000 to 2005 
+
+```{r}
+## Read in the data and see first six points
+sales <- read_csv("DepartmentStoreSales.csv")
+head(sales) %>% 
+    gt(caption = "Sample Data")
+```
+
+
+## We discuss four major components of time series (level, trend, seasonality, and noise). Discuss the meaning of these four major components. (3 points) 
+
+
+### **Level**: In time series analysis, level refers to the average value in the series. Usually, firms may work with the level value and then adjust their stock levels for seasonal and trend components. 
+
+### **Trend**: Trend in time series analysis is the sustained increase or decrease observed in a series that spans accross any seasonal patterns. In the case of the departmental store, there is an overall upward trajectory in sales. This means that, on average, overall sales are increasing even before factoring in seasonality. This trajectory is also quite predictable. The store management can then plan to stock higher levels of stock in the current quarter compared to the corresponding stock levels in the previous quarter. 
+
+### **Seasonality**: Seasonality refers to the short-term recurring cycles in the series. In other words, these are the periodic ups and downs observed in the data. In the case of our departmental store sales, we can observe a periodic rise and fall in demand that occurs every () quarters. The seasonal component is very predictable. In this case, the department should increase the stock during the peak periods and hold relatively lower stock during the off-peak periods.
+
+### **Noise**: Noise refers to the random variation in the series. This random variation is unpredictable.  Noise arises from the unknown factors that affect demand or unmeasurable factors, the known-knowns and the unknown-unknowns. This is the reason many businesses hold working capital in the form of extra cash or inventory to take care of these unpredictable ups and downs in sales. 
+
+
+## Show the data in a time-series format and create a well-performed time plot of the data. (2 points) 
+
+
+```{r}
+## Create a time series data
+my_sales_ts <- ts(sales, start = c(2000, 1), frequency = 4)
+
+## View the data
+print(my_sales_ts)
+
+## Plot the data
+autoplot(my_sales_ts[, "Sales"]) + 
+    labs(title = "Quarterly Sales, 2000-2005", y = "Sales", x = "Year")
+```
+
+I also create a seasons plot that shows the sales for each year by season. The plot shows that in spite of the seasonality, sales in each subsequent year were higher than the last. 
+
+```{r}
+ggseasonplot(my_sales_ts[, "Sales"]) +
+    labs(y =  "Sales",
+         title = "Seasonal Plots")
+
+```
+
+
+Likewise, the sub-series plot shows the trends in sales for each quarter. For instance, the first panel is a plot of sales in $2000Q1, 2001Q1 \cdots 2005Q1$. Again the plot shows a general upward trend. 
+
+```{r}
+ggsubseriesplot(my_sales_ts[, "Sales"]) + 
+    labs(y =  "Sales",
+         title = "Subseries Plots by Quarters")
+```
+
+## Decompose your time-series data into four major components (level, trend, seasonality, and noise) and plot these four components individually. Ensure to and explain your observations about different trends from your plots. (6 points)
+	
+
+```{r}
+## Decompose the data into level,seasons and trend
+my_dec_ts <- decompose(my_sales_ts[, "Sales"])
+
+## Plot the decomposition
+autoplot(my_dec_ts)
+```
+
+
+The decomposition above consists of 4 plots. The first plot is the observed raw data. The second plot illustrates the general upward trend of sales over the period. The trend shows that quarter after quarter, the general trend is up. The management of the store could plan future inventory on this trend among other factors. 
+
+The third plot shows the seasonal component, the short swings in sales. when stocking, the management could consider these dynamics by stocking more when the demand is high compared the the off-peak periods. 
+
+The final plot shows the random component of the sales. Here, the data appears to follow a random walk with no apparent pattern. In planning for sales, it is hard to cater for this component except for keeping some buffer stock just in case of an upward but unexpected uptick in demand. 
+
+## We discuss different trend models in time series, including the linear trend regression model, exponential trend model, and polynomial trend model. Discuss and compare these three models. (4 points)  
+
+
+### *Linear trend regression model*
+
+The forecasting equation for the linear trend model is:
+
+$y = a + \beta t$
+
+Here, t is the time index. The $\alpha$ and $\beta$ (the "intercept" and "slope") are come from a simple regression in with Y as the dependent variable and the time t as the independent variable. 
+
+Although useful, these models perform poorly when the trend is not linear as is the case with our data.In this case a polynomial trend model does better. Even where the trend is linear, the linear model may fail to pick seasonal or cyclical fluctuations. 
+
+
+### *Exponential trend model*
+
+Exponential smoothing methods use the weighted averages of past observations to make forecasts of the future. These weights reduce as the observations get older with more recent observations having a higher weight [@hyndman_forecasting_2018]. The technique is easy and quick to implement and produces fairly good forecasts in several cases. 
+
+
+### *Polynomial trend model*
+
+Polynomial trend models model the trend in data as a smooth variation in time. This model permits us to fit a either a line or a curve to the data as opposed to the linear model that assumes a purely linear relationship over time. The polynomial trend models provide a simple, flexible forms to describe the local trend components [@west_polynomial_1989]. These class of models are useful for modelling data that has an increasing or decreasing trend. More specifically, The polynomial trend models can be used in those situations where the relationship between study and explanatory
+variables is curvilinear.
+
+Given a polynomial regression model in one variable as follows;
+
+$y = \beta_{0} + \beta_{1}X + \beta_{2}X^{2} + e_{2}$
+
+This is a second-order model or quadratic model. $\beta_{1}$ and $\beta_{2}$ are called the linear effect parameter and quadratic effect parameter, respectively.This class of models can extend to include several variables and their interactions and even higher orders like cubes.
+
+## Partition the first 18 records as training sets and the rest of 6 records as validation sets. Fit a linear trend model on training sets. Based on this linear trend model, make a forecast for validation sets and show the results. (7 points) 
+
+
+```{r}
+## Create training and testing sets 
+ts_training <- window(my_sales_ts, start = c(2000, 1), 
+                      end = c(2004, 2))
+
+ts_testing <- window(my_sales_ts, start = c(2004, 2))
+```
+
+
+I then fit a linear trend model on the training data. 
+
+```{r}
+## Fit a linear trend model
+sales_model <- tslm(Sales ~ Quarter, data = ts_training)
+
+## Summary of linear trend model
+summary(sales_model)
+```
+
+
+
+```{r}
+## Forecast model with linear model
+my_linear_forecast <- forecast::forecast(sales_model, newdata = ts_testing[, "Quarter"])
+
+## Print my linear model forecast
+my_linear_forecast
+
+```
+
+We then plot the linear model forecasts. 
+
+```{r}
+autoplot(my_linear_forecast) + 
+    labs(title = "Forecasts from Linear Trend Model")
+```
+
+
+## Fit a polynomial trend model with seasonal effects on training sets. Based on this model, make a forecast for validation sets and show the results. Check accuracy measures of the forecasted model and show these accuracy measures. (8 points) 
+
+
+```{r}
+## Fit a model with season a trend 
+my_trend_model  <- forecast::tslm(Sales ~ trend + season, data = ts_training)
+
+## Summarise the model
+summary(my_trend_model)
+
+## A function to compute mean percent error
+mape <- function(actual,pred){
+
+  mape <- mean(abs((actual - pred)/actual))*100
+
+  return (mape)
+
+}
+
+```
+
+```{r}
+## Forecasting with the model with season a trend 
+my_trend_forecast <- forecast::forecast(my_trend_model, newdata = ts_testing)
+
+my_trend_forecast
+```
+
+
+```{r}
+autoplot(my_trend_forecast)
+```
+
+
+In this section I compute the error for both models. Note that the model with trend and seasons tends to do better than the linear trend model. 
+
+```{r}
+## capturing the forecasts
+forecasts <- data.frame(
+    
+    Quarter = (nrow(my_sales_ts) - 6):nrow(my_sales_ts),
+    linear_trend = c(65721, 66365, 67008, 67652, 68296, 68940, 69584),
+    trend_season = c(65596, 85399, 58221, 60166, 67824, 87627, 60449)
+)
+## % Error for the linear trend model
+mape(ts_testing[, "Sales"], forecasts$linear_trend)
+## % Error for model with trend and seasons
+mape(ts_testing[, "Sales"], forecasts$trend_season)
+```
+
+
+## Finally, based on your decomposition of four major components from 5.3, compare your 5.5 and 5.6 models and discuss which model is more appropriate in this particular setting and why. (5 points) 
+
+The plot below compares the comparison of both models. Note that the model with seasonality and trend (red broken line) captures the data much better than the linear model (blue line). I would choose the model with seasonality and trend given the nature of the data; It has both a trend component and a seasonal component. The linear trend model fares especially poorly in capturing seasons and cycles compared to the model with seasonality and trend. 
+
+```{r}
+sales %>% 
+    ggplot(aes(x = Quarter, y = Sales)) + 
+    geom_line() + 
+    geom_line(data = forecasts, aes(y = linear_trend),
+              col = "blue") + 
+    geom_line(data = forecasts, aes(y = trend_season),
+              col = "red", linetype = "dashed") + 
+    labs(title = "Comaring the Linear Trend Model and the Model with Season and Trend")
+```
+
+
+# References
+
+
+
+
+
+
+
+
+
+

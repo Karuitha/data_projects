@@ -1,0 +1,864 @@
+---
+title: "**HarvardX: PH125.9x: Data Science: Capstone: Predicting the Chance of a Patient Falling Using Data from China**"
+subtitle: "A Capstone Project for the `Professional Certificate in Data Science` offered by Harvard University (HarvardX) via EdX"
+author: "John King'athia Karuitha"
+date: "`r format(Sys.Date(), '%A %B %d, %Y')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+toc: true
+toc_depth: 4
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.height = 9, fig.width = 14, out.width='8in', fig.align = "center")
+
+# Download required packages ----
+if(!require("pacman")){install.packages("pacman", repos = "http://cran.us.r-project.org")}
+if(!require("tidyverse")){install.packages("tidyverse", repos = "http://cran.us.r-project.org")}
+if(!require("plyr")){install.packages("plyr", repos = "http://cran.us.r-project.org")}
+if(!require("readxl")){install.packages("readxl", repos = "http://cran.us.r-project.org")}
+if(!require("data.table")){install.packages("data.table", repos = "http://cran.us.r-project.org")}
+if(!require("RCurl")){install.packages("RCurl", repos = "http://cran.us.r-project.org")}
+if(!require("janitor")){install.packages("janitor", repos = "http://cran.us.r-project.org")}
+if(!require("Amelia")){install.packages("Amelia", repos = "http://cran.us.r-project.org")}
+if(!require("GGally")){install.packages("GGally", repos = "http://cran.us.r-project.org")}
+if(!require("ggthemes")){install.packages("ggthemes", repos = "http://cran.us.r-project.org")}
+if(!require("caret")){install.packages("caret", repos = "http://cran.us.r-project.org")}
+if(!require("corrplot")){install.packages("corrplot", repos = "http://cran.us.r-project.org")}
+if(!require("psych")){install.packages("psych", repos = "http://cran.us.r-project.org")}
+if(!require("gghalves")){install.packages("gghalves", repos = "http://cran.us.r-project.org")}
+if(!require("mlogit")){install.packages("mlogit", repos = "http://cran.us.r-project.org")}
+if(!require("rpart")){install.packages("rpart", repos = "http://cran.us.r-project.org")}
+if(!require("rpart.plot")){install.packages("rpart.plot", repos = "http://cran.us.r-project.org")}
+if(!require("e1071")){install.packages("e1071", repos = "http://cran.us.r-project.org")}
+if(!require("modeest")){install.packages("modeest", repos = "http://cran.us.r-project.org")}
+if(!require("skimr")){install.packages("skimr", repos = "http://cran.us.r-project.org")}
+if(!require("tidymodels")){install.packages("tidymodels", repos = "http://cran.us.r-project.org")}
+if(!require("gmnl")){install.packages("gmnl", repos = "http://cran.us.r-project.org")}
+if(!require("nnet")){install.packages("nnet", repos = "http://cran.us.r-project.org")}
+if(!require("stargazer")){install.packages("stargazer", repos = "http://cran.us.r-project.org")}
+if(!require("themis")){install.packages("themis", repos = "http://cran.us.r-project.org")}
+if(!require("tibble")){install.packages("tibble", repos = "http://cran.us.r-project.org")}
+
+##############################################################
+# SECTION 2
+###############################################################
+# Load required package----
+
+library(pacman)
+library(tidyverse)
+library(plyr)
+library(readxl)
+library(data.table)
+library(RCurl)
+library(janitor)
+library(Amelia)
+library(GGally)
+library(ggthemes)
+library(caret)
+library(corrplot)
+library(psych)
+library(gghalves)
+library(mlogit)
+library(rpart)
+library(rpart.plot)
+library(e1071)
+library(modeest)
+library(skimr)
+library(tidymodels)
+library(gmnl)
+library(nnet)
+library(stargazer)
+library(themis)
+library(tibble)
+```
+
+```{r}
+doParallel::registerDoParallel()
+```
+
+\newpage
+## **Abstract**
+>In this project, I use data from China to predict whether or not a patient will fall. In hospitals, falls by patients can be fatal and it is paramount to have an idea which patient is likely or unlikely to fall so as to take appropariate interventions. The dependent variable `activity` consists of a range of patient activities among them falling. The independent variables capture a range of physiological conditions such as heart rate and blood flow. The independent variables are highly correlated and hence, I start by performing principal components analysis (PCA) on the data. I then run 5 models- classification tree, random forest, K-Nearest Neighbours (KNN), Extreme gradient boosting (XGBoost), and multinomial logit. Finally, I assemble these models into one predictive algorithm (the ensemble). The random forest model offers the best specificity (0.8859) while extreme gradient boosting has the highest sensitivity (0.5437). The ensembled algorithm offers the best balanced accuracy (0.7048). 
+
+\newpage
+
+## **Introduction**
+In hospitals, predicting that a patient will fall goes a long way in ensuring their well being. Seriously ill and elderly patients could easily die if they attempt to take a walk but fall. In this exercise, I use a redacted dataset from [China](https://www.mdpi.com/1424-8220/14/6/10691) to predict the chance that a patient will fall^[The data is a redacted version of the one used in a study by Özdemir & Barshan (2017). However, the original dataset had over 300 features whilst the redacted version has 7 features]. I sourced the data from [Kagle](https://www.kaggle.com/pitasr/falldata). I downloaded the data and loaded it in my github [account](https://www.kaggle.com/karuitha). From the outset, it important to note that it is much more expensive to predict that a patient will NOT fall who ends up falling. It is much more acceptable to predict a patient will fall and they do NOT fall. From this perspective, maximizing specificity of the model is paramount in the choice of the right model.
+
+Note that I partly adopt the Tidymodels [framework](https://www.tidymodels.org/) in building the machine learning model. Tidymodels is a suit of packages for building machine learning models developed by R-Studio. `Max Kuhn`, the developer of `caret`, the other popular machine learning platform in R is the lead scientist in developing Tidymodels. Like the tidyverse, Tidymodels provides a consistent API for predictive modelling. Tidymodels has a smoother, more intuitive work-flow compared to caret and saves the data analyst of having to keep repeating data preprocessing steps. 
+
+The exercise proceeds as follows. In the next section, I download and load the required R packages and then present a summary of the final results. I then load and describe the data. I then explain the method of analysis, and then do the analysis. I then discuss the results and conclude.
+
+## **Objective of the Exercise**
+The objective of the exercise is to build a machine learning model that maximizes the chances of telling whether or not a patient is likely to fall. 
+
+## **Summary of Results**
+The results show that the random forest model does best in predicting patients do not fall who actually do not fall (specificity). The random forest model offers the best specificity (0.8859) while extreme gradient boosting has the highest sensitivity (0.5437). The ensemble algorithm offers the best balanced accuracy (0.7048). Overall, we can rely on the models to predict which patients are at  risk of falling and taking measures to support them.
+
+## **The Data**
+In this section, I load the data into a file called fall. The data has seven variables. The dependent variable is `category` and has six levels.
+
+1. Standing (coded 0)
+2. Walking (coded 1)
+3. Sitting (coded 2)
+4. Falling (coded 3)
+5. Cramps (coded 4)
+6. Running (coded 5)
+
+The rest of the variables are independent.
+
+1. Time: monitoring time.
+2. SL: sugar level.
+3. EEG: Electroencephalogram (EEG) is a test that detects electrical activity in the brain.
+4. BP: blood pressure.
+5. HR: heart beat rate.
+6. Circulation: blood circulation.
+
+In total, the data has 16382 rows of data and 7 columns of data. 
+
+```{r}
+##############################################################
+# SECTION 3
+###############################################################
+# Load the data ----
+
+## Get the URL for the datafile
+## The original source of the data is kagle.com, specifically https://www.kaggle.com/pitasr/falldata
+## However, it is hard to download data straight from kagle without supplying login details
+## hence, I loaded the data into my github account in the url below.
+
+url <- "https://raw.githubusercontent.com/Karuitha/Final_Project_HarvardX/main/falldetection.csv"
+
+## Download the dataset.
+
+download.file(url = url, destfile = "fall.csv", method = "curl")
+
+## load the dataset into R
+
+fall <- read.csv("fall.csv") %>% 
+  
+## Clean the column names by removing capital letters, spaces and special characters
+  janitor::clean_names()
+
+## The dependent variable is activity, classified as follows
+## Fall detection data set of Chinese hospitals of old age patients.
+
+### 0- Standing
+### 1- Walking
+### 2- Sitting
+### 3- Falling
+### 4- Cramps
+### 5- Running
+
+## Independent variables
+
+### time: monitoring time
+### sl: sugar level
+### eeg: eeg monitoring rate- electroencephalogram (EEG) is a test that detects electrical activity in the brain.
+### bp blood pressure
+### hr: heart beat rate
+### circulation: blood circulation
+
+# Convert the dependent variable into a factor with category falling as the base
+fall$activity <- factor(fall$activity, levels = c(3, 0, 1, 2, 4, 5))
+```
+
+## **Training set/ Test set split**
+I split the data into a training set and a test set. Here I use the function `initial_split` from `tidymodels` where I provide the data, the proportion of the data that goes into the training set and the dependent variable. After generating the index, I use the functions `training` and `testing` to specify the training and testing sets.
+
+```{r}
+set.seed(123, sample.kind = "Rounding")
+
+# Specify the index to split data into training and testing set
+index <- initial_split(fall, prop = 0.7, strata = activity)
+
+# Sopecify the training set
+fall_train <- training(index)
+
+# Dimensions of the training set
+dim(fall_train) # 11470 observations of 7 variables
+
+# Get the testing set
+fall_test <- testing(index)
+
+# Dimensions of the testing set
+dim(fall_test) # 4912 observations of 7 variables
+```
+
+Note that any additional analysis will involve only the training set with the testing set reserved for evaluation of the final model. Next, I explore the training data
+
+## **Exploratory Data Analysis- Training set**
+### Data Structure 
+I first examine the structure of the data. Note that except for the dependent variable that is a factor with six levels, all the other variables are numeric. The training dataset has `r nrow(fall_train)` observations of `r ncol(fall_train)` variables. The dependent variable is `activity`, a factor variable with 6 levels as follows.
+
+0. Standing
+1. Walking
+2. Sitting
+3. Falling
+4. Cramps
+5. Running
+
+The level of interest in this case is to forecast whether or not a patient will fall. When weighing the options, it is better to predict that a patient will not fall when in fact they do not fall. While its also good to predict which patient will fall, the former has more weight. For this reason, I evaluate the model mainly using `specificity` and `balanced accuracy` rather than `sensitivity`.
+
+The dependent variables are as follows. 
+
+1. time: monitoring time
+2. sl: sugar level.
+3. eeg: eeg monitoring rate- electroencephalogram (EEG) is a test that detects electrical activity in the brain.
+4. bp: blood pressure.
+5. hr: heart beat rate.
+6. circulation: blood circulation.
+
+I summarise the data below. 
+
+```{r}
+## Overview of the training data.
+## Structure of the training data
+str(fall_train)
+
+## First 6 observations of the training dataset
+head(fall_train) %>% knitr::kable(caption = "First Six Observations of the Training Set")
+
+## last 6 observations of the training dataset
+tail(fall_train) %>% knitr::kable(caption = "Last Six Observations of the Training Set")
+
+## Number of rows in the training dataset
+nrow(fall_train)
+
+## Number of columns in the training dataset
+ncol(fall_train)
+```
+
+### Missing Data
+As the summary below shows, the training data has no missing data points. Hence, I explore the data using visualizations next using the `missmap` function from the Amelia package. 
+```{r}
+# **************************************
+# Exploratory data analysis: missing data
+## Check for missing data.
+sapply(fall_train, is.na) %>% 
+  
+  ## Get the colsums of the logical dataframe.
+  ## The colsums represent missing data for each column.
+  colSums() %>% 
+  
+  ## Make a tibble of column names and missing values.
+  dplyr::tibble(variables = names(fall), missing = .) %>% 
+  
+  ## Arrange missing values in descending order of missingness
+  dplyr::arrange(desc(missing)) %>% 
+  
+  ## Get the top 7 (number of columns)
+  ## Our tibble has no missing data.
+  head(7) %>% 
+  
+  ## make a nice table
+  knitr::kable(caption = "Missing Data in the Training Set")
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+```{r}
+## Visualizing missingness of data 
+Amelia::missmap(fall_train, main = "Figure 1: Missingness Map- Training Set") 
+## Again there is no missing data
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+### Other Summary Statistics 
+The independent variable is categorical with six categories. The category of interest is 3 (falling). While the other categories are important, maximizing the prediction for falling remains the most important objective as the other activities are not as harmful.
+
+```{r}
+## Summary statistics for the dependent variables
+summary(fall_train$activity) %>% knitr::kable(caption = "Summary of Dependent Variable")
+```
+
+Table 5 below shows the summary statistics for the independent variables (features). The data shows that that there  is a wide variation in the dataset with the standard deviation of the variables ranging from 48.38601 to 130029.85851. 
+```{r}
+##***************************************************
+# Exploratory data analysis: summary statistics
+fall_train %>% 
+  
+  ## Deselect the activity column
+  select(-activity) %>% 
+  
+  ## Make a table of summary statistics
+  skimr::skim() %>%
+  
+  ## Remove some uninformative columns
+  dplyr::select(-contains(c("missing", "complete", "hist", "skim_type"))) %>% 
+  
+  ## Rename remaining columns
+  dplyr::rename(Variable = skim_variable, 
+                
+                Mean = numeric.mean, SD = numeric.sd, 
+         
+                Min = numeric.p0, Q1 = numeric.p25, 
+               
+                Median = numeric.p50, 
+                
+                Q3 = numeric.p75, Max = numeric.p100) %>% 
+  
+  ## make a nice table
+  knitr::kable(caption = "Summary Statistics for the `Fall` dataset", align = "l")
+```
+
+### Data Visualization
+In this section, I visualize the training dataset. First, I visualize the correlation matrix that shows extremely high correlation between the independent variables, for instance between `circulation` and `heart rate`. In its current form, running models using collinear data is likely yo yield unstable coefficients and hence unstable predictions. For this reason, I will run principal components analysis on the independent variables.
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+```{r}
+# Exploratory data analysis: data visualization
+fall_train[,-1] %>% GGally::ggpairs() + 
+  
+  ## Add title and caption
+  labs(title = "Figure 2: Correlation and Distribution of Independent Variables", 
+       
+       caption = "Source: Author's Computations") + 
+  
+       ## Add themes and adjust the font size plot title
+       ggthemes::theme_clean() + theme(plot.title = element_text(size = 8)) + 
+  
+       ## Adjust font sizes of axis text
+       theme(axis.text = element_text(size = 6))
+```
+
+\newpage
+### Correlation among the variables
+Figure 2 shows the high degree of correlation between the independent variables which could make a model have unstable coefficients. I intend to correct the multicollinearity by running principal components analysis. 
+```{r}
+## Visualize the correlation 
+## Run correlation on independent variables and call the corrplot
+cor(fall_train[,-1]) %>% corrplot::corrplot(method = "color", 
+                                            
+            ## Specify the corrplot type and add title
+            type = "lower", title = "Figure 3: A Visual of the Correlation Matrix - Training Set")
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+### Class Balance/ Imbalance
+Here I check for data balance and find that class 1 has very low prevalence that is likely to affect predictive accuracy on the test set. I intend to correct for the low prevalence by up-sampling the classes that have very low prevalence in order to create a balanced dataset. 
+```{r}
+## Check for possible class imbalance on the dependent variable
+## Make a table of class counts 
+table(fall_train$activity)
+
+## Make a proportionate table of class counts
+prop.table(table(fall_train$activity)) 
+
+# Class 1 has a problem of low prevalence.
+```
+
+## **Method**
+I adopt the following strategy;
+
+- First, given that the data has high collinearity, I run a principal components analysis (PCA) and generate uncorrelated variables.
+
+- I deal with the problem of imbalanced data by up-sampling the under-represented classes.
+
+- I run seven machine learning models and then make an ensemble.
+
+- I compare the performance of the models and choose the most optimal.
+
+### Principal Components Analysis and Handling Class Imbalance
+In this section, I do principal components analysis (PCA) and balance the datasets. Note that I have applied the transformation to deal with extreme values that exist in our [data](https://bookdown.org/max/FES/numeric-many-to-many.html#spatial-sign). 
+
+```{r}
+## Create a PCA recipe
+pca_recipe <- recipe(activity ~ ., data = fall_train)
+
+## Do the PCA analysis
+pca_trans <- pca_recipe %>% 
+  
+  ## Ensure all predictors have a mean of zero
+  step_center(all_predictors()) %>% 
+  
+  ## Ensure all predictors have a standard deviation of one
+  step_scale(all_predictors()) %>% 
+  
+  ## Run the principal components analysis
+  step_pca(all_predictors()) %>% 
+  
+  ## Apply adjustment to deal with outliers
+  step_spatialsign(all_predictors()) %>% 
+  
+  ## Adjust data to deal with missing values
+  step_upsample(activity, over_ratio = 1) %>% 
+  
+  ## Appply alll the steps above and generate new dataset.
+  prep()
+```
+
+### Visualizing the Principal Components
+
+Here, I extract the standard deviations, compute the variance and the cumulative variance for the PCs. The data shows that the first principal component accounts for about 66% of the variability while the second PC accounts for 17% of the variation. 
+
+```{r}
+## Check the names of the dependent variables
+names(pca_trans)
+
+## Access the standard deviations 
+sdev <- pca_trans$steps[[3]]$res$sdev
+
+# View the standard deviations output
+sdev
+
+## The contribution of PCA to the total variation
+variance_explained <- (sdev ^ 2) / sum(sdev ^ 2)
+
+# The variance explained by each principal component
+variance_explained
+```
+
+Here, I make the scree plot showing the contribution of each principal component to the overall variability in the data.
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+```{r}
+## Plot a scree plot
+## Create dataframe of principal components and variance explained by each PC>
+data.frame(pc = paste("pc", 1:length(variance_explained)), variance = variance_explained) %>% 
+  
+  # Call ggplot and supply the axes
+  ggplot(aes(x = pc, y = variance, fill = pc)) + 
+  
+  ## Add the geoms- geom_col and geom_label
+  geom_col() + geom_label(show.legend = FALSE, mapping = aes(label = round(variance, 4))) + 
+  
+  # Add a title
+  ggtitle("Figure 4: Skree Plot - Contribution of Each PC to Total Variability") + 
+  
+  # Remove title
+  theme(legend.position = "none") + 
+  
+  # Add a pleasant theme
+  ggthemes::theme_clean() + 
+  
+  # Add labels and caption
+  labs(y = "Variance", caption = "Source: Author's Construction")
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+In this section I make the plot for the cumulative variance. both the summary and the graph show that the first four principal components account for over 99% of the variability. 
+
+```{r}
+## Plot a scree plot
+## The cumulative variance captured by the PCAs
+variance_explained_cum <- cumsum(sdev ^ 2) / sum(sdev ^ 2)
+
+## View the cumulative variance explained
+variance_explained_cum
+
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+```{r}
+## Create a dataframe of principal components and cumulative variance
+data.frame(pc = paste("pc", 1:length(variance_explained_cum)), 
+           
+           variance = variance_explained_cum) %>% 
+  
+  ## Specify the axes
+  ggplot(aes(x = pc, y = variance, group = pc)) + 
+  
+  # Add a geom
+  geom_point() +
+  
+  # Add a title
+  ggtitle("Figure 5: Skree Plot - Cumulative Contribution of Each PC to Total Variability") + 
+  
+  # remove legend
+  theme(legend.position = "none") + 
+  
+  # Add a nice theme
+  ggthemes::theme_clean() + 
+  
+  # Add axes labels and title
+  labs(y = "Cumulative Variance", x = "Principal Components", caption = "PC1 is the contribution of PC1 to overall variance. PC2 is the contribution of PC1 and PC2 to overall variance, and so on \n Source: Author's Construction")
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+Next, I extract the summary statistics. Note that the new dataset for PCAs has `r pca_trans %>% juice() %>% nrow()` rows of data. Note that the classes are now evenly balanced with each class having 3226 observations. Also, the summary shows that the variability between the variables has reduced markedly. 
+
+```{r}
+## Extract the transformed dataset
+fall_train <- pca_trans %>% juice()
+
+## The number of rows in the training dataset containing pcas
+pca_trans %>% juice() %>% nrow()
+
+## Checking class balances by dependent variable
+table(pca_trans %>% 
+        
+        ## Extract transformed data
+        juice() %>% 
+        
+        ## Select dependent variable to check for balance in classes
+        select(activity)) %>% 
+  
+        ## Make a nice table and add title      
+        knitr::kable(caption = "Distribution of Classes")
+
+## Summary of the PCAs
+pca_trans %>% 
+  
+  ## Extract transformed data
+  juice() %>% 
+  
+  # Select all variables except activity
+  select(-activity) %>% 
+  
+  ## Summarize the data
+  skim_without_charts() %>% 
+  
+  ## Select some variables in the resulting table
+  select(-skim_type, -n_missing, -complete_rate) %>% 
+  
+  ## Make a nice table
+  knitr::kable(caption = "Summary Statistics for PCAs in the training set")
+```
+
+In this section, I examine the distribution of the values of each principal components to see the extent to which outliers exist.
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+
+```{r}
+## Checking for extreme values 
+pca_trans %>% juice() %>% 
+  
+  ## Convert the data to tidy format
+  pivot_longer(-activity, names_to = "pc", values_to = "value") %>% 
+  
+  ## Filter for values that meet threshold of 7.5 to filter out extreme values
+  filter(value > 7.5) 
+
+## Plot histogram for PCAs
+pca_trans %>% juice() %>% 
+  
+  ## Convert data to tidy format
+  pivot_longer(-activity, names_to = "pc", values_to = "value") %>% 
+  
+  ## Filter for values within limits to avoid extreme values
+  filter(value <= 7.5 & value >= -7.5) %>% 
+  
+  ## Plot the data by supplying axes
+  ggplot(mapping = aes(x = value, fill = pc), 
+         
+         color = "black") + 
+  
+  ## Add the geom and specify binwidth
+  geom_histogram(binwidth = 0.1) + 
+  
+  ## Add titles and labels
+  labs(title = "Figure 6: Histogram of PCs", caption = "Author's computations")
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+Next, I visualize the first 2 PCs
+ 
+```{r}
+pca_trans %>% 
+  
+  ## Extract transformed variables - the principal components
+  juice() %>% 
+  
+  ## Plot the first two principal components
+  ggplot(mapping = aes(x = PC1, y = PC2, color = activity)) + 
+  
+   ## Add a geom and a pleasant theme
+   geom_point() + ggthemes::theme_clean() + 
+  
+  ## Add labels and titles
+  labs(title = "Figure 7: Visualization of PC1 and PC2")
+```
+ 
+ Next, I apply the same transformation I have made on the training set to the testing set. Here, I use a function `bake`.
+ 
+```{r}
+## Transform the testing data similar to the training data
+fall_test <- pca_trans %>% 
+  
+  ## Use of bake function to generate testing test transformed exactly like the training set
+  bake(fall_test)
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+## **Running the ML models**
+I now run machine learning models and evaluate each of them in the following order. 
+
+1. Classification tree.
+
+2. Random Forest.
+
+3. K-Nearest Neighbours.
+
+4. Extreme Gradient Boosting.
+
+5. Generalized Multinomial Logit Model.
+
+6. Ensemble of all the models above. 
+
+Note that in evaluating the models, I will focus mainly on the specificity given that it is more expensive to predict no-fall in a patient who falls that it is to predict a fall in a patient who does not fall. Hence, a model that predicts that a patient will not fall with a higher precision is better than one that predicts a fall with equal level of precision. However, I will also, side by side, consider overall accuracy and specificity in case of ties. Also, given that our model has more than two classes, I consider the specificity of the main class `fall`. While the other classes are important, our case will be specific to predicting which patients fall or do not fall. The baseline accuracy on the test set, guessing the most frequent outcome, is `r mean(fall_test$activity == 3)`.
+
+In all cases, I run a 10-fold cross validation and set a random seed as follows.
+
+```{r}
+## Set seed to be used in the models
+seeds <- set.seed(123, sample.kind = "Rounding")
+
+## Set up cross validation parameters
+control <- trainControl(method = "repeatedcv",
+                        
+                     repeats = 10,
+                     
+                     seeds = seeds)
+```
+
+
+### Classification tree
+In this section, I run the classification tree using the code chunk below. The tree model has overall accuracy 0.5138 against a no information rate (NIR) of 0.2814.The model has a specificity of 0.86453 and a sensitivity of 0.44866. Note that the optimal complexity parameter is near zero. 
+
+```{r}
+# The classification tree model
+tree <- caret::train(activity ~ ., 
+                     
+                     data = fall_train, 
+                     
+                     # specify engine to use
+                     method = "rpart",
+                     
+                     # Set up cross validation
+                     trControl = control,
+                     
+                     # Set up metric to use
+                     metric = "Accuracy",
+                     
+                     # Tuning parameters
+                     tuneGrid = expand.grid(cp = seq(0, 0.05, 0.01)))
+
+# make predictions on the test set
+tree_prediction <- predict(tree, newdata = fall_test)
+
+# Generate confusion matrix on the test set
+confusionMatrix(tree_prediction, fall_test$activity)
+```
+
+
+```{=tex}
+\newpage
+\blandscape
+```
+
+```{r}
+plot(tree)
+
+#rpart.plot(tree$finalModel)
+```
+
+```{=tex}
+\newpage
+\elandscape
+```
+
+### The Random Forest Model
+The random forest model does way better than the tree in terms of accuracy with an overall accuracy of 0.6179 against a no information rate of 0.2814, a specificity level of 0.8859, and a sensitivity level of 0.5171. 
+
+```{r}
+## The random forest model
+## Set up the tuning parameters
+tunegrid <- expand.grid(.mtry= sqrt(ncol(fall_train)))
+
+## Set up the random forest model
+rf_default <- caret::train(activity ~ ., data = fall_train, 
+             
+              # Set up engine, cross validation and tuning parameters       
+              method = "rf", tunegrid = tunegrid, trControl = control)
+
+## make predictions on the test set
+rf_prediction <- predict(rf_default, newdata = fall_test)
+
+## generate confusion matrix
+confusionMatrix(rf_prediction, fall_test$activity)
+```
+
+### K-Nearest Neighbours (KNN)
+Although the KNN model does not perform as well as the random forest model, it is way batter than the tree model. The overall accuracy for the KNN is 0.5189 against a no information rate of 0.2134. The sensitivity is 0.5105 while the specificity is 0.8587. Finally, the balanced accuracy is quite good at 0.6846.
+
+```{r}
+## K-Nearest Neighbours (KNN)
+## Set up the model and cross validation
+knn <- train(activity ~ ., data = fall_train, method = "knn", 
+             
+             trControl = control)
+
+
+# Generate the confusion matrix
+confusionMatrix(fall_test$activity, predict(knn, newdata = fall_test))
+```
+
+
+### Extreme Gradient Boosting (XGBoost)
+
+In this section, I run the extreme gradient boosting (XGBoost) model. XGBoost refers to the engineering goal to push the limit of computations resources for boosted tree algorithms.
+
+```{r}
+# The XGboost model
+## Set up the tuning parameters
+tune_grid <- expand.grid(nrounds = 200,
+                        max_depth = 5,
+                        eta = 0.05,
+                        gamma = 0.01,
+                        colsample_bytree = 0.75,
+                        min_child_weight = 0,
+                        subsample = 0.5)
+
+## Set up model, cross validation and tuning parameters
+xgb_model <- train(activity ~., data = fall_train, method = "xgbTree",
+                trControl = control,
+                tuneGrid = tune_grid,
+                tuneLength = 10)
+
+## generate confusion matrix for the test set predictions
+confusionMatrix(fall_test$activity, predict(xgb_model, newdata = fall_test))
+```
+
+### Multinomial Logit Model
+In the multinomial logit model below, the overall accuracy is very poor- at 0.2828 against a no information rate of 0.2814. However the model has good specificity at 0.8630 and a very low sensitivity of 0.2970.  Consequently, the balanced accuracy is also low at 0.57995. Overall this model lacks good predictive power going by the balanced accuracy and sensitivity relative to the other models. However, it has specificity that is reasonable. 
+
+```{r}
+## Set up the multinomial logit model
+multinom <- multinom(activity ~ ., data = fall_train)
+
+## Predict the multinomial logit model on the test set
+multinom_predict <- predict(multinom, newdata = fall_test)
+
+## Get confusion matrix 
+confusionMatrix(multinom_predict, fall_test$activity)
+```
+
+### Ensemble
+
+#### Ensemble 1: With multinomial logit
+
+In this section, I assemble all the models and use a voting method to build an ensemble. The prediction is the value that receives the most votes from each of the models. In the ensemble, the overall accuracy is 0.5928, a specificity of 0.8804, and a sensitivity of 0.5291. The model does a good job in predicting who will not fall but rather poorly in predicting who will fall. Part of the reason for the low sensitivity maybe the inclusion of the multinomial logit model that had extremely low sensitivity. I remove the multinomial logit model from the ensemble and build a new ensemble next. 
+
+```{r}
+## make a dataframe with predictions on the test on all the models
+ensemble <- tibble(tree = predict(tree, newdata = fall_test), rf = predict(rf_default, newdata = fall_test), knn = predict(knn, newdata = fall_test), xgb = predict(xgb_model, newdata = fall_test), multinom_predict)
+
+
+## Create a new colum with outcome being the most popular outcome for the models
+ensemble$ensemble_all <- apply(ensemble, 1, function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+})
+
+## Convert the ensembled column into a factor
+ensemble$ensemble_all <- factor(ensemble$ensemble_all, levels = levels(ensemble$rf))
+
+## Compute the confusion matrix on the model
+confusionMatrix(ensemble$ensemble_all, fall_test$activity)
+```
+
+
+#### Ensemble 2: Without Mutinomial logit
+
+The multinomial logit performs poorly and hence I remove it in making the second ensemble. However, both the sensitivity and specificity barely change with this tweak given that the other models subsume the mistakes made by the multinomial logit model.
+
+```{r}
+## make a dataframe with predictions on the test on all the models
+ensemble2 <- tibble(tree = predict(tree, newdata = fall_test), rf = predict(rf_default, newdata = fall_test), knn = predict(knn, newdata = fall_test), xgb = predict(xgb_model, newdata = fall_test))
+
+
+## Create a new colum with outcome being the most popular outcome for the models
+ensemble2$ensemble_all <- apply(ensemble2, 1, function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+})
+
+## Convert the ensembled column into a factor
+ensemble2$ensemble_all <- factor(ensemble2$ensemble_all, levels = levels(ensemble2$rf))
+
+## Compute the confusion matrix on the model
+confusionMatrix(ensemble$ensemble_all, fall_test$activity)
+```
+
+## **Model Evaluation**
+I present the overall results in the table 8 below. Overall, the random forest model does best in terms of specificity and overall accuracy followed by the ensemble without the multinomial logit model. In terms of sensitivity, the extreme gradient boosting model performs best followed by the ensemble without the multinomial logit model. Ensemble with Multinomial logit model has the highest balanced accuracy. The results are in the table below. 
+
+```{r}
+## make a table of results
+tribble(~ Model, ~ Specificity, ~ Sensitivity, ~ BalancedAccuracy, ~ Accuracy, ~ NoInformationRate, "Classification Tree", "0.8645", "0.4487", "0.6566", "0.5138", "0.2814",
+        "Random Forest Model", "0.8859", "0.5171", "0.7015", "0.6179", "0.2814", "K Nearest Neighbours", "0.8587", "0.5105", "0.6846", "0.5189", "0.2134", "Extreme Gradient Boosting", "0.8563", "0.5437", "0.7000", "0.5450", "0.2484", "Multinomial Logit", "0.8630", "0.2970", "0.5800", "0.2828", "0.2814", "Ensemble with Multinomial", "0.8815", "0.5282", "0.7049", "0.5930", "0.2814", "Ensemble without Muntinomial", "0.8804", "0.5291", "0.7048", "0.5928", "0.2814") %>% knitr::kable(caption = "Results of the Machine Learning Models")
+```
+
+## **Conclusion**
+In this project, I have built models to predict whether or not a patient falls. I have developed several models- the classification tree, the random forest model, the K-nearest neighbour model, extreme gradient boosting, multinomial logit models and two ensembles- one with the multinomial logit model and one without the multinomial logit model. In evaluating the models I use specificity- the accuracy in predicting that a patient will not fall when in fact, they do not fall as it less expensive to predict that a patient will fall and they do not fall. Overall, the random forest model does the best in terms of specificity, while extreme gradient boosting has the best sensitivity. The challenges I have encountered in this exercise include computing power where the models take too long to run. The computational power has affected my ability to explore more models and fine tune the parameters for better results. 
+
+## **References**
+Anava, O., & Levy, K. (2016). k*-nearest neighbours: From global to local. In Advances in neural information processing systems (pp. 4916-4924).
+
+Chen, Z., & Fan, W. D. (2019). A multinomial logit model of pedestrian-vehicle crash severity in North Carolina. International journal of transportation science and technology, 8(1), 43-52.
+
+Özdemir, A. T., & Barshan, B. (2014). Detecting falls with wearable sensors using machine learning techniques. Sensors, 14(6), 10691-10708.
+
+Shaikhina, T., Lowe, D., Daga, S., Briggs, D., Higgins, R., & Khovanova, N. (2019). Decision tree and random forest models for outcome prediction in antibody incompatible kidney transplantation. Biomedical Signal Processing and Control, 52, 456-462.
+
+
+
+
+
+
+

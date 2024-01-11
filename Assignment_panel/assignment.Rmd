@@ -1,0 +1,619 @@
+---
+title: '**Financial Development and Educational Attainment: A Cross Country Comparison**'
+author: 'John Karuitha'
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+    number_depth: 3
+    toc_float: yes
+    theme: spacelab
+    highlight: zenburn
+    code_folding: hide
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+subtitle: '***Does education covary with financial development? An Instrumental variables panel regression approach***'
+bibliography: 
+  - references.bib
+  - grateful-refs.bib
+csl: cite.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+\newpage 
+
+# **Background**
+
+In this analysis, I examine the relationship between financial development and education attainment. My premise is that people who attain higher education are better placed to enter the formal labor market and hence demand financial services such as bank accounts. Education also raises awareness even among people in the informal and semi-formal sectors to better manage and access finance from formal financial intermediaries [@allen2014african]. I examine financial development as the number of people (aged 15 years and above) that have an account with a financial intermediary. I capture education attainment using secondary school enrollment ratio to primary school enrollment ratio. I also include variables such as institutional quality, region, trade openness as controls as they are well known drivers of financial development [@klapper2015role]. I use years of compulsory education as the instrumental variable for education. 
+
+We estimate an equation of the form;
+
+$findev_{ij} = \alpha + \beta_{1}Education_{ij} + \beta_{2}Governance_{ij} + \beta_{4}TradeOpenness_{ij} + \epsilon_{ij}$
+
+- Financial Development refers to the extent that people can access and use affordable financial services. In our case, we proxy financial development as the percentage of people with bank accounts in a country. 
+
+- We proxy general level of education as high school (secondary school) turnover to primary school turnover. 
+
+> ***Prior: We expect a positive relationship between education and financial development.*** 
+
+- Governance captures the quality of institutions in a country and how well these institutions improve the quality of life of the citizens. We use the first principle component of the Worldwide Governance Indicators to proxy governance or institutional quality. 
+
+
+> ***Prior: We expect a positive relationship between governance and financial development.*** 
+
+- Trade Openness: The extent to which a country trades with the outside world. We proxy this using the ratio of imports and exports to GDP. 
+
+
+> ***Prior: We expect a positive relationship between trade openness and financial development.***
+
+
+**Instrumental variables**: I use years of compulsory education in a country as the instrumental variable for education. Rationale: Years of compulsory education can be a good instrument for the education variable, because it is correlated with education levels but is not directly related to financial development. Similarly, I use the air freight of passengers and press freedom index as instruments for trade openness and governance, respectively. 
+
+
+```{r}
+## Install packages manager -----
+if(!require(pacman)){
+  install.packages('pacman')
+}
+
+## install themer for graphs
+if(!require(artyfarty)){
+  remotes::install_github("datarootsio/artyfarty")
+}
+
+## Load required packages -----
+p_load(tidyverse, janitor, 
+       naniar, mice, ggthemes,
+       artyfarty, WDI, wbstats, 
+       plm, correlationfunnel,
+       kableExtra, stargazer,
+       Amelia, countrycode,
+       corrplot, grateful,
+       patchwork, doParallel)
+
+## Set up themes ----
+theme_set(theme_scientific())
+options(digits = 3)
+options(scipen = 999)
+
+## Speed
+## Hasten code execution by parallel computing
+# Tuning is faster in parallel
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makeCluster(all_cores)
+registerDoParallel(cl)
+
+```
+
+
+```{r, eval=FALSE}
+### Load the data ------
+education <- read_csv("education.csv", na = "..") %>% 
+  clean_names() %>% 
+  rename(compulsory_education = compulsory_education_duration_years_se_com_durs,
+         corruption = control_of_corruption_estimate_cc_est,
+         air_freight = air_transport_passengers_carried_is_air_psgr) %>% 
+  select(-time_code) %>% 
+  mutate(air_freight = parse_number(air_freight) %>% log())
+  
+
+## Press freedom ----
+press <- read_csv('press.csv') %>% 
+  clean_names() %>% 
+  rename(country_code = country_iso3) %>% 
+  select(-indicator, -indicator_id, -subindicator_type) %>% 
+  pivot_longer(
+    -c(country_code, country_name),
+    names_to = "time",
+    values_to = "press_freedom"
+  ) %>% 
+  mutate(time = str_remove(time, "^x"))
+
+## KKM Index ----
+governance <- read_csv("9c0304bb-658e-491e-891d-a3c35a472b2c_Data.csv",
+                na = "..") %>% 
+  clean_names() %>% 
+  select(ends_with('est')) %>%
+  mice::mice(
+    n = 5,
+    maxit = 500,
+    seed = 123
+  ) %>%
+  complete() %>% 
+  prcomp(
+    scale. = TRUE,
+    center = TRUE
+  ) %>%
+  pluck("x") %>%
+  data.frame() %>%
+  select(PC1) %>%
+  set_names("governance") %>% 
+  bind_cols(
+    read_csv("9c0304bb-658e-491e-891d-a3c35a472b2c_Data.csv",
+                na = "..") %>% 
+  clean_names() %>% 
+    select(country_name, 
+           country_code, 
+           time)
+  )
+
+## Get the main data ----
+my_data <- read_csv('ff5b1b8a-0065-492a-8775-0a3fe60ed0a1_Data.csv',
+         na = "..") %>%
+  clean_names() %>%
+  select(-ends_with('est')) %>% 
+  select(-time_code) %>%
+  mutate(continent = countrycode(
+    sourcevar = country_code,
+    origin = "iso3c",
+    destination = "continent"
+  )) %>%
+  mutate(country_name = case_when(
+    country_code == "XKX" ~ "Kosovo",
+    .default = countrycode())
+  ) %>% 
+  filter(!is.na(continent)) %>%
+  left_join(education,
+        by = c("country_name", "country_code", "time")) %>%
+  left_join(press,
+        by = c("country_name", "country_code", "time")) %>%
+  left_join(
+    governance,
+    by = c("country_name", "country_code", "time")
+  ) %>% 
+  mutate(
+    educ = school_enrollment_secondary_percent_net_se_sec_nenr/
+      school_enrollment_primary_percent_net_se_prm_nenr,
+    openess = imports_of_goods_and_services_percent_of_gdp_ne_imp_gnfs_zs + 
+      exports_of_goods_and_services_percent_of_gdp_ne_exp_gnfs_zs
+  ) %>% 
+## Impute the data ----
+mice::mice(
+    n = 5,
+    maxit = 500,
+    seed = 123
+  ) %>%
+  complete() %>% 
+## Select variables ----
+  select(
+    country_code,
+    country_name,
+    continent,
+    time,
+    account_ownership_at_a_financial_institution_or_with_a_mobile_money_service_provider_percent_of_population_ages_15_fx_own_totl_zs,
+    governance,
+    educ,
+    openess,
+    compulsory_education,
+    air_freight,
+    press_freedom
+  ) %>%
+  rename(
+    accounts = account_ownership_at_a_financial_institution_or_with_a_mobile_money_service_provider_percent_of_population_ages_15_fx_own_totl_zs
+  ) %>% 
+  mutate(time = as.numeric(time),
+         compulsory_education = as.numeric(compulsory_education)
+         ) %>% 
+  group_by(country_name) %>% 
+  mutate(
+    accounts = replace_na(accounts, median(accounts, na.rm = TRUE)),
+    governance = replace_na(governance, median(governance, na.rm = TRUE)),
+    educ = replace_na(educ, median(educ, na.rm = TRUE)),
+    openess = replace_na(openess, median(openess, na.rm = TRUE)),
+    compulsory_education = replace_na(compulsory_education, median(compulsory_education, na.rm = TRUE)),
+    air_freight = replace_na(air_freight, median(air_freight, na.rm = TRUE)),
+    press_freedom = replace_na(press_freedom, median(press_freedom, na.rm = TRUE))
+  ) %>% 
+  ungroup() %>% 
+  group_by(continent) %>% 
+  mutate(
+    accounts = replace_na(accounts, median(accounts, na.rm = TRUE)),
+    governance = replace_na(governance, median(governance, na.rm = TRUE)),
+    educ = replace_na(educ, median(educ, na.rm = TRUE)),
+    openess = replace_na(openess, median(openess, na.rm = TRUE)),
+    compulsory_education = replace_na(compulsory_education, median(compulsory_education, na.rm = TRUE)),
+    air_freight = replace_na(air_freight, median(air_freight, na.rm = TRUE)),
+    press_freedom = replace_na(press_freedom, median(press_freedom, na.rm = TRUE))
+  ) %>% 
+  ungroup() 
+
+##############################
+my_data %>% write_csv("my_data.csv")
+  
+```
+
+
+# **Data**
+
+```{r}
+my_data <- read_csv('my_data.csv') %>% 
+  mutate(air_freight = case_when(
+    air_freight == -Inf | air_freight == Inf ~ 0,
+    .default = air_freight
+  ))
+```
+
+
+We source the data from the World Bank, World Development Indicators (WDI) and the Worldwide Governance Indicators (WGI) for the years 1998-2002. The data consists of `r nrow(my_data)` observations of `r ncol(my_data)` variables. The data consists of the following variables (see Table 1). 
+
+**Instrumental variables**: I use years of compulsory education in a country as the instrumental variable for education. Rationale: Years of compulsory education can be a good instrument for the education variable, because it is correlated with education levels but is not directly related to financial development. Similarly, I use the air freight of passengers and press freedom index as instruments for trade openness and governance, respectively. All this data is available in the World Bank Website. 
+
+```{r}
+#names(my_data)
+tribble(~Variable, ~Definition,
+        "time", "Year the data collected, 1998-2022.",
+        "country_name", "Name of the country.",
+        "country_code", "ISO3c country code",
+        "Continent", "Continent of associated country.",
+        "Accounts", "% of people aged 15+ with an account",
+        "Governance", "KKM Governance Index, defined as the first principal component of the KKM indicators",
+        "Educ", "Educational attainment- ratio of high school turnover tp primary school turnover",
+        "Openess", "Trade openess, defined as the ratio of imports and exports to GDP",
+      "compulsory_education", "Number of years of compulsory education in country." ,
+      
+      "Press freedom index", "The data is collected through an online questionnaire sent to journalists, media lawyers, researchers and other media specialists selected by Reporters without Borders (RSF) in the 180 countries covered by the Index.",
+      
+      "Air Transport, passengers carried", "Passengers carried by air into and out of a country."
+        ) %>% 
+  kbl(caption = "Variables Definition",
+      booktabs = TRUE) %>% 
+  kable_classic(
+    full_width = TRUE,
+    latex_options = "hold_position"
+  ) %>% 
+  footnote(
+    number = "The last three variables serve as instruments",
+    general = "Source: The World Bank, https://databank.worldbank.org/source/world-development-indicators"
+  )
+```
+
+
+
+
+# **Data Exploration**
+
+I explore the data by creating summary tables and visualizations. First, I examine the distribution of the variables (see Figure 1).
+
+
+\newpage
+
+\blandscape
+
+
+```{r, fig.height=8, fig.width=12,fig.cap="Distribution of the variables"}
+
+ed = my_data %>%
+  ggplot(mapping = aes(x = educ)) +
+  geom_histogram() +
+  labs(x = 'Education',
+       title = "Distribution of Education Variable")
+
+ac = my_data %>%
+  ggplot(mapping = aes(x = accounts)) +
+  geom_histogram() +
+  labs(x = 'Financial Development',
+       title = "Distribution of Financial Development Variable")
+
+mgov = my_data %>%
+  ggplot(mapping = aes(x = governance)) +
+  geom_histogram() +
+  labs(x = 'Governance',
+       title = "Distribution of Governance Variable")
+
+
+trade = my_data %>%
+  ggplot(mapping = aes(x = openess)) +
+  geom_histogram() +
+  labs(x = 'Trade Openness',
+       title = "Distribution of Trade Openness Variable")
+
+
+(ed | ac) / (mgov | trade)
+```
+
+
+\elandscape
+
+\newpage
+
+Next, I look at the relationship between education and financial development by continent. We see a consistently strong positive relationship between the two variables across all continents. 
+
+```{r, fig.height=6, fig.cap='Scatterplot of Financial Development against Education'}
+my_data %>% 
+  ggplot(mapping = aes(x = accounts, 
+                       y = educ,
+                       color = continent)) + 
+  geom_point() + 
+  geom_smooth() + 
+  scale_color_tableau() + 
+  labs(x = "Financial Development",
+       y = "Education",
+       title = "Scatterplot of Financial Development against Education") + theme(legend.title = element_blank(),
+                                                                                 legend.position = "top")
+```
+
+
+```{r, fig.height=6, fig.cap='Education vs Financial Development'}
+my_data %>% 
+  summarise(
+    accounts = mean(accounts),
+    educ = mean(educ),
+    .by = c(continent, time)
+  ) %>% 
+  ggplot(aes(y = accounts, 
+             x = educ,
+             color = continent)) + 
+  geom_line() + 
+  labs(x = "Education", 
+       y = "Financial Development",
+       title = "Education vs Financial Development") +
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  )
+```
+
+\newpage
+
+I then examine the average trends in financial development by continent over time. We see that Africa lies far below the other regions.
+
+```{r, fig.height=6, fig.cap='% People 15+ Years Old with Bank Accounts'}
+## Create the graphs ----
+my_data %>%
+  summarise(
+    accounts = mean(accounts),
+    .by = c(time, continent)
+  ) %>%
+  ggplot(mapping = aes(x = time, 
+                       y = accounts, 
+                       color = continent)) + 
+  geom_line(show.legend = TRUE) + 
+  labs(x = "", y = "Banks Accounts",
+       title = "% People 15+ Years Old with Bank Accounts") + 
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  )
+```
+
+\newpage
+
+The figure below reinforces the low level of financial development in Africa, with Europe exhibiting the highest median financial development.
+
+```{r, fig.cap='% of People aged 15+ with Accounts'}
+my_data %>%
+  mutate(continent = fct_reorder(continent, accounts, median)) %>% 
+  ggplot(mapping = aes(y = accounts, 
+                       x = continent, 
+                       fill = continent)) + 
+  geom_boxplot(show.legend = FALSE) + 
+  labs(x = "",
+       y = "% of People aged 15+ with Accounts",
+       title = "% of People aged 15+ with Accounts")
+```
+
+I also look at the correlation between these financial development and the other variables. We see a very high correlation between financial development (accounts) and governance and education. Financial development has moderate relationship with trade openness. The high correlation between education and governance could bring about multicollinearity and cross-sectional dependence problems.  
+
+
+```{r, fig.cap="Correlation Analysis"}
+
+my_data %>%
+  select(where(is.numeric), -time) %>% 
+  cor() %>% 
+  corrplot(
+    method = "number",
+    type = "lower",
+    diag = FALSE
+  )
+```
+
+
+I also summarise the data below 
+
+```{r}
+## Summary statistics 
+my_data %>%
+  select(where(is.numeric), -time) %>%
+  skimr::skim_without_charts() %>%
+  select(-n_missing, -complete_rate) %>%
+  rename(
+    Variable = skim_variable,
+    Mean = numeric.mean,
+    SD = numeric.sd,
+    Min = numeric.p0,
+    Q1 = numeric.p25,
+    Median = numeric.p50,
+    Q3 = numeric.p75,
+    Max = numeric.p100
+  ) %>%
+  kbl(
+    caption = "Summary Statistics",
+    booktabs = TRUE
+  ) %>%
+  kable_classic(
+    full_width = TRUE,
+    latex_options = "hold_position"
+  )
+```
+
+\newpage
+
+# **Regression Analysis**
+
+I run panel regressions as follows;
+
+- Fixed effects model.
+- Random effects model.
+- Pooled OLS
+
+We estimate an equation of the form;
+
+$findev_{ij} = \alpha + \beta_{1}Education_{ij} + \beta_{2}Governance_{ij} + \beta_{4}Trade_openness_{ij}$
+
+```{r, results='asis'}
+## PLM
+fixed_effects <- plm(accounts ~ educ + openess + governance,
+    index = c("continent", "time"),
+    data = my_data,
+    effect = "twoway",
+    model = "within")
+
+fixed_effects_iv <- plm(accounts ~ educ + openess + governance| compulsory_education + 
+                          air_freight + press_freedom,
+    index = c("continent", "time"),
+    data = my_data,
+    effect = "twoway",
+    model = "within")
+
+pooling_effects <- plm(accounts ~ educ + openess + governance,
+                      index = c("continent", "time"),
+                      data = my_data,
+                      effect = "twoway",
+                      model = "pooling")
+
+pooling_effects_iv <- plm(accounts ~ educ + openess + governance | compulsory_education + 
+                          air_freight + press_freedom,
+                      index = c("continent", "time"),
+                      data = my_data,
+                      effect = "twoway",
+                      model = "pooling")
+
+```
+
+The individual regression output follows. 
+
+## The fixed effects model 
+
+### Fixed effects without Instruments
+ 
+Below is a summary of the fixed effects model without instruments. 
+
+```{r}
+summary(fixed_effects)
+```
+
+### Fixed Effects with Instruments
+
+Then the fixed effects model WITH instruments. 
+
+```{r}
+summary(fixed_effects_iv)
+```
+
+
+## Pooled OLS Model
+
+### Pooled OLS without Instruments
+
+Here, I present the pooled OLS model without instruments
+
+```{r}
+summary(pooling_effects)
+```
+
+
+### Pooled OLS with Instruments
+
+Then look at the pooled OLS with instruments
+
+```{r}
+summary(pooling_effects_iv)
+```
+
+
+
+## Combined results
+
+I combine the regression output into one table below. 
+
+
+\newpage
+
+\blandscape
+
+```{r, results='asis'}
+stargazer(fixed_effects, 
+          fixed_effects_iv, 
+          pooling_effects,
+          pooling_effects_iv,
+          type = "html",
+          title = "Panel Regression Analysis",
+          column.labels = c("Fixed Effects", "Fixed Effects (Instruments)", 
+                            "Pooled OLS", "Pooled OLS (Instruments)"),
+          dep.var.labels = c("Financial Development"),
+          header = FALSE,
+          covariate.labels = c("Education", "Trade Openness",
+                               "Governance")
+          )
+```
+
+
+\elandscape
+
+\newpage
+
+The output shows that the three variables have a statistically significant relationship with financial development. Holding governance and trade openness constant, a better education is positively associated with higher average financial development. Governance has a positive relationship with financial development, ceteris paribus. On the contrary, trade openness has a marginal negative relationship with financial development. The relationship is uniform across the models. The models without instruments have a better explanatory power than models with instruments. For instance, the fixed effects model with instruments have an $R^2$ of 52.6\% compared to 11.8\% for the model with instruments. Similarly, the pooled OLS without instruments has an adjusted $R^2$ of 62.4\% compared to the pooled OLS with instruments that has an adjusted $R^2$ of 12.9\%. But which of these models is better? Let us examine the AIC. 
+
+```{r}
+## Get AIC
+logLik.plm <- function(object){
+  out <- -plm::nobs(object) * log(2 * var(object$residuals) * pi)/2 - deviance(object)/(2 * var(object$residuals))
+  
+  attr(out,"df") <- nobs(object) - object$df.residual
+  attr(out,"nobs") <- plm::nobs(summary(object))
+  return(out)
+}
+## AIC
+tribble(
+  ~Model, ~AIC,
+"Fixed effects", logLik.plm(fixed_effects)[1],
+"Fixed effects with instruments", logLik.plm(fixed_effects_iv)[1],
+"Pooled OLS", logLik.plm(pooling_effects)[1],
+"Pooled OLS with instruments", logLik.plm(pooling_effects_iv)[1]) %>% 
+  arrange(AIC) %>% 
+  kbl(booktabs = TRUE,
+      caption = "AIC for Panel Models") %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+
+This analysis shows that the pooled OLS with instruments is the better model, followed by the fixed effects with instruments. 
+
+The models could be subject to omitted variable bias though it does fairly well with a $R^{2}$. Hence increased investments in raising institutional quality and education attainment should be encouraged. 
+
+>**Policy recommendation**: Given that our analysis is between education and financial development, we recomend substantial investments in education to raise the levels of financial development in the long term. This recomendation is especially pertinent for regions with low levels of financial development like Africa. 
+
+\newpage
+
+
+# **Conclusion**
+
+In this analysis, we have examined the relationship between financial development proxied by the number of bank accounts and three variables that are postulated to drive financial development; governance, education, and trade openness. We find that Africa lags in financial development. All the three measures have a statistically significant relationship with financial development, and the models are all significant going by the F-statistic. Hence increased investments in raising education attainment should be encouraged holding institutional quality trade openness constant in order to raise financial development in the long term.
+
+# **Acknowledgements**
+
+```{r}
+cite_packages(output = "paragraph", out.dir = getwd())
+```
+
+
+
+# **References** {-}
+
+
+

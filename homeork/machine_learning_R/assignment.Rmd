@@ -1,0 +1,506 @@
+---
+title: "Using Machine Learning to Predict Employee Turnover"
+author: "Jamshid Zar"
+date: "`r format(Sys.Date(), format = '')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output:
+  pdf_document:
+      toc: true
+      toc_depth: 3
+      number_sections: true
+  html_document: default
+subtitle: "Assignment 3: CSCI 3141: Foundations of Data Science Using R"
+bibliography: citations.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+if(!require(pacman)){install.packages("pacman")}
+pacman::p_load(tidyverse, tidymodels, ggthemes, firatheme, skimr, kableExtra,
+               corrplot, Amelia, janitor,patchwork, themis, rpart.plot, ranger,
+               remotes, devtools)
+
+theme_set(theme_few())
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+remotes::install_github("vankesteren/firatheme")
+```
+
+\newpage
+
+# Background
+
+In this analysis, we use data regarding employee turnover in an organisation to build machine learning models that will help the management to predict employee churn. Employee turnover is a major cost for organisation - moreso the replacement and training new employees. 
+
+As @skelton2019predicting aptly note;
+
+>Employee turnover expenses can cost businesses more than 100 per cent of a single employee’s annual wages and negatively affection an organization’s production and profits. High employee turnover also could affect community tax collections, social programs and physical and mental health issues. Therefore, understanding contributors to higher employee turnover remains essential for organizational managers from both a corporate and societal standpoint (p.1).
+
+This project aims to predict employee turnover using machine learning. If managers could reasonably pinpoint the employees that are likely to leave, then they could initiate mitigation measures, saving the organisation valuable financial resources.  
+
+# Objective and Problem Definition
+
+The objective of this project is to build a machine learning model that predicts the probability of an employee leaving the organisation. 
+
+# Summary of Results
+
+# Data 
+
+In this section, I explore the data starting with a description of the variables and exploratory data analysis (EDA) - data visualization and computing summary statistics.
+
+## Variables Description
+
+I begin by loading in the data.
+
+```{r}
+employees <- read_csv("employee_churn_data.csv") %>% 
+    mutate(promoted = factor(promoted, labels = c("not_promoted", "promoted")),
+           
+           left = factor(left, labels = c("no", "yes")))
+#names(employees)
+```
+
+
+The data `employees` has `r nrow(employees)` observations of `r ncol(employees)` variables. The data consists of the following variables. 
+
+
+```{r, echo = FALSE}
+tribble(~ Variable, ~ Description,
+        
+        "department", "The department the employee belongs.",
+        
+        "promoted", "1 if the employee was promoted in the previous 24 months, 0 otherwise.", 
+        
+        "review", "The composite score the employee received in their last evaluation.", 
+        
+        "projects", "How many projects the employee is involved.", 
+        
+        "salary", "For confidentiality reasons, salary comes in three tiers: low, medium, and high.", 
+        
+        "tenure", "How many years the employee has been at the company.", 
+        
+        "satisfaction", "A measure of employee satisfaction from surveys.", 
+        
+        "avg_hrs_month", "The average hours the employee worked in a month.", 
+        
+        "left", "Target variable: 'yes' if the employee ended up leaving, 'no' otherwise.")  %>% 
+    formatting_function(caption = "Table 1: Variables Description")
+```
+
+Note that the outcome of interest is `left`, indicating whether or not the employee left the organisation. 
+
+## Exploratory Data Analysis
+
+In  exploring and cleaning the data, I examine the folloing matters. 
+
+- Missing values.
+- Duplicate observations.
+- Unusually high correlations between the independent variables.
+
+
+### Missing Values
+
+As Figure () below shows, the data has no missing values. 
+
+```{r, fig.cap = "Missingness Map"}
+employees %>% sapply(is.na) %>% 
+    colSums() %>% 
+    tibble(variable = names(employees), missing = .) %>% 
+    formatting_function(caption = "Missing values")
+```
+
+
+### Duplicate Observations
+
+Again the data set has no duplicate observations. 
+
+```{r}
+employees %>% 
+    janitor::get_dupes()
+```
+
+
+### Correlation Analysis
+
+Figure () captures the correlation analysis showing an especially high correlation () between employee tenure and average hours worked per month. Given that this is a nearly perfect correlation, we drop one of these variables from the analysis. 
+
+
+```{r, fig.cap = "Correlation Matrix for Dependent Variables"}
+employees %>% 
+    select(where(is.numeric)) %>% 
+    cor() %>% 
+    corrplot(method = "circle", type = "lower", diag = FALSE)
+```
+
+
+### Distribution of the Target Variable, Left
+
+Figure () Panel A below shows the distribution of the target variable, `left`. The graph illustrates the lower prevalence of employees who left compared to those that remained with the organisation. In the modeling stage, this class imbalance can cause problems. To address this matter, we up-sample the data so that the proportion of employees who left is roughly equal to those that remained in the training set. We shall revisit this issue later in the modeling section. 
+
+### Turnover by Department
+
+Next, we examine the turnover by department. The analysis in Figure () Panel B below shows that staff in the IT and Logistics departments have a higher incidence of leaving the organisation staff in other departments. 
+
+### Turnover by Salary Bands
+
+Figure () Panel C below shows no notable differences in staff turnover by salary. While pay is an important element of an employee motivation to work, it does not appear to make a difference in the decision for the staff to stay with or to leave the organisation.
+
+### Turnover and Promotion in the Last 24 Months
+
+Promotion seems to have a notable relationship with the likelihood of an employee leaving the organisation (see Figure () panel D). 
+
+
+\newpage
+
+\blandscape
+
+
+```{r, fig.cap = "Target Variable Distribution", echo = FALSE, fig.height=8, fig.width=12}
+(employees %>% 
+    ggplot(mapping = aes(x = left, fill = left)) + 
+    geom_bar() + 
+     labs(title = "Panel A: How Many Employees Left?") +
+    scale_fill_fira() + 
+
+###########################
+employees %>% 
+    ggplot(mapping = aes(x = department, fill = left)) + 
+    geom_bar(position = "fill", show.legend = FALSE) + 
+    coord_flip() +
+    scale_fill_fira() + 
+    labs(x = "", y = "", 
+         title = "Panel B: Turnover by Department")) / 
+##############################
+(employees %>% 
+    ggplot(mapping = aes(x = salary, fill = left)) + 
+    geom_bar(position = "fill", show.legend = FALSE) + 
+    labs(x = "", y = "", 
+         title = "Panel C: Turnover by Salary Bands") + scale_fill_fira() +
+##############################
+employees %>% 
+    ggplot(mapping = aes(x = promoted, fill = left)) + 
+    geom_bar(position = "fill", show.legend = FALSE) + 
+    labs(x = "", y = "", 
+         title = "Panel D: Turnover and Staff Promotion") + scale_fill_fira())
+```
+
+
+
+\elandscape
+
+\newpage
+
+### Summary Statistics for Numeric Variables
+
+In this section, I compute summary statistics for the numeric variables followed by the non-numeric variables. The summaries complement Figure () in Appendix 1. Overall, the imbalance in the target variable `left` and the skewed distribution of some of the other variables in the dataset, especially `salary` and `bonus`. Te variable `bonus` also has substantial outliers meaning a few employees get very high bonuses relative to other employees. 
+
+```{r}
+employees %>% 
+    select(where(is.numeric)) %>% 
+    skimr::skim_without_charts() %>% 
+    select(-n_missing, -skim_type) %>% 
+    rename(Mean = numeric.mean, SD = numeric.sd, Min = numeric.p0,
+           Q1 = numeric.p25, Median = numeric.p50, Q3 = numeric.p75,
+           Max = numeric.p100) %>% 
+    formatting_function(caption = "Summary Statistics")
+```
+
+
+### Summary Statistics for Non-numeric Variables
+
+```{r}
+employees %>% 
+    select(where(is.character)) %>% 
+    skimr::skim_without_charts() %>% 
+    select(-n_missing, -skim_type, -character.empty) %>% 
+    formatting_function(caption = "Summary Statistics")
+```
+
+# Choice of Variables
+
+I drop the variable `avg_hrs_month` given that it has a very high correlation with `tenure`. However, I still retain `salary` and `bonus`. Although the two variables exhibit very little contribution to employees leaving the organisation, the little difference that exists could still contribute to the model performance. 
+
+# Building the Models
+
+## Experimental Setup and Model Evaluation
+
+For this analysis, I will run 3 predictive models.
+
+1. Logistic Regression Model.
+
+2. The Decision Tree Model.
+
+3. The Random Forest Model.
+
+In all cases, I tune the parameters and use a distinct training and testing set with cross validation in the training set.
+
+## Model Evaluation
+
+I use `specificity`, the area under the curve (`roc-auc`), and the `balanced accuracy`. The justification for using specificity is that it is better to predict an employee will leave the organisation when, in reality, they do not leave. However, it is not as good for a model to predict that an employee will not leave the organisation when they in reality do leave. In other words, the cost of not detecting employee churn is much higher. The Area Under Curve (AUC) supplements the specificity by evaluating how well the models discriminate the positive (those employees who leave) and negative (employees that remain with the organisation) at all thresholds [@narkhede2018understanding]. Like the AUC, the balanced accuracy, the arithmetic mean of `sensitivity` and `specificity` evaluates how well the models discriminate between employees who leave versus the employees who stay [@gorzalczany2016multi]. 
+
+## Training and Testing Sets
+
+I choose an 80-20 training-testing set split. To split the data, I use the initial_split function from `tidymodels`, a streamlined set of packages for machine learning in R. 
+
+```{r}
+split_object <- initial_split(employees, strata = left, prop = 0.8)
+
+training_set <- split_object %>% training()
+
+testing_set <- split_object %>% testing()
+```
+
+The training set has `r 0.8 * nrow(employees)` observations while the testing set has `r 0.2 * nrow(employees)`. Henceforth, we only use the testing set for model evaluation. However, I implement cross validation using the training set in each of the models that follow. 
+
+Next, I up-sample the data to cater for the imbalance in the target variable, `left`. I also drop one of the independent variables with a correlation beyond an absolute value of 0.85. 
+
+```{r}
+f_recipe <- recipes::recipe(left ~ ., 
+                             
+                             data = training_set) %>%
+  
+  ##We up-sample the data to balance the outcome variable
+  themis::step_upsample(left, 
+                        
+                        over_ratio = 1, 
+                        
+                        seed = 200) %>%
+  
+  ##We make all character variables factors
+  step_dummy(all_nominal_predictors()) %>%
+  
+  ##We remove one in a pair of highly correlated variables
+  ## The threshold for removal is 0.85 (absolute) 
+  ## The choice of threshold is subjective. 
+  step_corr(all_numeric_predictors(), 
+            
+            threshold = 0.85) %>%
+  
+  ## Train these steps on the training data
+  prep(training = training_set)
+```
+
+I also set up folds for cross validation. We use these folds in all the models that follow. 
+
+```{r}
+set.seed(200)
+cell_folds <- vfold_cv(training_set)
+```
+
+## Logistic Regression Model
+
+
+
+## Decision Tree Model
+
+The decision tree model uses a tree like model of decisions and their consequences. Although it is simple to fit and interpret, it is prone to over fitting. In this model, we shall tune two parameters.
+
+- Tree depth: How many splits a tree can make before coming to a prediction.
+
+- Cost complexity: This parameter allows us to control the size of the tree and hence manage over-fitting by adding a penalty for every new branch created. 
+
+Next, we fit the model allowing for hyper parameter tuning;
+
+```{r}
+## Setting up the model
+dss_model <- decision_tree(
+    
+    tree_depth = tune(),
+    
+    cost_complexity = tune()
+    
+) %>% 
+    set_mode("classification") %>% 
+    
+    set_engine("rpart")
+```
+
+I then set up a workflow
+
+```{r}
+dss_wf <- workflow() %>% 
+    add_recipe(f_recipe) %>% 
+    add_model(dss_model)
+```
+
+Next, I generate a grid of hyper-parameters. 
+
+```{r}
+set.seed(200)
+
+tree_grid <- grid_regular(
+  
+  cost_complexity(),
+  
+  tree_depth(),
+  
+  levels = 5
+)
+
+#head(tree_grid)
+```
+
+I use the workflow to run models over different parameters and choose the best combination. 
+
+
+```{r}
+tree_tune <- dss_wf %>% 
+    
+    tune_grid(
+    
+    resamples = cell_folds,
+    
+    grid = tree_grid
+    
+  )
+    
+```
+
+
+```{r}
+best_tree <- tree_tune %>% 
+    select_best(metric = "roc_auc")
+```
+
+
+```{r}
+last_tree <- dss_wf %>% 
+    
+    finalize_workflow(best_tree) %>% 
+  
+    fit(data = training_set)
+```
+
+
+
+```{r}
+last_tree %>% 
+  
+  extract_fit_engine() %>% 
+  
+  rpart.plot(roundint = FALSE)
+```
+
+
+### Model Evaluation 
+
+In this section, I evaluate the decision tree model on the test set. As noted earlier, we focus on the `specificity` and `AUC`. 
+
+```{r}
+evaluation <- last_tree %>% 
+    augment(new_data = testing_set)
+    
+```
+
+
+Next I compute the metrics. 
+
+```{r}
+evaluation %>% 
+    conf_mat(truth = left, estimate = .pred_class) %>% 
+    autoplot()
+```
+
+
+The Table () summary of the metrics of the models. Note that the `specificity` and `sensitivity` and are almost equal at 0.83. Consequently the balanced accuracy is also 0.83. 
+
+```{r}
+evaluation %>% 
+    conf_mat(truth = left, estimate = .pred_class) %>% 
+    summary()
+```
+
+
+
+```{r}
+
+evaluation %>% 
+    roc_auc(truth = left, .pred_no)
+    
+```
+
+
+```{r}
+evaluation %>% 
+    roc_curve(truth = left, .pred_no) %>% 
+    autoplot() +
+    labs(title = "ROC Curve for Logit Model (ROC AUC = 0.91)")
+```
+
+
+## Random Forest Model
+
+The Random Forest Model is an ensemble technique that works by creating many decision trees at run time. It is less prone to over-fitting and even performs well using the default metrics without tuning the parameters. Due to limits in computation power, it is hard for us to fine tune this model.
+
+Ideally, we need to tune the following parameters;
+
+- Mtry: This is the number of variables to sample randomly in each split.
+- Min_n: The minimum number of data points required in a node for the node to be split further.
+
+```{r}
+random_forest_model <- rand_forest() %>% 
+    set_mode("classification") %>% 
+    set_engine("ranger", importance = "impurity")
+```
+
+
+I then set up a workflow consisting of the model, the recipe.
+
+```{r}
+rf_workflow <- workflow() %>% 
+    add_recipe(f_recipe) %>% 
+    add_model(random_forest_model)
+```
+
+
+
+
+
+
+
+
+
+# Conclusion
+
+
+# References
+
+::: {#refs}
+:::
+
+\newpage
+
+
+# Appendix
+
+
+\newpage
+
+\blandscape
+
+```{r, fig.height=8, fig.width=12, echo = FALSE, fig.cap = "Visualising Numeric Variables Against the Target Variable, Left"}
+employees %>% 
+    select(left, where(is.numeric)) %>% 
+    GGally::ggpairs(aes(fill = left, color = left), alpha = 0.5) + 
+    scale_fill_fira() + 
+    scale_color_fira()
+```
+
+
+\elandscape
+
+\newpage

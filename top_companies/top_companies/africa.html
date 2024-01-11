@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="John Karuitha">
+<meta name="dcterms.date" content="2023-08-13">
+
+<title>Navigating Africa’s Business Landscape through Python Data Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="africa_files/libs/clipboard/clipboard.min.js"></script>
+<script src="africa_files/libs/quarto-html/quarto.js"></script>
+<script src="africa_files/libs/quarto-html/popper.min.js"></script>
+<script src="africa_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="africa_files/libs/quarto-html/anchor.min.js"></script>
+<link href="africa_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="africa_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="africa_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="africa_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="africa_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: black;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: black;
+background-image: url(africa.jpeg);
+background-size: cover;
+      }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><strong>Navigating Africa’s Business Landscape through Python Data Analysis</strong></h1>
+            <p class="subtitle lead"><strong><em>Analyzing Top Companies Africa with Python and Pandas</em></strong></p>
+                      </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliations</div>
+    
+      <div class="quarto-title-meta-contents">
+      <p class="author">John Karuitha <a href="https://orcid.org/0000-0002-8204-7034" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              Karatina University, School of Business
+            </p>
+          <p class="affiliation">
+              Graduate School of Business Administration, University of the Witwatersrand
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 13, 2023</p>
+      </div>
+    </div>
+    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">August 13, 2023</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background"><span class="header-section-number">1</span> <strong>Background</strong></a></li>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives"><span class="header-section-number">2</span> <strong>Objectives</strong></a></li>
+  <li><a href="#summary-of-results" id="toc-summary-of-results" class="nav-link" data-scroll-target="#summary-of-results"><span class="header-section-number">3</span> <strong>Summary of Results</strong></a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">4</span> <strong>Data</strong></a></li>
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration"><span class="header-section-number">5</span> <strong>Data Exploration</strong></a>
+  <ul class="collapse">
+  <li><a href="#number-of-rows-and-columns" id="toc-number-of-rows-and-columns" class="nav-link" data-scroll-target="#number-of-rows-and-columns"><span class="header-section-number">5.1</span> Number of rows and columns</a></li>
+  <li><a href="#first-and-last-rows-of-the-data" id="toc-first-and-last-rows-of-the-data" class="nav-link" data-scroll-target="#first-and-last-rows-of-the-data"><span class="header-section-number">5.2</span> First and Last Rows of the Data</a></li>
+  <li><a href="#visual-summary" id="toc-visual-summary" class="nav-link" data-scroll-target="#visual-summary"><span class="header-section-number">5.3</span> Visual Summary</a></li>
+  <li><a href="#variable-types" id="toc-variable-types" class="nav-link" data-scroll-target="#variable-types"><span class="header-section-number">5.4</span> Variable Types</a></li>
+  <li><a href="#missing-values" id="toc-missing-values" class="nav-link" data-scroll-target="#missing-values"><span class="header-section-number">5.5</span> Missing Values</a></li>
+  <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics"><span class="header-section-number">5.6</span> Summary Statistics</a></li>
+  </ul></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis"><span class="header-section-number">6</span> Analysis</a>
+  <ul class="collapse">
+  <li><a href="#which-companies-are-the-best-performing-in-africa" id="toc-which-companies-are-the-best-performing-in-africa" class="nav-link" data-scroll-target="#which-companies-are-the-best-performing-in-africa"><span class="header-section-number">6.1</span> <strong>Which Companies are the Best Performing in Africa?</strong></a>
+  <ul class="collapse">
+  <li><a href="#companies-with-the-highest-sales-in-africa" id="toc-companies-with-the-highest-sales-in-africa" class="nav-link" data-scroll-target="#companies-with-the-highest-sales-in-africa"><span class="header-section-number">6.1.1</span> <strong><em>Companies with the Highest Sales in Africa</em></strong></a></li>
+  <li><a href="#companies-with-the-highest-profits-in-africa" id="toc-companies-with-the-highest-profits-in-africa" class="nav-link" data-scroll-target="#companies-with-the-highest-profits-in-africa"><span class="header-section-number">6.1.2</span> <strong><em>Companies with the Highest Profits in Africa</em></strong></a></li>
+  <li><a href="#companies-with-the-highest-market-value-in-africa" id="toc-companies-with-the-highest-market-value-in-africa" class="nav-link" data-scroll-target="#companies-with-the-highest-market-value-in-africa"><span class="header-section-number">6.1.3</span> <strong><em>Companies with the Highest Market Value in Africa</em></strong></a></li>
+  </ul></li>
+  <li><a href="#which-countries-and-continents-have-the-highest-concentration-of-large-companies" id="toc-which-countries-and-continents-have-the-highest-concentration-of-large-companies" class="nav-link" data-scroll-target="#which-countries-and-continents-have-the-highest-concentration-of-large-companies"><span class="header-section-number">6.2</span> Which Countries and Continents Have the Highest Concentration of Large Companies?</a></li>
+  <li><a href="#is-there-a-correlation-between-company-size-in-terms-of-assets-and-financial-performance" id="toc-is-there-a-correlation-between-company-size-in-terms-of-assets-and-financial-performance" class="nav-link" data-scroll-target="#is-there-a-correlation-between-company-size-in-terms-of-assets-and-financial-performance"><span class="header-section-number">6.3</span> Is There a Correlation Between Company Size (in terms of assets) and Financial Performance?</a></li>
+  <li><a href="#are-there-regional-patterns-in-company-performance-based-on-continent" id="toc-are-there-regional-patterns-in-company-performance-based-on-continent" class="nav-link" data-scroll-target="#are-there-regional-patterns-in-company-performance-based-on-continent"><span class="header-section-number">6.4</span> Are There Regional Patterns in Company Performance Based on Continent?</a></li>
+  <li><a href="#which-companies-contiments-have-the-highest-returns-on-assets-and-profit-margins" id="toc-which-companies-contiments-have-the-highest-returns-on-assets-and-profit-margins" class="nav-link" data-scroll-target="#which-companies-contiments-have-the-highest-returns-on-assets-and-profit-margins"><span class="header-section-number">6.5</span> Which Companies, Contiments have the Highest Returns on Assets and Profit margins?</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> <strong>Conclusion</strong></a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><strong>References</strong></a></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="background" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> <strong>Background</strong></h1>
+<p>In this analysis, we use data from Kagle<span class="citation" data-cites="top2000companies">(<a href="#ref-top2000companies" role="doc-biblioref">Kagle, 2023</a>)</span> to illustrate the use of Python and Pandas in data analysis<span class="citation" data-cites="vanderplas2016python">(<a href="#ref-vanderplas2016python" role="doc-biblioref">VanderPlas, 2016</a>)</span>. The data captures the top 2000 companies in the world and is available for free upon registration on the <a href="https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally">Kagle website</a>. We filter the data to only include companies from Africa.</p>
+</section>
+<section id="objectives" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> <strong>Objectives</strong></h1>
+<p>The primary goal of this exercise is to illustrate how to use Python, pandas and other libraries in Python programming to analyse data for meaningful insights about large companies in Africa.</p>
+<p>Specifically, we seek to;</p>
+<ol type="1">
+<li>Rank companies in Africa by their performance.</li>
+<li>Rank countries in Africa based on the concentration of large companies.</li>
+<li>Compute the correlation between company size (in terms of assets) and financial performance.</li>
+<li>Uncover regional patterns in company performance based on country.</li>
+<li>Establish the companies, countries in Africa with the highest returns on assets and profit margins.</li>
+</ol>
+</section>
+<section id="summary-of-results" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> <strong>Summary of Results</strong></h1>
+<ol type="1">
+<li>Most large companies in the sample are located in South Africa.</li>
+<li>There is a positive relationship between company size and financial performance (sales, profits, market value). However, this relationship varies across countries.</li>
+<li>Companies from South Africa have the highest sales, profits, asset base, and valuation.</li>
+<li>Companies in Nigeria are more efficient in converting sales and assets into profits.</li>
+</ol>
+<p><strong>NB: ALL FIGURES ARE IN BILLIONS OF US DOLLARS</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Please visit my <a href="www.rpubs.com/Karuitha">rpubs site</a> to see more data projects. Alternatively, copy and paste the link &lt;www.rpubs.com/Karuitha&gt; into your browser. You can also view my <a href="www.linkedin.com/in/Karuitha">linkedin</a> site for my skills and education.</p>
+<p>My <a href="https://public.tableau.com/app/profile/john.karuitha">Tableau public profile</a> contains my data visualizations.</p>
+<p>My Shiny web apps are available on this <a href="https://karuitha.shinyapps.io/">site</a>. You can copy-paste this web address instead <a href="https://karuitha.shinyapps.io" class="uri">https://karuitha.shinyapps.io</a></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Skills &amp; Technologies Applied: Python, Pandas, Geopandas, Matplotlib, Quarto, Data Science.</p>
+</div>
+</div>
+</section>
+<section id="data" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> <strong>Data</strong></h1>
+<p>The data is available on <a href="https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally">kagle</a> as a csv file (registration is required to access the data). I start by loading the necessary packages for the analysis: pandas, numpy, matplotlib, and seaborn <span class="citation" data-cites="borjigin2023">(<a href="#ref-borjigin2023" role="doc-biblioref">Borjigin, 2023</a>)</span>.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> Point</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next I read in the data using pandas and set the index column as the name of the company given it is a unique and meaningful identifier.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>company <span class="op">=</span> pd.read_csv(<span class="st">"Top2000CompaniesGlobally.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>company.columns</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>Index(['Global Rank', 'Company', 'Sales ($billion)', 'Profits ($billion)',
+       'Assets ($billion)', 'Market Value ($billion)', 'Country', 'Continent',
+       'Latitude', 'Longitude'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<p>Next, I rename the columns using names that are easier to work with. I create a dictionary of old names versus new names and then rename the columns.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Create a dictionary of old names vs new names</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>names <span class="op">=</span> {<span class="st">'Global Rank'</span>:<span class="st">'rank'</span>, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">'Sales ($billion)'</span>:<span class="st">'sales'</span>, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">'Profits ($billion)'</span>:<span class="st">'profits'</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">'Assets ($billion)'</span>:<span class="st">'assets'</span>, </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">'Market Value ($billion)'</span>:<span class="st">'market_value'</span>, </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">'Country'</span>:<span class="st">'country'</span>, </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">'Continent'</span>:<span class="st">'continent'</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">'Latitude'</span>:<span class="st">'latitude'</span>, </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">'Longitude'</span>:<span class="st">'longitude'</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">'Company'</span>:<span class="st">'company'</span>}</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename the columns in place</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>company.rename(columns <span class="op">=</span> names, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we filter the data to narrow down on Africa.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>company <span class="op">=</span> company[company[<span class="st">'continent'</span>] <span class="op">==</span> <span class="st">"Africa"</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Addd the index</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>company.set_index(<span class="st">"company"</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-exploration" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> <strong>Data Exploration</strong></h1>
+<p>We now explore the data.</p>
+<section id="number-of-rows-and-columns" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="number-of-rows-and-columns"><span class="header-section-number">5.1</span> Number of rows and columns</h2>
+<p>We start with the number of rows and columns in the data.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>company.shape</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>(25, 9)</code></pre>
+</div>
+</div>
+<p>We see that the data has 25 rows (records) and 9 columns (variables).</p>
+</section>
+<section id="first-and-last-rows-of-the-data" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="first-and-last-rows-of-the-data"><span class="header-section-number">5.2</span> First and Last Rows of the Data</h2>
+<p>Next, lets examine the first 5 rows.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>company.head(<span class="dv">5</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Bank Group</td>
+<td>231</td>
+<td>21.0</td>
+<td>1.9</td>
+<td>182.0</td>
+<td>19.9</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sasol</td>
+<td>320</td>
+<td>20.8</td>
+<td>2.9</td>
+<td>24.7</td>
+<td>29.4</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MTN Group</td>
+<td>345</td>
+<td>16.5</td>
+<td>2.5</td>
+<td>21.4</td>
+<td>34.5</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FirstRand</td>
+<td>397</td>
+<td>8.4</td>
+<td>1.6</td>
+<td>94.1</td>
+<td>18.0</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sanlam</td>
+<td>574</td>
+<td>10.8</td>
+<td>0.7</td>
+<td>52.3</td>
+<td>10.7</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>We also check the last 7 rows.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>company.tail(<span class="dv">7</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Gold Fields</td>
+<td>1435</td>
+<td>3.4</td>
+<td>0.7</td>
+<td>11.2</td>
+<td>5.9</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Imperial Holdings</td>
+<td>1658</td>
+<td>9.9</td>
+<td>0.4</td>
+<td>5.5</td>
+<td>4.2</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Aspen Pharmacare Holdings</td>
+<td>1711</td>
+<td>1.9</td>
+<td>0.4</td>
+<td>3.8</td>
+<td>9.7</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">RMB Holdings</td>
+<td>1716</td>
+<td>0.6</td>
+<td>0.6</td>
+<td>3.3</td>
+<td>6.1</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Banque Centrale Populaire</td>
+<td>1871</td>
+<td>1.9</td>
+<td>0.2</td>
+<td>32.0</td>
+<td>3.9</td>
+<td>Morocco</td>
+<td>Africa</td>
+<td>31.791702</td>
+<td>-7.092620</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Assore</td>
+<td>1948</td>
+<td>1.6</td>
+<td>0.5</td>
+<td>2.1</td>
+<td>5.2</td>
+<td>South Africa</td>
+<td>Africa</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Commercial International Bank</td>
+<td>1966</td>
+<td>1.5</td>
+<td>0.3</td>
+<td>14.8</td>
+<td>2.8</td>
+<td>Egypt</td>
+<td>Africa</td>
+<td>26.820553</td>
+<td>30.802498</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="visual-summary" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="visual-summary"><span class="header-section-number">5.3</span> Visual Summary</h2>
+<p>let us use seaborn pairplot() function to create a summary picture of the data using all variables, colored by country.</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Pairs plots for the Variables (A)"</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>sns.pairplot(company[[<span class="st">'country'</span>, <span class="st">'sales'</span>, <span class="st">'profits'</span>, <span class="st">'assets'</span>, <span class="st">'market_value'</span>]], hue <span class="op">=</span> <span class="st">"country"</span>, corner <span class="op">=</span> <span class="va">True</span>, palette <span class="op">=</span> <span class="st">"Dark2"</span>, kind <span class="op">=</span> <span class="st">"scatter"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="africa_files/figure-html/cell-10-output-1.png" width="1083" height="945" class="figure-img"></p>
+<figcaption class="figure-caption">Pairs plots for the Variables (A)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Pairs plots for the Variables (B)"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>sns.pairplot(company[[<span class="st">'country'</span>, <span class="st">'sales'</span>, <span class="st">'profits'</span>, <span class="st">'assets'</span>, <span class="st">'market_value'</span>]], corner <span class="op">=</span> <span class="va">True</span>, palette <span class="op">=</span> <span class="st">"Dark2"</span>, kind <span class="op">=</span> <span class="st">"kde"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="africa_files/figure-html/cell-11-output-1.png" width="946" height="945" class="figure-img"></p>
+<figcaption class="figure-caption">Pairs plots for the Variables (B)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="variable-types" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="variable-types"><span class="header-section-number">5.4</span> Variable Types</h2>
+<p>The variable types are also an important data component.</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>company.info()</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Index: 25 entries, Standard Bank Group to Commercial International Bank
+Data columns (total 9 columns):
+ #   Column        Non-Null Count  Dtype  
+---  ------        --------------  -----  
+ 0   rank          25 non-null     int64  
+ 1   sales         25 non-null     float64
+ 2   profits       25 non-null     float64
+ 3   assets        25 non-null     float64
+ 4   market_value  25 non-null     float64
+ 5   country       25 non-null     object 
+ 6   continent     25 non-null     object 
+ 7   latitude      25 non-null     float64
+ 8   longitude     25 non-null     float64
+dtypes: float64(6), int64(1), object(2)
+memory usage: 2.5+ KB</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>company.dtypes</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>rank              int64
+sales           float64
+profits         float64
+assets          float64
+market_value    float64
+country          object
+continent        object
+latitude        float64
+longitude       float64
+dtype: object</code></pre>
+</div>
+</div>
+</section>
+<section id="missing-values" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="missing-values"><span class="header-section-number">5.5</span> Missing Values</h2>
+<p>Let us check the data for any missing values for sales, profits, assets, market_value, longitude, and latitude.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'sales'</span>].isna()]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'profits'</span>].isna()]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'assets'</span>].isna()]</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'market_value'</span>].isna()]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'longitude'</span>].isna()]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>company[company[<span class="st">'latitude'</span>].isna()]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rank</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>This is a conveniently clean data without missing values which is a rare occurrence in data science.</p>
+</section>
+<section id="summary-statistics" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="summary-statistics"><span class="header-section-number">5.6</span> Summary Statistics</h2>
+<p>We use the describe method to make summary statistics for numeric and character variables separately.</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>company.describe(include <span class="op">=</span> <span class="st">"float64"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>25.000000</td>
+<td>25.000000</td>
+<td>25.000000</td>
+<td>25.000000</td>
+<td>25.000000</td>
+<td>25.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>7.068000</td>
+<td>0.824000</td>
+<td>25.240000</td>
+<td>11.064000</td>
+<td>-17.915824</td>
+<td>19.299126</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>6.109195</td>
+<td>0.706093</td>
+<td>38.608073</td>
+<td>8.497445</td>
+<td>23.543621</td>
+<td>10.892318</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.600000</td>
+<td>0.000000</td>
+<td>2.100000</td>
+<td>2.800000</td>
+<td>-30.559482</td>
+<td>-9.429499</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>1.900000</td>
+<td>0.400000</td>
+<td>5.500000</td>
+<td>5.900000</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>5.400000</td>
+<td>0.600000</td>
+<td>11.200000</td>
+<td>8.100000</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>9.900000</td>
+<td>0.800000</td>
+<td>24.700000</td>
+<td>10.700000</td>
+<td>-30.559482</td>
+<td>22.937506</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>21.000000</td>
+<td>2.900000</td>
+<td>182.000000</td>
+<td>34.500000</td>
+<td>31.791702</td>
+<td>30.802498</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>We also do the same for string data types.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>company.describe(include <span class="op">=</span> <span class="st">"object"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">continent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>25</td>
+<td>25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">unique</td>
+<td>5</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">top</td>
+<td>South Africa</td>
+<td>Africa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">freq</td>
+<td>19</td>
+<td>25</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Here we see that there are 25 observations with 5 unique countries. The country with the most companies is the South Africa (19 out of the 25 companies in the sample).</p>
+</section>
+</section>
+<section id="analysis" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Analysis</h1>
+<p>In this section, we explore some key issues from the data, listed in order.</p>
+<section id="which-companies-are-the-best-performing-in-africa" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="which-companies-are-the-best-performing-in-africa"><span class="header-section-number">6.1</span> <strong>Which Companies are the Best Performing in Africa?</strong></h2>
+<section id="companies-with-the-highest-sales-in-africa" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="companies-with-the-highest-sales-in-africa"><span class="header-section-number">6.1.1</span> <strong><em>Companies with the Highest Sales in Africa</em></strong></h3>
+<p>We start by examining sales. The Standard Bank Group and Sasol lead the pack in this case. Npte that the top 10 companies are from South Africa with the exception of Royal Carribean Cruises from Liberia.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>company.nlargest(<span class="dv">25</span>, <span class="st">"sales"</span>)[[<span class="st">'country'</span>, <span class="st">'sales'</span>]]</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">sales</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Bank Group</td>
+<td>South Africa</td>
+<td>21.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sasol</td>
+<td>South Africa</td>
+<td>20.8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MTN Group</td>
+<td>South Africa</td>
+<td>16.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Bidvest Group</td>
+<td>South Africa</td>
+<td>16.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sanlam</td>
+<td>South Africa</td>
+<td>10.8</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shoprite Holdings</td>
+<td>South Africa</td>
+<td>10.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Steinhoff International</td>
+<td>South Africa</td>
+<td>9.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Imperial Holdings</td>
+<td>South Africa</td>
+<td>9.9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">FirstRand</td>
+<td>South Africa</td>
+<td>8.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Royal Carribean Cruises</td>
+<td>Liberia</td>
+<td>7.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MMI Holdings</td>
+<td>South Africa</td>
+<td>6.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">AngloGold Ashanti</td>
+<td>South Africa</td>
+<td>6.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Orascom Construction</td>
+<td>Egypt</td>
+<td>5.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Naspers</td>
+<td>South Africa</td>
+<td>5.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Impala Platinum Holdings</td>
+<td>South Africa</td>
+<td>3.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Gold Fields</td>
+<td>South Africa</td>
+<td>3.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Attijariwafa Bank</td>
+<td>Morocco</td>
+<td>3.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Aspen Pharmacare Holdings</td>
+<td>South Africa</td>
+<td>1.9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Banque Centrale Populaire</td>
+<td>Morocco</td>
+<td>1.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Remgro</td>
+<td>South Africa</td>
+<td>1.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Assore</td>
+<td>South Africa</td>
+<td>1.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Dangote Cement</td>
+<td>Nigeria</td>
+<td>1.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Exxaro Resources</td>
+<td>South Africa</td>
+<td>1.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Commercial International Bank</td>
+<td>Egypt</td>
+<td>1.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">RMB Holdings</td>
+<td>South Africa</td>
+<td>0.6</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="companies-with-the-highest-profits-in-africa" class="level3" data-number="6.1.2">
+<h3 data-number="6.1.2" class="anchored" data-anchor-id="companies-with-the-highest-profits-in-africa"><span class="header-section-number">6.1.2</span> <strong><em>Companies with the Highest Profits in Africa</em></strong></h3>
+<p>In terms of profits, Sasol and MTN Group from South Africa come up tops. Dangote Cement of Nigeria is the only company on the top 10 that is outside South Africa.</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>company.nlargest(<span class="dv">25</span>, <span class="st">"profits"</span>)[[<span class="st">'country'</span>, <span class="st">'profits'</span>]]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">profits</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sasol</td>
+<td>South Africa</td>
+<td>2.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MTN Group</td>
+<td>South Africa</td>
+<td>2.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Standard Bank Group</td>
+<td>South Africa</td>
+<td>1.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">FirstRand</td>
+<td>South Africa</td>
+<td>1.6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Exxaro Resources</td>
+<td>South Africa</td>
+<td>1.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Remgro</td>
+<td>South Africa</td>
+<td>1.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dangote Cement</td>
+<td>Nigeria</td>
+<td>0.8</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">AngloGold Ashanti</td>
+<td>South Africa</td>
+<td>0.8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Gold Fields</td>
+<td>South Africa</td>
+<td>0.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Orascom Construction</td>
+<td>Egypt</td>
+<td>0.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Steinhoff International</td>
+<td>South Africa</td>
+<td>0.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sanlam</td>
+<td>South Africa</td>
+<td>0.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">RMB Holdings</td>
+<td>South Africa</td>
+<td>0.6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Attijariwafa Bank</td>
+<td>Morocco</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bidvest Group</td>
+<td>South Africa</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Impala Platinum Holdings</td>
+<td>South Africa</td>
+<td>0.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Assore</td>
+<td>South Africa</td>
+<td>0.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shoprite Holdings</td>
+<td>South Africa</td>
+<td>0.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Naspers</td>
+<td>South Africa</td>
+<td>0.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Imperial Holdings</td>
+<td>South Africa</td>
+<td>0.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Aspen Pharmacare Holdings</td>
+<td>South Africa</td>
+<td>0.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">MMI Holdings</td>
+<td>South Africa</td>
+<td>0.3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Commercial International Bank</td>
+<td>Egypt</td>
+<td>0.3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Banque Centrale Populaire</td>
+<td>Morocco</td>
+<td>0.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Royal Carribean Cruises</td>
+<td>Liberia</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="companies-with-the-highest-market-value-in-africa" class="level3" data-number="6.1.3">
+<h3 data-number="6.1.3" class="anchored" data-anchor-id="companies-with-the-highest-market-value-in-africa"><span class="header-section-number">6.1.3</span> <strong><em>Companies with the Highest Market Value in Africa</em></strong></h3>
+<p>The picture replicates itself in market valuation.</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>company.nlargest(<span class="dv">25</span>, <span class="st">"market_value"</span>)[[<span class="st">"country"</span>, <span class="st">"market_value"</span>]]</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">country</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">company</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MTN Group</td>
+<td>South Africa</td>
+<td>34.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Sasol</td>
+<td>South Africa</td>
+<td>29.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Naspers</td>
+<td>South Africa</td>
+<td>27.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Standard Bank Group</td>
+<td>South Africa</td>
+<td>19.9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">FirstRand</td>
+<td>South Africa</td>
+<td>18.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Dangote Cement</td>
+<td>Nigeria</td>
+<td>15.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Sanlam</td>
+<td>South Africa</td>
+<td>10.7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shoprite Holdings</td>
+<td>South Africa</td>
+<td>10.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Remgro</td>
+<td>South Africa</td>
+<td>9.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Aspen Pharmacare Holdings</td>
+<td>South Africa</td>
+<td>9.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">AngloGold Ashanti</td>
+<td>South Africa</td>
+<td>9.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Impala Platinum Holdings</td>
+<td>South Africa</td>
+<td>9.3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bidvest Group</td>
+<td>South Africa</td>
+<td>8.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Royal Carribean Cruises</td>
+<td>Liberia</td>
+<td>7.4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Orascom Construction</td>
+<td>Egypt</td>
+<td>7.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Attijariwafa Bank</td>
+<td>Morocco</td>
+<td>6.7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Exxaro Resources</td>
+<td>South Africa</td>
+<td>6.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">RMB Holdings</td>
+<td>South Africa</td>
+<td>6.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Gold Fields</td>
+<td>South Africa</td>
+<td>5.9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Assore</td>
+<td>South Africa</td>
+<td>5.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Steinhoff International</td>
+<td>South Africa</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Imperial Holdings</td>
+<td>South Africa</td>
+<td>4.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">MMI Holdings</td>
+<td>South Africa</td>
+<td>4.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Banque Centrale Populaire</td>
+<td>Morocco</td>
+<td>3.9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Commercial International Bank</td>
+<td>Egypt</td>
+<td>2.8</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="which-countries-and-continents-have-the-highest-concentration-of-large-companies" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="which-countries-and-continents-have-the-highest-concentration-of-large-companies"><span class="header-section-number">6.2</span> Which Countries and Continents Have the Highest Concentration of Large Companies?</h2>
+<p>In this section, we utilize the global rank in size variable to identify the countries and continents with the highest number of top-ranking companies. We see that companies from USA, Japan, China, UK, Canada, and South Korea dominate the rankings. Note that these are countries mainly from North America and Asia (with the exception of the UK) which illustrates the dominance of these two continents in global trade.</p>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>company[<span class="st">'country'</span>].value_counts()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>South Africa    19
+Morocco          2
+Egypt            2
+Nigeria          1
+Liberia          1
+Name: country, dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>company[<span class="st">'continent'</span>].value_counts()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>Africa    25
+Name: continent, dtype: int64</code></pre>
+</div>
+</div>
+<p>We then visualize this information on a world map using latitude and longitude data to show the geographic distribution of these companies. The size of the dots represents profits. We find that while there are the profitable companies are mainly in Asia, Europe, and North America. The rest of the world generates very few profits.</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a GeoDataFrame</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>geometry <span class="op">=</span> [Point(lon, lat) <span class="cf">for</span> lon, lat <span class="kw">in</span> <span class="bu">zip</span>(company[<span class="st">'longitude'</span>], company[<span class="st">'latitude'</span>])]</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> gpd.GeoDataFrame(company, geometry<span class="op">=</span>geometry, columns<span class="op">=</span>[<span class="st">'company'</span>, <span class="st">'sales'</span>, <span class="st">'profits'</span>, <span class="st">'assets'</span>])</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>world <span class="op">=</span> gpd.read_file(gpd.datasets.get_path(<span class="st">'naturalearth_lowres'</span>))</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Top Companies by Sales on a World Map"</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a subplot</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the world map</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>world.boundary.plot(ax<span class="op">=</span>ax, color <span class="op">=</span> <span class="st">"lightgrey"</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot your data on the map</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>gdf.plot(ax<span class="op">=</span>ax, marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'red'</span>, markersize<span class="op">=</span><span class="st">'profits'</span>, label<span class="op">=</span><span class="st">'Companies'</span>)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Add labels and legend</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Top Companies in Africa by Profits on a Map'</span>)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Longitude'</span>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Latitude'</span>)</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="africa_files/figure-html/cell-29-output-1.png" width="819" height="439" class="figure-img"></p>
+<figcaption class="figure-caption">Top Companies by Sales on a World Map</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="is-there-a-correlation-between-company-size-in-terms-of-assets-and-financial-performance" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="is-there-a-correlation-between-company-size-in-terms-of-assets-and-financial-performance"><span class="header-section-number">6.3</span> Is There a Correlation Between Company Size (in terms of assets) and Financial Performance?</h2>
+<p>Here, we analyze the relationship between the asset base of companies, which is a proxy for size and financial metrics such as sales, profits, and market value. The goal is to determine if larger companies tend to have higher sales, profits, and market value, or if there are exceptions. Overall, there appears to be a positive link between the size of a company and its financial performance in terms of sales, profits, and market value. However, this relationship varies by country.</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Pairs plots for the Variables (C)"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>sns.pairplot(company[[<span class="st">"country"</span>, <span class="st">"assets"</span>, <span class="st">"sales"</span>, <span class="st">"profits"</span>, <span class="st">"market_value"</span>]], hue <span class="op">=</span> <span class="st">"country"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="africa_files/figure-html/cell-30-output-1.png" width="1083" height="945" class="figure-img"></p>
+<figcaption class="figure-caption">Pairs plots for the Variables (C)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>company[[<span class="st">"assets"</span>, <span class="st">"sales"</span>, <span class="st">"profits"</span>, <span class="st">"market_value"</span>]].corr()</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">assets</th>
+<th data-quarto-table-cell-role="th">sales</th>
+<th data-quarto-table-cell-role="th">profits</th>
+<th data-quarto-table-cell-role="th">market_value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">assets</td>
+<td>1.000000</td>
+<td>0.503100</td>
+<td>0.388891</td>
+<td>0.273381</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">sales</td>
+<td>0.503100</td>
+<td>1.000000</td>
+<td>0.637116</td>
+<td>0.579276</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">profits</td>
+<td>0.388891</td>
+<td>0.637116</td>
+<td>1.000000</td>
+<td>0.766124</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">market_value</td>
+<td>0.273381</td>
+<td>0.579276</td>
+<td>0.766124</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="are-there-regional-patterns-in-company-performance-based-on-continent" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="are-there-regional-patterns-in-company-performance-based-on-continent"><span class="header-section-number">6.4</span> Are There Regional Patterns in Company Performance Based on Continent?</h2>
+<p>In this section, I group the data by country and analyze the average sales, profits, and assets for companies in each country. South African companies in the sample have by far the highest sales, profits, asset base, and market valuation .</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Sales by Companies"</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">"fivethirtyeight"</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>company.groupby(<span class="st">"country"</span>)[<span class="st">"sales"</span>].<span class="bu">sum</span>().sort_values().plot(kind <span class="op">=</span> <span class="st">"barh"</span>, title <span class="op">=</span> <span class="st">"Total Sales of Top Companies in Africa by Country"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>&lt;AxesSubplot:title={'center':'Total Sales of Top Companies in Africa by Country'}, ylabel='country'&gt;</code></pre>
+<p>Sales by Companies</p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="africa_files/figure-html/cell-32-output-2.png" width="789" height="459"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Total Profits of Top 2000 Companies globally by Continent"</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>company.groupby(<span class="st">"country"</span>)[<span class="st">"profits"</span>].<span class="bu">sum</span>().sort_values().plot(kind <span class="op">=</span> <span class="st">"barh"</span>, title <span class="op">=</span> <span class="st">"Total Profits of Top Companies in Africa by Country"</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>&lt;AxesSubplot:title={'center':'Total Profits of Top Companies in Africa by Country'}, ylabel='country'&gt;</code></pre>
+<p>Total Profits of Top 2000 Companies globally by Continent</p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="africa_files/figure-html/cell-33-output-2.png" width="795" height="459"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Total Assets of Top 2000 Companies globally by Continent"</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>company.groupby(<span class="st">"country"</span>)[<span class="st">"assets"</span>].<span class="bu">sum</span>().sort_values().plot(kind <span class="op">=</span> <span class="st">"barh"</span>, title <span class="op">=</span> <span class="st">"Total Assets of Top Companies in Africa by Country"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>&lt;AxesSubplot:title={'center':'Total Assets of Top Companies in Africa by Country'}, ylabel='country'&gt;</code></pre>
+<p>Total Assets of Top 2000 Companies globally by Continent</p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="africa_files/figure-html/cell-34-output-2.png" width="797" height="459"></p>
+</div>
+</div>
+</section>
+<section id="which-companies-contiments-have-the-highest-returns-on-assets-and-profit-margins" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="which-companies-contiments-have-the-highest-returns-on-assets-and-profit-margins"><span class="header-section-number">6.5</span> Which Companies, Contiments have the Highest Returns on Assets and Profit margins?</h2>
+<p>The return on assets is the ratio of profits to assets and captures the efficiency with which a company utilises its assets to generate profits. The net profit margin also captures how well a company is able to convert its sales into profits. The margin can also proxy the management efforts towards expenses management.</p>
+<p>Dangote cement of Nigeria leads with a return on assets of 0.25. This is phenomenal!! The companies in the top 5 all have a return greater than 15%, which is an exceptional performance.</p>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>company[<span class="st">"roa"</span>] <span class="op">=</span> company[<span class="st">"profits"</span>] <span class="op">/</span> company[<span class="st">"assets"</span>]</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>company[<span class="st">"margin"</span>] <span class="op">=</span> company[<span class="st">"profits"</span>] <span class="op">/</span> company[<span class="st">"sales"</span>]</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>company[<span class="st">'roa'</span>].sort_values(ascending <span class="op">=</span> <span class="va">False</span>).head()</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>company
+Dangote Cement      0.250000
+Exxaro Resources    0.244898
+Assore              0.238095
+RMB Holdings        0.181818
+Remgro              0.154930
+Name: roa, dtype: float64</code></pre>
+</div>
+</div>
+<p>Next, I compute the median ROA for each continent. Nigeria leads, though the country has only one company in the sample. South Africa is in second place with a median ROA of 7%.</p>
+<div class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>company.groupby(<span class="st">"country"</span>)[<span class="st">'roa'</span>].median().sort_values(ascending <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<pre><code>country
+Nigeria         0.250000
+South Africa    0.072727
+Egypt           0.045849
+Morocco         0.008872
+Liberia         0.000000
+Name: roa, dtype: float64</code></pre>
+</div>
+</div>
+<p>Let us do the same for profit margin. RMB Holdings has a profit margin of 1 which implies that the company generated profits equal to sales. Overall, the conversion of sales to profits is impressive among the industry leaders.</p>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>company[<span class="st">'margin'</span>].sort_values(ascending <span class="op">=</span> <span class="va">False</span>).head()</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<pre><code>company
+RMB Holdings        1.000000
+Exxaro Resources    0.800000
+Remgro              0.647059
+Dangote Cement      0.533333
+Assore              0.312500
+Name: margin, dtype: float64</code></pre>
+</div>
+</div>
+<p>Nigeria and Egypt leads in median profit margin. Again this could be die to the low number of companies from the coutries in this sample.</p>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>company.groupby(<span class="st">"country"</span>)[<span class="st">'margin'</span>].median().sort_values(ascending <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<pre><code>country
+Nigeria         0.533333
+Egypt           0.164815
+South Africa    0.139423
+Morocco         0.126161
+Liberia         0.000000
+Name: margin, dtype: float64</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> <strong>Conclusion</strong></h1>
+<p>In this analysis, we use data from Kagle to illustrate the use of Python and Pandas in data analysis. From the analysis, we find that;</p>
+<ol type="1">
+<li>Most large companies in the sample are located in South Africa.</li>
+<li>There is a positive relationship between company size and financial performance (sales, profits, market value). However, this relationship varies across countries.</li>
+<li>Companies from South Africa have the highest sales, profits, asset base, and valuation.</li>
+<li>Companies in Nigeria are more efficient in converting sales and assets into profits.</li>
+</ol>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-borjigin2023" class="csl-entry" role="listitem">
+Borjigin, C. (2023). <em>Python data science</em>. Springer Nature Singapore. <a href="https://doi.org/10.1007/978-981-19-7702-2">https://doi.org/10.1007/978-981-19-7702-2</a>
+</div>
+<div id="ref-top2000companies" class="csl-entry" role="listitem">
+Kagle. (2023). <em>Top 2000 companies globally</em>. <a href="https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally" class="uri">https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally</a>.
+</div>
+<div id="ref-vanderplas2016python" class="csl-entry" role="listitem">
+VanderPlas, J. (2016). <em>Python data science handbook: Essential tools for working with data</em>. " O’Reilly Media, Inc.".
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+<script src="africa_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

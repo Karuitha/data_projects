@@ -1,0 +1,59 @@
+---
+title: "Data Literacy"
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Literacy
+
+Data literacy is the ability to understand, work with, and communicate about data to make decisions and plan future outcomes.
+
+Generally, data analysis and statistical skills can be applied to:
+
+- Experimentation and Intervention.
+- Planning and Programming.
+- Tracking.
+- Reporting.
+- Demonstrate Impact.
+- Decision Making.
+- Visualization.
+
+It is paramount to know when to collect and analyze data to achieve an objective. It is even better to be conversant with data collection, exploration, analysis, and reporting. while not all people in an organisation can be data experts, data literacy is key in an organisation.
+
+Is data literacy important??
+
+## Data Lifecycle
+
+The data lifecycle refers to the steps we take to transform a research question into an insightful analysis. 
+
+- Defining a relevant, feasible and open ended research question.
+    - what type of research.
+    - Research design. Depends on conclusions eg cause and effect vs describe patterns or uncover relationships.
+    - hat data to collect
+    - Pop of interest
+    - Timeline of data
+    - Comparisons to makein subgroups of data for example.
+    - Good research question: An actual question, open-ended, grounded in theory, prior research, or practice, Not too simple or too complex.
+- Collect and organise data.
+
+- Ethics and data seccutiy and confidentiality.
+- Reproducibility.
+    
+- wrangle the data.
+    - Row and columns arranged correctly.
+    - All missing and duplicate data checked - awwarwe.
+    - Variables defined formatted and named correctly.
+- Explore and visualise the data.
+    - tables, graphs.
+    - See patterns and trends.
+    - Spot outliers.
+- Analyse and interptret the data.
+    - Statirtical tests and models to confirm/ disapprove the trends uncovered in the exploration stage.
+- Communicate the results of the analysis to the relevant stakeholders.
+    - package - report, slide deck, dashboard, oral presentation.
+    - makes sense for intended audience.

@@ -1,0 +1,74 @@
+## **Web Scrapping Intuition**
+
+To appreciate the basics of web-scrapping in any programming language, it is important to grasp the fundamentals of XML, HTML, and CSS. Starting with William W. Tunnicliffe,s presentation in 1967, markup languages have evolved into various forms to suit different applications. Examples include TeX, HTML, XML, and XHTML. I highlight XML, HTML and CSS and how we can take advantage of each to identify the start and end of content we may wish to scrap. 
+
+### ***XML Tags***
+
+Markup languages have two basic constructs;
+
+- Tags.
+- Content. 
+
+A tag usually begins with < and ends with a >. The tags come in three flavors. 
+
+- Start tags: `<student_name>`. This tag marks the start of content. 
+
+- Start tags: `</student_name>`. This tag marks the end of content. 
+
+- Empty tags: </>. 
+
+The wording in between the < and > is the identifier of the content. In between the beginning and ending tags, we include our content. For instance, we could capture an employee's name using the following markup code. 
+
+`<employee_name> james Peter Onyango </employee_name>`
+
+Hence, we can use the marker employee_name to identify the content we want to capture. We now extend the same idea to HTML and CSS. 
+
+
+### ***HTML and CSS Tags***
+
+The Hypertext Markup Language (HTML) is the language that programmers use to create web pages. Usually, HTML combines well with CSS to create elegant web pages. To scrap web pages for data, we have to scan for the following five elements. 
+
+- Headers; We construct a HTML header as follows. 
+
+<head>
+<title> Web Scrapping in R </title>
+</head>
+
+- Headings;
+
+Commonly, there are six headers h1 to h6, as follows. 
+
+`<h1> Header 1 </h1>`
+
+`<h2> Header 2 </h2>`
+
+`<h3> Header 3 </h3>`
+
+`<h4> Header 4 </h4>`
+
+`<h5> Header 5 </h5>`
+
+`<h6> Header 6 </h6>`
+
+- Paragraphs; A paragraph usually has a tag `p`. 
+
+`<p> Paragraph 1 </p>`
+
+`<p> Paragraph 2 </p>`
+
+- Tables; This is the focus of this article. In HTML, tags for tables are as follows. 
+
+`<table>` tag that captures main table structure. 
+
+`<tbody>` tag that specifies the body of the table. 
+
+`<thead>` tag that specifies the table header. 
+
+`<tr>` tag that specifies each of the rows of the table. 
+
+
+- Anchors; Anchors allow web developers to attach an URL to some text on a web page. Viewers can then click on the text to activate the link and visit the page. An example of an anchor is as follows. 
+
+`<a href="https://rpubs.com/Karuitha/karuitha_cars_pressure"> Click to see my project </a>`
+
+

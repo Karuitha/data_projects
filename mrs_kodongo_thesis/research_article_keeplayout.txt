@@ -1,0 +1,765 @@
+Research Article
+
+   Dorothy Miruka
+Table of Contents
+
+1 Research Questions     2
+
+2 Data                   3
+
+2.1 Data Reliability . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+
+2.2 Exploring the Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+
+2.2.1 Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+
+2.2.2 Job satisfaction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+
+2.2.3 Working from Home . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+
+2.2.4 Technology . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+
+2.3 Data Analysis and Discussion of Results . . . . . . . . . . . . . . . . . . . . . . . . 14
+
+2.3.1 Principal Components Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14
+
+2.3.2 Remote work and employee motivation? . . . . . . . . . . . . . . . . . . . . . . . 17
+
+2.3.3 Remote work and and job satisfaction? . . . . . . . . . . . . . . . . . . . . . . . . 19
+
+2.3.4 Employee motivation and job satisfaction? . . . . . . . . . . . . . . . . . . . . . . 20
+
+2.3.5 Technological skills, employee motivation and job satisfaction in remote work . . 21
+
+3 References             26
+
+4 Appendix               27
+
+                      1
+Chapter 1
+
+Research Questions
+
+The research seeks to answer the following questions:
+   1. Is there a relationship between working from home and employee motivation?
+   2. Is there a relationship between working from home and job satisfaction?
+   3. Is there a relationship between employee motivation and job satisfaction?
+   4. How do technological skills affect the relationship between employee motivation and job satisfac-
+       tion when working from home?
+
+                                                                  2
+Chapter 2
+
+Data
+
+We collected the data using an online survey of Wits University staff members. The survey captured
+data for 41 variables of interest that covered constructs for job satisfaction, employee motivation,
+technology, and demographic and personal data. The description of the variables is in the appendix.
+The sampling frame consisted of all () staff members of the university in 2021. The survey resulted
+in 201 questionaires for a desired sample size of 354. To make up for the defficiency, we bootstrapped
+the data to represent 354 observations. The rest of the analysis draws from these 354 observations.
+
+2.1 Data Reliability
+
+As noted in the methodology section, we used a virtual questionaire to collect the data from the
+administrative staff of University of the Witwatersrand, Johannesburg. In this ection, we examine the
+reliability of the data using the Cronbach's Alpha. The Cronbach's Alpha is useful for quantifying
+reliability of the data by measuring the internal consistency of the data.
+Cronbach's alpha for the 'my_data' data-set
+Items: 41
+Sample units: 354
+alpha: 0.618
+Bootstrap 95% CI based on 1000 samples
+
+ 2.5% 97.5%
+0.551 0.669
+The Cronbach's $$ lies between 0.4 and 0.57 which may indicate poor response. For instance, most of
+the respondents are female and relatively older. However, the data does lie in the acceptable region.
+
+                                                                  3
+2.2 Exploring the Data
+
+We start this section by exploring the data set through visualizations. Figure 1 contains the profiles
+of employees in the sample and that responded to the survey. In Panel C, for instance, 84% of the
+respondents were female and 16% male. This response profile is problematic given that the sampling
+frame is different as the University has about 50% male employees []. Even more extreme is the profile
+for permanent versus part time employees at 93% and 7% (see Panel A), respectively, although this
+closely follows employee job categories at the University. The profiles for other employee categories
+including age, experience, marital status, and education level do not possess these extreme qualities.
+In the regression analysis, we control for the gender of the respondents (see section ()).
+
+                                                                  4
+   A: Job Category                                                                          B: Age Group
+
+                                                            95                                                                                                 36
+
+                                                                                                 20                       22                    23
+
+                          5                                 Permanent                                     56-65           26-35             36-45              46-55
+
+                      Part time                                 86                          D: Experience                       20
+
+   C: Gender                                                  Female
+
+                                                                              70                                                                                   32
+
+                                                                                                                                            21          23
+
+5
+
+                               14                                                                            3
+                                                                                            1
+                                    Male
+                                                                                            1-5                  Over 25      6-10          11-15       16-20  21-25
+   E: Marital Status
+                                                                                            F: Education Level
+
+                                                                                                                                                               52
+
+                                                                                                                                                    22
+
+                                                    17                                                           11                   12
+
+           3                                 10                                             3                                       Degree
+
+   Prefer not to say                      Divorced  Single  Married or living with partner  certificate          High School                        Diploma    Postgraduate
+
+                                                    Figure 2.1: Respondents Profile (% of Total Count)
+We also examine each of the categories of questions in the questionaire that covered the following areas.
+
+   � Motivation.
+   � Job Satisfaction.
+   � Working from home.
+   � Technology.
+
+2.2.1 Motivation
+
+Table () below shows the summary statistics of the responses capturing motivation of employees. On a
+scale of 1 (strongly disagree) to 7 (strongly agree), most respondents (102) strongly disagreed that they
+had no time to work when working from home (see the median od the variable motiv no time to work
+in the table). The other variables have a similar interpretation.
+
+ 1234567
+90 94 24 63 21 25 37
+
+                               Table 2.1: Summary: Variables Capturing Motivation
+
+Variable                              Mean      SD Min Q1 Median Q3 Max
+
+motiv no time to work                 3.152542  1.9984149  1 1.00  2.0 4  7
+motiv work clearly explained          6.045198  1.2428570  2 5.00
+motiv comfortable working hours       5.951977  1.5951268  1 6.00  6.5 7  7
+motiv satisfied career progress       4.223164  2.1058196  1 2.00
+motiv equipment tools efficient       5.214689  1.6828443  1 4.00  7.0 7  7
+
+                                                                   5.0 6  7
+
+                                                                   6.0 7  7
+
+motiv adequate working area           5.711864  1.4128209  2 5.00  6.0 7  7
+motiv interest what i did             6.387006  0.7858166  4 6.00
+motiv lighting ventilation workplace  5.836158  1.6305313  1 5.25  7.0 7  7
+motiv comfortable work environment    5.771186  1.4638864  1 5.00
+                                                                   6.0 7  7
+
+                                                                   6.0 7  7
+
+                                      6
+                                                                                                                                                                                                                                                                                                          motiv_no_timmeo_titvo__wwoorrkk_cmleoatirvly__ceoxmpfloarintaebmdleo_twivo_rskaintisgf_iehdo_mucroastrieve_re_qpuriopgmresnmst_ottoivo_lsa_deefqfiuciaetnet_wmoortkivin_gin_taemreoastti_v_wlhigahtt_ini_gd_midveontivti_lactoiomn_fowrtoarbklpel_awceork_environment
+
+7
+motiv_no_time_to_wmoroktiv_work_clearly_emxpoltaivin_ecdomfortable_workminogt_ivh_osuarstisfied_career_mprootgivr_eesqsuipment_tools_mefofitcivie_natdequate_working_maroetiav_interest_whmato_ti_ivd_ildighting_ventilatimono_tiwv_ocrkopmlafocertable_work_environment
+
+   Corr:      Corr:      Corr:    Corr:       Corr:    Corr:        Corr:    Corr:
+-0.235***  -0.208***  -0.179***  -0.024    -0.356***  -0.083      0.197***  -0.005
+
+             Corr:    Corr:        Corr:     Corr:      Corr:       Corr:     Corr:
+           0.676***   0.081      0.188***  0.445***   0.742***    0.181***  0.245***
+
+                       Corr:     Corr:       Corr:      Corr:       Corr:     Corr:
+                      -0.057     0.135*    0.539***   0.313***    0.231***  0.306***
+
+                                   Corr:    Corr:      Corr:        Corr:     Corr:
+                                 0.358***  -0.053     -0.015      0.210***  0.360***
+
+                                             Corr:    Corr:         Corr:     Corr:
+                                           0.479***   0.126*      0.597***  0.697***
+
+                                                        Corr:       Corr:     Corr:
+                                                      0.236***    0.415***  0.441***
+
+                                                                  Corr:     Corr:
+                                                                  0.123*    0.080
+
+                                                                              Corr:
+                                                                            0.822***
+
+2 4 6 234567 2 4 6    246        2 4 6 2 3 4 5 6 74 5 6 7 2 4 6             246
+
+           Figure 2.2: Correlation Between Motivation Indicators
+2.2.2 Job satisfaction
+
+Table () summarises the responses capturing job satisfaction. As an example, when the researcher
+posed the question "My day never seemed to end", most respondents strongly disagreed, implying a
+high degree of job satisfaction.
+
+ 1234567
+96 72 46 75 32 25 8
+
+                               Table 2.2: Summary: Variables Capturing Motivation
+
+Variable                                   Mean      SD Min Q1 Median Q3 Max
+
+js day seemed to never end                 2.949152  1.6924133  11  3 4.00                        7
+js work disturbed family life              2.920904  1.9813474  11
+js work affected family respo              2.745763  1.7581205  11  2 4.75                        7
+js private life negative effect work       1.737288  0.8046744  11
+js institution impt to me                  5.734463  1.3787537  25  2 4.00                        6
+
+                                                                    2 2.00                        4
+
+                                                                    6 7.00                        7
+
+js adequate opp to develop skills          5.206215  1.7474760  14  6 7.00                        7
+js could communicate all levels            5.282486  1.6402786  15
+js work affected private tasks             2.918079  1.8792322  11  6 6.00                        7
+js postpone job tasks due to family respo  2.042373  1.4715088  11
+                                                                    2 4.75                        7
+
+                                                                    2 2.00                        7
+
+                                           8
+                                                                                                                                                                                                                                                                                                          js_day_seemedj_st_ow_noerkv_edr_isetunrdjbse_dw_ofarkm_ialyff_eljcisfte_epdr_ivfamtei_lyli_fere_snpeogatjisv_ei_nesftfietuctti_ojswn__oairdmkepqtu_atote__moeppjs__tcoo_udledv_eclomp_msukjsinl_liscwaoterk__ajsal_lf_fpeleocvstetpdlso_nperi_vjaotbe__ttaasskkss_due_to_family_respo
+
+9
+js_day_seemed_to_nevejsr_ewnodrk_disturbed_famjsily__wlioferk_affected_famjsil_yp_rrievaspteo_life_negative_effecjst_winosrtkitution_impt_jsto__amdeequate_opp_to_devjse_locpo_usldk_illcsommunicate_ajsll__wleovrekl_saffectedj_sp_rpiovastep_otnaes_kjsob_tasks_due_to_family_respo
+
+       Corr:        Corr:     Corr:      Corr:      Corr:    Corr:               Corr:      Corr:
+     0.728***     0.515***  0.329***  -0.178***  -0.358***  0.147**            0.307***   0.384***
+
+                    Corr:     Corr:    Corr:       Corr:    Corr:                Corr:      Corr:
+                  0.857***  0.422***  -0.020     -0.147**   0.040              0.589***   0.518***
+
+                              Corr:    Corr:      Corr:      Corr:               Corr:      Corr:
+                            0.427***  -0.036     -0.005     -0.117*            0.700***   0.303***
+
+                                         Corr:      Corr:     Corr:              Corr:      Corr:
+                                      -0.403***  -0.175***  -0.158**           0.495***   0.299***
+
+                                                   Corr:     Corr:              Corr:      Corr:
+                                                 0.403***   0.157**            -0.008     -0.042
+
+                                                              Corr:            Corr:       Corr:
+                                                            0.350***           0.053      -0.039
+
+                                                                                  Corr:     Corr:
+                                                                               -0.481***  0.237***
+
+                                                                                          Corr:
+                                                                                          0.113*
+
+246  246       2  4         61 2 3 42 3 4 5 6 7 2 4 6       246                246        246
+
+                  Figure 2.3: Correlation Between Job Satisfaction Indicators
+2.2.3 Working from Home
+
+Again, Table () below summarises the responses for employees regarding remote work. Most respon-
+dents, for instance,strongly agreed that daily and weekly job objectives were clearly stated.
+
+   34567
+ 21 11 58 108 156
+
+                           Table 2.3: Summary: Variables Capturing Work from Home
+
+Variable                                           Mean      SD Min Q1 Median Q3 Max
+
+wfh job objectives clear daily weekly              6.036723  1.1246940  3 5.00  67                7
+wfh adequate equipment                             5.488701  1.7942739  1 5.00
+wfh remote productivity office productivity equal  6.062147  1.4248232  1 6.00  67                7
+wfh work from home can be improved                 3.988701  2.1048674  1 2.00
+wfh remote work hinders growth                     1.867232  0.9996598  1 1.00  77                7
+
+                                                                                46                7
+
+                                                                                22                4
+
+wfh online physical meetings equivalent            5.940678  1.5478709  1 5.25  77                7
+wfh remote work tech reliable                      5.994350  1.4730715  2 6.00
+wfh struggle focus remote work                     1.850283  1.2334628  1 1.00  67                7
+wfh missed social interactions                     3.550848  1.9826333  1 2.00
+wfh prefer remote work                             5.522599  1.9354449  1 5.00  12                7
+
+                                                                                35                7
+
+                                                                                67                7
+
+                                         10
+                                                                                                                                                                                                                                                                                                          wfh_job_objectives_wcwlfehfah_r_a_rddeeamqilyuo_atewte_e_peerkoqldyuuiwpcmfthive_itnwyt_oorkff_icfreo_mp_rohwdofumhc_etri_veicmtyao_nwte_eqfb_huew_a_olimnrklip_nrheoi_vnpedhdeyrs_icgawrlo_fhwm_terheemtinogtes_wwefqohur_kisv_tatreluecgnhgt_lere_lfiwoacfbhule_sm_riesmseodte__sowcoiwarklf_hi_nptererafecrt_iornesmote_work
+
+11
+wfh_job_objectives_clear_dwaiflhy_wadeeeqwkulfyha_ter_eemqoutiep_mperondt uctivity_wofffhic_ew_oprrko_dfurocmtiv_ithyo_meqeu_aclwanfh__bree_mimotper_owveodrkw_fhhi_nodnelrisn_eg_rpohwytshical_meetwinfghs__remquoitvea_lewnotrk_tewcfhh__rsetlriuagbglele_focus_rewmfho_tem_iwssoerkd_social_interwacfhti_opnrsefer_remote_work
+
+  Corr:      Corr:        Corr:      Corr:     Corr:     Corr:     Corr:      Corr:       Corr:
+0.672***     0.101.    -0.268***  -0.212***  0.239***   0.145**    0.043      0.112*     -0.060
+
+               Corr:      Corr:    Corr:       Corr:     Corr:       Corr:    Corr:        Corr:
+             0.542***  -0.304***  -0.090.    0.319***   0.168**    0.219***   0.028      -0.165**
+
+                          Corr:    Corr:       Corr:    Corr:      Corr:         Corr:   Corr:
+                       -0.190***  0.149**    0.505***   0.128*     0.034      -0.244***  0.023
+
+                                    Corr:       Corr:      Corr:   Corr:       Corr:      Corr:
+                                  0.305***   -0.309***  -0.246***  0.134*     0.168**    -0.039
+
+                                                Corr:      Corr:     Corr:      Corr:       Corr:
+                                             -0.287***  -0.318***  0.402***   0.270***   -0.336***
+
+                                                          Corr:       Corr:      Corr:    Corr:
+                                                        0.409***   -0.267***  -0.355***  0.151**
+
+                                                                      Corr:    Corr:       Corr:
+                                                                   -0.404***  -0.110*    0.316***
+
+                                                                               Corr:        Corr:
+                                                                              -0.061     -0.259***
+
+                                                                                            Corr:
+                                                                                         -0.225***
+
+34567 2 4 6  246       2 4 6 1 2 3 4 2 4 6 234567 2 4 6                       246        246
+
+             Figure 2.4: Correlation Between Working from Home Indicators
+2.2.4 Technology
+
+In this section, I visualize the variables that capture the use of technology by employees while working
+from home. As an example, most employees disagreed that they had problems communicating with
+colleagues virtually.
+
+   123456
+101 112 86 28 15 12
+
+                               Table 2.4: Summary: Variables Capturing Technology
+
+Variable                                               Mean      SD Min Q1 Median Q3 Max
+
+tech communication employees problematic               2.378531  1.2765890  11  23 6
+tech acess work related info hard                      2.025424  1.3988777  11  22 6
+tech made me miss impt info                            1.737288  0.9851127  11  12 4
+tech not hinder work                                   6.161017  1.4882182  16  77 7
+tech remote help available incase digital hitches      6.107345  1.1708462  16  67 7
+
+                                                   12
+                                                                                                                                                                                                                                                                                                          tech_communication_employeeste_cphro_balceemssa_tiwc ork_related_infote_chha_rmd ade_me_miss_impt_infotech_not_hintdeecrh__wreomrkote_help_available_incase_digital_hitchestech_communication_employees_problematic tech_acess_work_related_info_hardtech_made_me_miss_impt_infotech_not_hinder_work tech_remote_help_available_incase_digital_hitches
+
+13            Corr:                                                              Corr:                            Corr:            Corr:
+            0.509***                                                           0.455***                        -0.248***        -0.190***
+
+                                                                                 Corr:                           Corr:            Corr:
+                                                                               0.753***                        -0.150**         -0.171**
+
+                                                                                                                  Corr:            Corr:
+                                                                                                               -0.303***        -0.307***
+
+                                                                                                                                Corr:
+                                                                                                                                0.063
+
+2  4  6  2  4         61                                                    2            3               4  2  4          6  2  4          6
+
+            Figure 2.5: Correlation Between Working from Home Indicators
+2.3 Data Analysis and Discussion of Results
+
+In this section, we will examine the research questions in greater detail.
+
+2.3.1 Principal Components Analysis
+
+To start with, we create aggregate metrics to capture the four variables;
+
+� Motivation.
+� Job Satisfaction.
+� Working from Home.
+� Technology.
+
+To construct these variables from the responses in the questionaires, we apply Principal Components
+Analysis (PCA). We label these variables motiv for motivation, js for job satisfaction, wfh for working
+from home, and tech for technology. In each PCA analysis, we extract the first principal component.
+This first principal component proxies the corresponding metric in answering the research questions.
+
+The output below shows the contributions of each of the components for motivation. The first principal
+component constitutes 39% of total variance.
+
+Importance of components:
+
+                           PC1 PC2 PC3 PC4  PC5                             PC6         PC7
+
+Standard deviation    1.8490 1.3948 1.0803 0.9991 0.77615 0.60972 0.49859
+
+Proportion of Variance 0.3799 0.2162 0.1297 0.1109 0.06693 0.04131 0.02762
+
+Cumulative Proportion 0.3799 0.5960 0.7257 0.8366 0.90356 0.94487 0.97249
+
+                           PC8  PC9
+
+Standard deviation    0.36603 0.33709
+
+Proportion of Variance 0.01489 0.01263
+
+Cumulative Proportion 0.98737 1.00000
+
+For job satisfaction, the first principal component constitutes 40% of total variance.
+
+Importance of components:
+
+                           PC1 PC2 PC3 PC4 PC5 PC6 PC7
+
+Standard deviation    1.8722 1.3037 1.1993 0.93546 0.78796 0.63453 0.52269
+
+Proportion of Variance 0.3895 0.1888 0.1598 0.09723 0.06899 0.04474 0.03036
+
+Cumulative Proportion 0.3895 0.5783 0.7382 0.83539 0.90437 0.94911 0.97947
+
+                           PC8  PC9
+
+Standard deviation    0.34363 0.25831
+
+Proportion of Variance 0.01312 0.00741
+
+Cumulative Proportion 0.99259 1.00000
+
+For the wfh variable the first principal component contributes 29% of the total variability.
+
+Importance of components:
+
+                           PC1 PC2 PC3 PC4  PC5                             PC6         PC7
+
+Standard deviation    1.6878 1.4211 1.1533 0.9910 0.89516 0.79859 0.74449
+
+Proportion of Variance 0.2849 0.2020 0.1330 0.0982 0.08013 0.06377 0.05543
+
+Cumulative Proportion 0.2849 0.4868 0.6198 0.7180 0.79817 0.86194 0.91737
+
+                                        14
+                           PC8  PC9 PC10
+
+Standard deviation  0.62738 0.56810 0.3317
+
+Proportion of Variance 0.03936 0.03227 0.0110
+
+Cumulative Proportion 0.95673 0.98900 1.0000
+
+Lastly, first principal component for technology contributes 52% of the total variability.
+
+Importance of components:
+
+                           PC1 PC2 PC3 PC4     PC5
+
+Standard deviation  1.5465 0.9704 0.9282 0.7714 0.45829
+
+Proportion of Variance 0.4783 0.1883 0.1723 0.1190 0.04201
+
+Cumulative Proportion 0.4783 0.6667 0.8390 0.9580 1.00000
+
+The graphs below shows the contributions of each principal component to the total variability.
+
+                                15
+                                                  Principal Component Analysis, Motivation                                                    Principal Component Analysis, Satisfaction
+
+    Variances                                                                                      Variances
+           0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5                                                                0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5
+
+                                            1  2     3     4     5     6     7              8  9                                           1  2  3  4  5  6  7  8                         9
+
+16
+
+                                               Principal Component Analysis, Remote Work                                                      Principal Component Analysis, Technology
+
+    Variances                                                                                      Variances
+           0.5 1.0 1.5 2.0 2.5                                                                            0.5 1.0 1.5 2.0
+
+                                            1  2  3     4     5     6     7     8           9  10                                          1     2     3     4                            5
+
+                                                                    Figure 2.6: Contribution of the Principal Components
+2.3.1.1 Visualizing the First Principal Components
+In this section, we examine the correlation between the proxies for motivation, job satisfaction, technol-
+ogy, and working from home. Again, these proxies are the first principal components of the measures
+for motivation, job satisfaction, working from home and technology computed in the previous section.
+Figure () shows a significant correlation between the variables. For instance, there is very high positive
+correlation between the motivation and job satisfaction on the one hand and technology and job
+satisfaction on the other. However, there appears to be a non-linear relationship between the variables
+making the correlations less useful.
+
+2.3.2 Remote work and employee motivation?
+
+Figure () below shows the relationship between employee motivation and working from home. The
+relationship is negative at the initial levels but turns positive at higher levels. In the regression analysis
+in section () below, we examine the significance of the relationship between employee motivation and
+working from home in the presence of other related variables.
+
+                                                                 17
+    motiv       js       wfh                 tech
+
+             Corr:     Corr:               Corr:   motiv
+           0.448***  0.375***           -0.163**
+
+                       Corr:               Corr:   js
+                     0.395***           -0.448***
+
+                                           Corr:   wfh
+                                        -0.397***
+
+                                                   tech
+
+18
+
+    -4 -2 0 2 -3 -2 -1 0 1 2 -4 -2 0 2  024
+            Work from Home and Employee Motivation
+
+Motivation                                             motiv
+
+                                                              2
+                                                              0
+                                                              -2
+                                                              -4
+
+            -4  -2  0                               2
+
+                Working from Home
+
+2.3.3 Remote work and and job satisfaction?
+
+Figure () below shows the relationship between job satisfaction and working from home. The relation-
+ship is negative at the initial levels but flattens at higher levels. This observation goes against the
+theory. In the regression analysis in section () below, we examine the significance of this relationship
+in the presence of other related variables.
+
+                       19
+                  Work from Home and Job Satisfaction
+
+Job Satisfaction                                          motiv
+
+                                                                 2
+                                                                 0
+                                                                 -2
+                                                                 -4
+
+                  -4  -2  0                            2
+
+                      Working from Home
+
+2.3.4 Employee motivation and job satisfaction?
+
+As expected, Figure () below shows the positive relationship between employee motivation and job
+satisfaction. In line with the theory, higher employee motivation corresponds to higher job satisfaction.
+Again , we examine the significance of this relationship in the regression analysis section below.
+
+                             20
+                  Motivation and Job Satisfaction
+
+Job Satisfaction                                          motiv
+
+                                                                 2
+                                                                 0
+                                                                 -2
+                                                                 -4
+
+                  -4  -2                           0   2
+
+                          Motivation
+
+2.3.5 Technological skills, employee motivation and job satisfaction in
+          remote work
+
+Overall, there is a positive relationship between the employee motivation and job satisfaction (see
+Figure () below). The figure also indicates that employees with better technology skills have higher
+motivation. However, job satisfaction does not appear to have a significant relationship with the
+technology. The implication here is that the positive relatonship between the employee motivation
+and job satisfaction arises from other factors beyond profficiency in technology. We discuss some of
+these other factors in the regression analysis in the next section.
+
+                                                   21
+    Motivation vs Job Satisfaction               Motivation vs Technology                                                                                                        Job Satisfaction vs Technology
+
+22  Job Satisfaction                   tech
+                                                                                           Technology
+                                                                                                                                                                     Technology4
+
+                                              2
+
+                                              0
+
+    -4  -2              0           2            -4  -2                    0  2                                                                                                  -3  -2  -1  0             1     2
+
+            Motivation                                   Motivation                                                                                                                      Job Satisfaction
+
+                                       Figure 2.7: Respondents Profile (% of Total Count)
+We run a regression analysis of the following form;
+
+motivation = 0 + 1jobsatisf action + ncontrols + errorterm
+
+Where motivation and job satisfaction are variables that captures employee motivation and job satisfac-
+tion, respectively. The controls include gender, age group, marital status, education level, employment
+category, experience, and whether or not the employee worked from home. We also include an interac-
+tion of technology and job satisfaction. The interaction is the outcome of interest in this section. The
+summary of the regression analysis is in the table below.
+
+The regression confirms the outcome of Figure () above. While the relationship between job satisfaction
+and motivation is positive and significant, the relationship between motivation and the interaction of
+job satisfaction and technology is not. What are the additional variables that affect the levels of
+motivation among employees?
+
+The regression table shows that the level of motivation among employees is a function of other variables.
+These variables include working from home (wfh), age group, marital status, education level, experience.
+Notably, both technology and job satisfaction are not a significant driver of the level of motivation
+among employees. However, the flexibility to work from home does positively affect the level of
+motivation.
+
+Divorced employees had a greater motivation than married or single employees in the sample. Em-
+ployees with certificate level education had less motivation compared to employees with higher levels
+of education. Part-time employees have a greater motivation motivation than parmanent employees
+which is a suprising outcome from the analysis.
+
+Compared to employees with 1-5 years of experience, employees with experience between 6 and 20
+years have a greater motivation. On the other hand, employees with experience of 21-25 years have
+significantly less motivation. Critically, working from home has a significant relationship with employee
+motivation. Hence, management could explore mechanisms to allow employees to choose remote work
+where possible.
+
+Note that we do not include age in the regression as it is highly correlated with experience. The
+regression disagnostics plot in Figure () indicates a mild level of multicollinearity. However, the model
+is significant with the independent variables explaining 77% of the variation in the dependent variable
+with a significant F-statistic.
+
+Call:
+lm(formula = motiv ~ js * tech + age_group + wfh + gender + marital +
+
+      education + employment_category, data = final_data)
+
+Residuals:
+
+Min            1Q Median  3Q Max
+
+-3.0017 -0.6874 0.2112 0.7953 1.9543
+
+Coefficients:             Estimate Std. Error t value Pr(>|t|)
+                          -2.51384 0.56021 -4.487 9.91e-06 ***
+(Intercept)
+js                         0.24795 0.04465 5.553 5.71e-08 ***
+tech                       0.06088 0.05238 1.162 0.245919
+
+                                      23
+age_group36-45                1.96590 0.21448 9.166 < 2e-16 ***
+
+age_group46-55                1.47520 0.19313 7.638 2.30e-13 ***
+
+age_group56-65                2.97460 0.27506 10.814 < 2e-16 ***
+
+wfh                           0.54434 0.04914 11.076 < 2e-16 ***
+
+genderMale                    1.38113 0.23463 5.887 9.53e-09 ***
+
+maritalMarried or living with partner 0.30730 0.23197 1.325 0.186156
+
+maritalPrefer not to say      1.13274 0.49271 2.299 0.022115 *
+
+maritalSingle                 -0.55007 0.27396 -2.008 0.045462 *
+
+educationDegree               -0.49899 0.46036 -1.084 0.279184
+
+educationDiploma              -1.29656 0.44289 -2.928 0.003649 **
+
+educationHigh School          -2.56517 0.46012 -5.575 5.08e-08 ***
+
+educationPostgraduate         -1.42016 0.41646 -3.410 0.000728 ***
+
+employment_categoryPermanent  2.37620 0.32386 7.337 1.64e-12 ***
+
+js:tech                       0.23845 0.03358 7.101 7.37e-12 ***
+
+---
+
+Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.155 on 337 degrees of freedom
+Multiple R-squared: 0.6274, Adjusted R-squared: 0.6098
+F-statistic: 35.47 on 16 and 337 DF, p-value: < 2.2e-16
+
+                              24
+    Posterior Predictive Check                                                                               Linearity
+
+    Model-predicted lines should resemble observed data line                                                 Reference line should be flat and horizontal
+
+                                                                                                                     2
+
+                                 0.20                                                                                          1
+
+    Density                      0.15                                                                        Residuals         0
+
+                                 0.10                                                                                          -1
+
+                                 0.05                                                                                          -2
+
+                                 0.00                                                                                          -3
+
+                                       -4                         0                     4                                                      -2                       0                   2
+                                                                                                                                                                                               0.100
+                                                                  motiv                                                                                 Fitted values
+
+                                                   Observed data  Model-predicted data
+
+    Homogeneity of Variance                                                                                  Influential Observations
+
+    Reference line should be flat and horizontal                                                             Points should be inside the contour lines
+
+    |Std. residuals|             1.5                                                                                           20
+
+                                                                                                             Std. Residuals                                                            1.0
+
+                                 1.0
+
+                                                                                                                               0                      100 37 22 95 119
+
+25                               0.5
+
+                                                                                                                               -20                                                     1.0
+
+                                 0.0
+
+                                           -2                            0                 2                                        0.000      0.025         0.050         0.075
+                                                                                                                                                        Leverage (hii)
+                                               Fitted values
+
+    Collinearity                                                                                             Normality of Residuals
+
+    High collinearity (VIF) may inflate parameter uncertainty                                                Dots should fall along the line
+                                                                                                                     3
+              10
+    Variance Inflation                                                                                       Sample Quantiles
+       Factor (VIF, log-scaled)                                                                                                2
+
+                                 5                                                                                             1
+                                 3
+                                 2                                                                                             0
+
+                                                                                                                               -1
+
+                                                                                                                               -2
+
+                                 1                                                                                             -3
+                                    age_groupeduecmaptiolonyment_categgeonrdyer js js:tech marital tech wfh
+                                                                                                                                           -2              0                           2
+
+                                                                                                                                               Standard Normal Distribution Quantiles
+
+                                                                  Low (< 5)
+
+                                                                             Figure 2.8: Regression Diagnosis
+Chapter 3
+
+References
+
+                                                                 26
+Chapter 4
+
+Appendix
+
+                                                                 27
+

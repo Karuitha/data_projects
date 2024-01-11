@@ -1,0 +1,109 @@
+Bases Table,
+Obs,Observation Number
+Cust,"Customer (0 if no, 1 if yes)"
+B1,I tend to plan things very carefully. (1 is Strongly Agree - 4 is Strongly Disagree; 5 is Don't Know)
+B2,I sometimes have trouble controlling my spending. (1 is Strongly Agree - 4 is Strongly Disagree; 5 is Don't Know)
+B3,I think it is important to purchase products that are made locally. (1 is Strongly Agree - 4 is Strongly Disagree; 5 is Don't Know)
+B4,I carefully consider the health benefits of what I eat. (1 is Strongly Agree - 4 is Strongly Disagree; 5 is Don't Know)
+,
+Descriptor Table,
+Obs,Observation Number
+D1,"Have you ever visited Sticks Kebob Shop? (1 if yes, 0 if no)"
+D2.1,How many times in the last week did you do the following? - Make/eat lunch at home
+D2.2,How many times in the last week did you do the following? - Bring lunch to work
+D2.3,How many times in the last week did you do the following? - Buy lunch at work
+D2.4,How many times in the last week did you do the following? - Buy lunch at restaurant
+D2.5,How many times in the last week did you do the following? - Skipped lunch
+D2.6,How many times in the last week did you do the following? - Other
+D3.1,Please specify the top five restaurants you have visited in the last six months in order of visit frequency. - Most frequent
+D3.2,Please specify the top five restaurants you have visited in the last six months in order of visit frequency. - Second most frequent
+D3.3,Please specify the top five restaurants you have visited in the last six months in order of visit frequency. - Third most frequent
+D3.4,Please specify the top five restaurants you have visited in the last six months in order of visit frequency. - Fourth most frequent
+D3.5,Please specify the top five restaurants you have visited in the last six months in order of visit frequency. - Fifth most frequent
+D4.1,Please indicate how important the following factors are when you visit a restaurant - Convenient
+D4.2,Please indicate how important the following factors are when you visit a restaurant - Variety
+D4.3,Please indicate how important the following factors are when you visit a restaurant - Value
+D4.4,Please indicate how important the following factors are when you visit a restaurant - Healthy
+D4.5,Please indicate how important the following factors are when you visit a restaurant - Taste
+D4.6,Please indicate how important the following factors are when you visit a restaurant - Staff
+D4.7,Please indicate how important the following factors are when you visit a restaurant - Ambiance
+D4.8,Please indicate how important the following factors are when you visit a restaurant - Consistency
+D4.9,Please indicate how important the following factors are when you visit a restaurant - Community
+D4.10,Please indicate how important the following factors are when you visit a restaurant - Other
+D5,What is your gender? (1 is Female; 2 is Male)
+D6,What is your age? (1 is <= 25; 2 is 26 to 40; 3 is 41 to 65; 4 is > 65)
+D7,What is your approximate average annual household income? (1 is < 50k; 2 is 50k to 100k; 3 is > 100k)
+D8,How would you best describe your household type? (1 is Single; 2 is Couple/Family; 3 is Other/Shared)
+D9.1,"How many children, by age, currently live in your household? - Less than 12"
+D9.2,"How many children, by age, currently live in your household? - 12-17"
+D9.3,"How many children, by age, currently live in your household? - 18+"
+D10.1,What is your profession? - Accountant
+D10.2,What is your profession? - Lawyer
+D10.3,What is your profession? - General purpose contractor
+D10.4,What is your profession? - Design
+D10.5,What is your profession? - Educator
+D10.6,What is your profession? - Homemaker
+D10.7,What is your profession? - Business professional
+D10.8,What is your profession? - Other
+D11.1,"If you have children living at home, in what activities do they participate? - Soccer"
+D11.2,"If you have children living at home, in what activities do they participate? - Football"
+D11.3,"If you have children living at home, in what activities do they participate? - Tennis"
+D11.4,"If you have children living at home, in what activities do they participate? - Lacrosse"
+D11.5,"If you have children living at home, in what activities do they participate? - Swimming"
+D11.6,"If you have children living at home, in what activities do they participate? - Music"
+D11.7,"If you have children living at home, in what activities do they participate? - Hiking"
+D11.8,"If you have children living at home, in what activities do they participate? - Visiting local attractions"
+D11.9,"If you have children living at home, in what activities do they participate? - Visiting children's museums"
+D11.10,"If you have children living at home, in what activities do they participate? - Attending local sporting events"
+D11.11,"If you have children living at home, in what activities do they participate? - Other"
+D12.1,In what activities or hobbies do you participate yourself? - Volunteer work
+D12.2,In what activities or hobbies do you participate yourself? - Tennis
+D12.3,In what activities or hobbies do you participate yourself? - Swimming
+D12.4,In what activities or hobbies do you participate yourself? - Skiing/snowboarding
+D12.5,In what activities or hobbies do you participate yourself? - Running
+D12.6,In what activities or hobbies do you participate yourself? - Hiking
+D12.7,In what activities or hobbies do you participate yourself? - Golf
+D12.8,In what activities or hobbies do you participate yourself? - Gardening
+D12.9,In what activities or hobbies do you participate yourself? - Fishing
+D12.10,In what activities or hobbies do you participate yourself? - Camping
+D12.11,In what activities or hobbies do you participate yourself? - Bicycling
+D12.12,In what activities or hobbies do you participate yourself? - Yoga
+D12.13,In what activities or hobbies do you participate yourself? - Book clubs
+D12.14,In what activities or hobbies do you participate yourself? - Eating out
+D12.15,In what activities or hobbies do you participate yourself? - Attending local sporting events
+D12.16,In what activities or hobbies do you participate yourself? - Visting museums
+D12.17,In what activities or hobbies do you participate yourself? - Kids' activities
+D12.18,In what activities or hobbies do you participate yourself? - Other
+D13,"In the last month, how many times have you used coupons when you visited a restaurant?"
+D14.1,How do you find restaurant coupons? - Valpak/direct mail
+D14.2,How do you find restaurant coupons? - Coupon site or blog
+D14.3,How do you find restaurant coupons? - Groupon/other daily deal
+D14.4,How do you find restaurant coupons? - Store receipt offer
+D14.5,How do you find restaurant coupons? - Loyalty card reward
+D14.6,How do you find restaurant coupons? - Offer mentioned in media
+D14.7,How do you find restaurant coupons? - Other
+D15.1,How did you first find out about Sticks? - Heard from a friend or colleague
+D15.2,"How did you first find out about Sticks? - Saw in media ( print or online-Facebook, blog, review)"
+D15.3,"How did you first find out about Sticks? - Direct marketing ( e.g., Valpak, Groupon)"
+D15.4,How did you first find out about Sticks? - Noticed while driving or walking by restaurant
+D15.5,"How did you first find out about Sticks? - Noticed from catering at workplace ( e.g., menu stack)"
+D15.6,How did you first find out about Sticks? - Noticed at outdoor event / food festival
+D15.7,How did you first find out about Sticks? - Other (please specify)
+D16,Have you eaten at Sticks in the past three months? (1 is Yes; 2 is No)
+D17.1,"In the last month, how often have you visited Sticks for the following occasions? - Weekday lunch"
+D17.2,"In the last month, how often have you visited Sticks for the following occasions? - Weekday dinner"
+D17.3,"In the last month, how often have you visited Sticks for the following occasions? - Weekend lunch"
+D17.4,"In the last month, how often have you visited Sticks for the following occasions? - Weekend dinner"
+D17.5,"In the last month, how often have you visited Sticks for the following occasions? - Sticks event ( catering at work, food festival)"
+D17.6,"In the last month, how often have you visited Sticks for the following occasions? - After school snack or after sports practice / event"
+D17.7,"In the last month, how often have you visited Sticks for the following occasions? - Other (please specify)"
+D18.1,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Convenient place to eat
+D18.2,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Variety of menu options
+D18.3,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Good value for money
+D18.4,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Healthy menu options
+D18.5,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Food taste and satisfaction
+D18.6,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Friendly staff
+D18.7,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Pleasant ambiance
+D18.8,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Consistency / reliability
+D18.9,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Part of community
+D18.10,Please indicate how you rate Sticks in comparison to similar restaurants that you visit regularly  - Other (please specify)

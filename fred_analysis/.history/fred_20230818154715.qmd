@@ -1,0 +1,43 @@
+---
+title: "Analysing Economic Data from FRED in Python"
+subtitle: "Automatically Pulling and Analyzing Data from the FRED Databased in Python"
+format: html
+---
+
+# **Background**
+
+In this analysis, I use data from the Federal Reserve bank of St Loius Database (FRED) to illustrate data analysis using Python and Pandas. As a starting point, I load the required packages- Pandas, Numpy, Matplotlib, Seaborn, and Plotly. The package `fredapi` does not come into Python by default. I hence install it and then load it.
+
+
+# **Data**
+I start by installing the packages fredapi and plotly.
+```{python}
+!pip install fredapi
+!pip install plotly
+```
+
+Next, I load the required modules: matplotlib, numpy, seaborn, pandas, plotly, and fredapi.
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.express as px
+from fredapi import Fred
+```
+
+Next, we shift oir attention to our data source: FRED. FRED database is owned and maintained by the federal reserve bank of St. Louis. I load the data from the FRED api.
+
+
+
+# **Analysis**
+
+## Exploration
+
+## In-depth analysis
+
+# **Conclusion**
+
+# **References**
+

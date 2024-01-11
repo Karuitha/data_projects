@@ -1,0 +1,384 @@
+---
+subtitle: "***Analyzing Top Companies Africa with Python and Pandas***"
+title: "**Navigating Africa's Business Landscape through Python Data Analysis**"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957-00100
+        city: Karatina
+        state: Kenya
+        postal-code: 10101
+      - name: Graduate School of Business Administration, University of the Witwatersrand
+        address: 2nd St Davids Pl & St Andrew Rd, Parktown
+        city: Johannesburg
+        state: South Africa
+        postal-code: 2193
+title-block-banner: "africa.jpeg"
+title-block-banner-color: "black"
+self-contained: true
+date: today
+date-modified: today
+date-format: long
+format: 
+  html:
+    theme: zephyr
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    smooth-scroll: true
+    code-fold: false
+execute: 
+  message: false
+  warning: false
+  echo: fenced
+bibliography: references.bib
+csl: apa.csl
+---
+
+# **Background**
+
+In this analysis, we use data from Kagle[@top2000companies] to illustrate the use of Python and Pandas in data analysis[@vanderplas2016python]. The data captures the top 2000 companies in the world and is available for free upon registration on the [Kagle website](https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally). We filter the data to only include companies from Africa.
+
+# **Objectives**
+
+The primary goal of this exercise is to illustrate how to use Python, pandas and other libraries in Python programming to analyse data for meaningful insights about large companies in Africa.
+
+Specifically, we seek to;
+
+1.  Rank companies in Africa by their performance.
+2.  Rank countries in Africa based on the concentration of large companies.
+3.  Compute the correlation between company size (in terms of assets) and financial performance.
+4.  Uncover regional patterns in company performance based on country.
+5.  Establish the companies, countries in Africa with the highest returns on assets and profit margins.
+
+# **Summary of Results**
+
+1.  Most large companies in the sample are located in South Africa.
+2.  There is a positive relationship between company size and financial performance (sales, profits, market value). However, this relationship varies across countries.
+3.  Companies from South Africa have the highest sales, profits, asset base, and valuation.
+4.  Companies in Nigeria are more efficient in converting sales and assets into profits.
+
+**NB: ALL FIGURES ARE IN BILLIONS OF US DOLLARS**
+
+::: callout-tip
+Please visit my [rpubs site](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link <www.rpubs.com/Karuitha> into your browser. You can also view my [linkedin](www.linkedin.com/in/Karuitha) site for my skills and education.
+
+My [Tableau public profile](https://public.tableau.com/app/profile/john.karuitha) contains my data visualizations.
+
+My Shiny web apps are available on this [site](<https://karuitha.shinyapps.io/>). You can copy-paste this web address instead <https://karuitha.shinyapps.io>
+:::
+
+
+
+::: callout-tip
+Skills & Technologies Applied: Python, Pandas, Geopandas, Matplotlib, Quarto, Data Science.
+:::
+
+# **Data**
+
+The data is available on [kagle](https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally) as a csv file (registration is required to access the data). I start by loading the necessary packages for the analysis: pandas, numpy, matplotlib, and seaborn [@borjigin2023].
+
+```{python}
+#| echo: true
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+from shapely.geometry import Point
+```
+
+Next I read in the data using pandas and set the index column as the name of the company given it is a unique and meaningful identifier.
+
+```{python}
+company = pd.read_csv("Top2000CompaniesGlobally.csv")
+
+company.columns
+```
+
+Next, I rename the columns using names that are easier to work with. I create a dictionary of old names versus new names and then rename the columns.
+
+```{python}
+## Create a dictionary of old names vs new names
+names = {'Global Rank':'rank', 
+'Sales ($billion)':'sales', 
+'Profits ($billion)':'profits',
+'Assets ($billion)':'assets', 
+'Market Value ($billion)':'market_value', 
+'Country':'country', 
+'Continent':'continent',
+'Latitude':'latitude', 
+'Longitude':'longitude',
+'Company':'company'}
+
+# Rename the columns in place
+company.rename(columns = names, inplace = True)
+```
+
+Next, we filter the data to narrow down on Africa.
+
+```{python}
+company = company[company['continent'] == "Africa"]
+```
+
+```{python}
+## Addd the index
+company.set_index("company", inplace = True)
+
+```
+
+# **Data Exploration**
+
+We now explore the data.
+
+## Number of rows and columns
+
+We start with the number of rows and columns in the data.
+
+```{python}
+company.shape
+```
+
+We see that the data has 25 rows (records) and 9 columns (variables).
+
+## First and Last Rows of the Data
+
+Next, lets examine the first 5 rows.
+
+```{python}
+company.head(5)
+```
+
+We also check the last 7 rows.
+
+```{python}
+company.tail(7)
+```
+
+## Visual Summary
+
+let us use seaborn pairplot() function to create a summary picture of the data using all variables, colored by country.
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (A)"
+sns.pairplot(company[['country', 'sales', 'profits', 'assets', 'market_value']], hue = "country", corner = True, palette = "Dark2", kind = "scatter")
+```
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (B)"
+sns.pairplot(company[['country', 'sales', 'profits', 'assets', 'market_value']], corner = True, palette = "Dark2", kind = "kde")
+```
+
+## Variable Types
+
+The variable types are also an important data component.
+
+```{python}
+company.info()
+```
+
+```{python}
+company.dtypes
+```
+
+## Missing Values
+
+Let us check the data for any missing values for sales, profits, assets, market_value, longitude, and latitude.
+
+```{python}
+company[company['sales'].isna()]
+```
+
+```{python}
+company[company['profits'].isna()]
+```
+
+```{python}
+company[company['assets'].isna()]
+```
+
+```{python}
+company[company['market_value'].isna()]
+```
+
+```{python}
+company[company['longitude'].isna()]
+```
+
+```{python}
+company[company['latitude'].isna()]
+```
+
+This is a conveniently clean data without missing values which is a rare occurrence in data science.
+
+## Summary Statistics
+
+We use the describe method to make summary statistics for numeric and character variables separately.
+
+```{python}
+company.describe(include = "float64")
+```
+
+We also do the same for string data types.
+
+```{python}
+company.describe(include = "object")
+```
+
+Here we see that there are 25 observations with 5 unique countries. The country with the most companies is the South Africa (19 out of the 25 companies in the sample).
+
+# Analysis
+
+In this section, we explore some key issues from the data, listed in order.
+
+## **Which Companies are the Best Performing in Africa?**
+
+### ***Companies with the Highest Sales in Africa***
+
+We start by examining sales. The Standard Bank Group and Sasol lead the pack in this case. Npte that the top 10 companies are from South Africa with the exception of Royal Carribean Cruises from Liberia.
+
+```{python}
+company.nlargest(25, "sales")[['country', 'sales']]
+```
+
+### ***Companies with the Highest Profits in Africa***
+
+In terms of profits, Sasol and MTN Group from South Africa come up tops. Dangote Cement of Nigeria is the only company on the top 10 that is outside South Africa.
+
+```{python}
+company.nlargest(25, "profits")[['country', 'profits']]
+```
+### ***Companies with the Highest Market Value in Africa***
+
+The picture replicates itself in market valuation.
+
+```{python}
+company.nlargest(25, "market_value")[["country", "market_value"]]
+```
+
+## Which Countries and Continents Have the Highest Concentration of Large Companies?
+
+In this section, we utilize the global rank in size variable to identify the countries and continents with the highest number of top-ranking companies. We see that companies from USA, Japan, China, UK, Canada, and South Korea dominate the rankings. Note that these are countries mainly from North America and Asia (with the exception of the UK) which illustrates the dominance of these two continents in global trade.
+
+```{python}
+company['country'].value_counts()
+```
+
+```{python}
+company['continent'].value_counts()
+```
+
+We then visualize this information on a world map using latitude and longitude data to show the geographic distribution of these companies. The size of the dots represents profits. We find that while there are the profitable companies are mainly in Asia, Europe, and North America. The rest of the world generates very few profits.
+
+```{python}
+# Create a GeoDataFrame
+geometry = [Point(lon, lat) for lon, lat in zip(company['longitude'], company['latitude'])]
+gdf = gpd.GeoDataFrame(company, geometry=geometry, columns=['company', 'sales', 'profits', 'assets'])
+
+```
+
+```{python}
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+```
+
+```{python}
+#| fig-cap: "Top Companies by Sales on a World Map"
+# Create a subplot
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Plot the world map
+world.boundary.plot(ax=ax, color = "lightgrey")
+
+# Plot your data on the map
+gdf.plot(ax=ax, marker='o', color='red', markersize='profits', label='Companies')
+
+# Add labels and legend
+ax.set_title('Top Companies in Africa by Profits on a Map')
+ax.set_xlabel('Longitude')
+ax.set_ylabel('Latitude')
+ax.legend()
+
+plt.show()
+
+```
+
+## Is There a Correlation Between Company Size (in terms of assets) and Financial Performance?
+
+Here, we analyze the relationship between the asset base of companies, which is a proxy for size and financial metrics such as sales, profits, and market value. The goal is to determine if larger companies tend to have higher sales, profits, and market value, or if there are exceptions. Overall, there appears to be a positive link between the size of a company and its financial performance in terms of sales, profits, and market value. However, this relationship varies by country.
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (C)"
+sns.pairplot(company[["country", "assets", "sales", "profits", "market_value"]], hue = "country")
+```
+
+```{python}
+company[["assets", "sales", "profits", "market_value"]].corr()
+```
+
+## Are There Regional Patterns in Company Performance Based on Continent?
+
+In this section, I group the data by country and analyze the average sales, profits, and assets for companies in each country. South African companies in the sample have by far the highest sales, profits, asset base, and market valuation .
+
+```{python}
+#| fig-cap: "Sales by Companies"
+company.groupby("country")["sales"].sum().sort_values().plot(kind = "barh", title = "Total Sales of Top Companies in Africa by Country")
+```
+
+```{python}
+#| fig-cap: "Total Profits of Top 2000 Companies globally by Continent"
+company.groupby("country")["profits"].sum().sort_values().plot(kind = "barh", title = "Total Profits of Top Companies in Africa by Country")
+```
+
+```{python}
+#| fig-cap: "Total Assets of Top 2000 Companies globally by Continent"
+company.groupby("country")["assets"].sum().sort_values().plot(kind = "barh", title = "Total Assets of Top Companies in Africa by Country")
+```
+
+## Which Companies, Contiments have the Highest Returns on Assets and Profit margins?
+
+The return on assets is the ratio of profits to assets and captures the efficiency with which a company utilises its assets to generate profits. The net profit margin also captures how well a company is able to convert its sales into profits. The margin can also proxy the management efforts towards expenses management.
+
+Dangote cement of Nigeria leads with a return on assets of 0.25. This is phenomenal!! The companies in the top 5 all have a return greater than 15%, which is an exceptional performance.
+
+```{python}
+company["roa"] = company["profits"] / company["assets"]
+company["margin"] = company["profits"] / company["sales"]
+```
+
+```{python}
+company['roa'].sort_values(ascending = False).head()
+```
+
+Next, I compute the median ROA for each continent. Nigeria leads, though the country has only one company in the sample. South Africa is in second place with a median ROA of 7%.
+
+```{python}
+company.groupby("country")['roa'].median().sort_values(ascending = False)
+```
+
+Let us do the same for profit margin. RMB Holdings has a profit margin of 1 which implies that the company generated profits equal to sales. Overall, the conversion of sales to profits is impressive among the industry leaders.
+
+```{python}
+company['margin'].sort_values(ascending = False).head()
+```
+
+Nigeria and Egypt leads in median profit margin. Again this could be die to the low number of companies from the coutries in this sample.
+
+```{python}
+company.groupby("country")['margin'].median().sort_values(ascending = False)
+```
+
+# **Conclusion**
+
+In this analysis, we use data from Kagle to illustrate the use of Python and Pandas in data analysis. From the analysis, we find that;
+
+1.  Most large companies in the sample are located in South Africa.
+2.  There is a positive relationship between company size and financial performance (sales, profits, market value). However, this relationship varies across countries.
+3.  Companies from South Africa have the highest sales, profits, asset base, and valuation.
+4.  Companies in Nigeria are more efficient in converting sales and assets into profits.
+
+# **References** {.unnumbered}

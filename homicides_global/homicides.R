@@ -1,0 +1,243 @@
+## Load required packages ----
+if(!require(pacman)){
+  
+  install.packages("pacman")
+  
+}
+
+## Install packages ----
+pacman::p_load(tidyverse, data.table, countrycode, janitor, ggthemes, bbplot, 
+               
+               maps, zoo, patchwork, TeachingDemos, gridExtra, plotly)
+
+## Load the data ----
+my_murders_data <- read_csv("homicides_data.csv") %>% 
+  
+  janitor::clean_names() %>% 
+  
+  select(-starts_with("indicator")) %>% 
+  
+  mutate(continent = countrycode(
+    
+    sourcevar = country_name,
+    
+    origin = "country.name",
+    
+    destination = "continent"
+    
+  )) %>% 
+  
+  pivot_longer(starts_with("x"), names_to = "years", 
+               
+               values_to = "murder_rate") %>% 
+  
+  filter(!is.na(continent) & 
+           
+           !country_name %in% c("Kosovo", "Channel Islands")) %>% 
+  
+  mutate(years = str_remove_all(years, "^x") %>% as.numeric()) %>% 
+  
+  mutate(
+    
+    murder_rate = case_when(
+      
+      country_name == "South Africa" & is.na(murder_rate) ~ 35.7,
+      
+      country_name == "Lesotho" & is.na(murder_rate) ~ 43.9,
+      
+      country_name == "Belize" & is.na(murder_rate) ~ 37.9,
+      
+      country_name == "Botswana" & is.na(murder_rate) ~ 15.3,
+      
+      TRUE ~ murder_rate
+      
+      
+      
+    )) %>% 
+  
+  group_by(country_name) %>% 
+  
+  mutate(murder_rate = replace_na(murder_rate, median(murder_rate, na.rm = TRUE))) %>% 
+  
+  ungroup()
+  
+  
+## Countries with highest homicide rates in 2018
+
+(murdershigh_bar_plot <- my_murders_data %>% 
+  
+  mutate(
+    
+    murder_rate = case_when(
+      
+      country_name == "South Africa" & is.na(murder_rate) ~ 35.7,
+      
+      country_name == "Lesotho" & is.na(murder_rate) ~ 43.9,
+      
+      country_name == "Belize" & is.na(murder_rate) ~ 37.9,
+      
+      country_name == "Botswana" & is.na(murder_rate) ~ 15.3,
+      
+      TRUE ~ murder_rate
+      
+    )) %>% 
+  
+  group_by(country_name) %>% 
+  
+  mutate(murder_rate = replace_na(murder_rate, median(murder_rate, na.rm = TRUE))) %>% 
+           
+           ungroup() %>% 
+  
+  filter(years == 2018, !is.na(murder_rate)) %>% 
+  
+  arrange(desc(murder_rate)) %>% 
+  
+  mutate(murder_rate = round(murder_rate, 2)) %>% 
+  
+  slice(1:20) %>% 
+  
+  ggplot(mapping = aes(x = fct_reorder(country_name, murder_rate, min), 
+                       
+                       y = murder_rate)) + 
+  
+  geom_col(col = "black", fill = "gray") + 
+  
+  geom_text(aes(label = murder_rate)) +
+  
+  coord_flip() + 
+  
+  labs(x = NULL, y = "Intentional Homicides per 100,000 Residents", 
+       
+       title = "Top 20 Countries: Intentional Homicides, 2018", 
+       
+       subtitle = "Murder Rates per 100,000 People",
+       
+       caption = "Data Source: The World Bank, 
+       John Karuitha, 2022
+       *NB: St. Vincent & the Grenadines has a high murder rates but no data for 2018
+       War ravaged countries like Somalia and Afghanistan may have higher murder rates but no statistics."
+       
+       ) + 
+  
+  theme_fivethirtyeight())
+
+## Countries with lowest homicide rates in 2018
+
+(murderslow_bar_plot <- my_murders_data %>% 
+    
+    mutate(
+      
+      murder_rate = case_when(
+        
+        country_name == "South Africa" & is.na(murder_rate) ~ 35.7,
+        
+        country_name == "Lesotho" & is.na(murder_rate) ~ 43.9,
+        
+        country_name == "Belize" & is.na(murder_rate) ~ 37.9,
+        
+        country_name == "Botswana" & is.na(murder_rate) ~ 15.3,
+        
+        TRUE ~ murder_rate
+        
+      )) %>% 
+    
+    group_by(country_name) %>% 
+    
+    mutate(murder_rate = replace_na(murder_rate, median(murder_rate, na.rm = TRUE))) %>% 
+    
+    ungroup() %>% 
+    
+    filter(years == 2018, !is.na(murder_rate)) %>% 
+    
+    arrange(murder_rate) %>% 
+    
+    mutate(murder_rate = round(murder_rate, 2)) %>% 
+    
+    slice(1:20) %>% 
+    
+    ggplot(mapping = aes(x = fct_reorder(country_name, murder_rate, min), 
+                         
+                         y = murder_rate)) + 
+    
+    geom_col(col = "black", fill = "gray") + 
+    
+    geom_text(aes(label = murder_rate)) +
+    
+    coord_flip() + 
+    
+    labs(x = NULL, y = "Intentional Homicides per 100,000 Residents", 
+         
+         title = "Bottom 20 Countries: Intentional Homicides, 2018", 
+         
+         subtitle = "Murder Rates per 100,000 People",
+         
+         caption = "Data Source: The World Bank, 
+       John Karuitha, 2022"
+       
+    ) + 
+    
+    theme_fivethirtyeight())
+
+
+
+## Map the data ----
+joint_world_murder_data <- map_data("world") %>% 
+  
+  mutate(code = countrycode(sourcevar = region, 
+                            
+                            origin = "country.name", destination = "iso3c")) %>% 
+  
+  full_join(my_murders_data, by = c("code" = "country_code")) %>% 
+  
+  mutate(murder_rate = replace_na(murder_rate, median(murder_rate, na.rm = TRUE))) %>% 
+  
+  select(-subregion) %>% 
+  
+  filter(!is.na(lat), !is.na(long))
+
+###############################
+
+ggplotly(murders_map_plot <- joint_world_murder_data %>% 
+  
+  filter(years == 2018) %>% 
+  
+  ggplot(mapping = aes(x = long, y = lat, group = group, 
+                       
+                       fill = murder_rate)) + 
+  
+  geom_polygon(show.legend = TRUE, color = "black") + 
+  
+  scale_fill_gradient(low = "white", high = "red") + 
+    
+    labs(x = NULL, y = NULL, title = "Country Rankings by Intentional Homicides, 2018",
+         
+         subtitle = "Homicide Captured by Murders per 100,000 People",
+         
+         caption = "John Karuitha, 2022 Using Data from The World Bank.
+         Technology: R, Tidyverse, countrycode, janitor, & ggthemes") + 
+    
+    theme_fivethirtyeight())
+
+## Make the mapping for Africa only ----
+
+ggplotly(murders_map_plot <- joint_world_murder_data %>% 
+           
+           filter(years == 2018 & continent == "Africa") %>% 
+           
+           ggplot(mapping = aes(x = long, y = lat, group = group, 
+                                
+                                fill = murder_rate)) + 
+           
+           geom_polygon(show.legend = TRUE, color = "black") + 
+           
+           scale_fill_gradient(low = "white", high = "red") + 
+           
+           labs(x = NULL, y = NULL, title = "Country Rankings by Intentional Homicides in Africa, 2018",
+                
+                subtitle = "Homicide Captured by Murders per 100,000 People",
+                
+                caption = "John Karuitha, 2022 Using Data from The World Bank.
+         Technology: R, Tidyverse, countrycode, janitor, & ggthemes") + 
+           
+           theme_fivethirtyeight())
+

@@ -1,0 +1,38 @@
+Here are average systolic blood pressure data for children/young adults aged 1 through 19 (we used these exact data in homework 8). Run the following lines of code:
+
+age <- c(1:19)
+SBP <- c(91,102,104,108,109,112,109,113,116,119,115,122,124,128,129,135,130,132,134)
+bpstudy <- data.frame(age,SBP)
+
+1. Reproduce the scatterplot from homework 8, question 9, this time including the prediction intervals (make these blue), and the confidence intervals (make these red). As a reminder, the homework 8 question asked you to create a scatterplot showing both the individual data points and the best regression line fit through them, and to add labels to both axes and show the data points using a different color than the line.
+
+2. Explain the difference between the confidence intervals and the prediction intervals in words.
+
+3. Do there appear to be any outliers in these data? Use the definition of outlier as exceeding more than 1.5 times the interquartile range in either direction. How do these point(s) appear on the scatterplot?
+
+4. Rerun the model after removing any outliers. (If there were no outliers, remove the single point with the highest residual). How does the regression model change? Consider coefficients and R-squared.
+
+Attached to this assignment is
+
+ health-status.csv
+
+  a clean copy of the 2020 NHIS file used throughout the semester. This version has the variables already renamed and recoded to NA as required. The aim is to explore regression models that predict self-reported health status as a function of age, sex, income, education, and alcohol consumption. Here are brief summaries of the values. You can consult the data dictionary for more detail where necessary.
+
+age - originally AGEP_A - age in years and 85+
+sex - originally SEX_A - 1=male, 2=female
+education - originally EDUC_A - 00 - never attended school up to 11 - doctoral degree
+alcohol - average number of days per week in the past year in which alcoholic beverages were consumed from 0 to 7
+income - originally INCGRP_A - family income with categories of 1 (lowest) to 5 (highest) health - general health status 1-excellent, 2-very good, 3-good, 4-fair, 5-poor
+
+5. Fit a regression model relating health status to age, sex, income, education, and alcohol consumption.
+
+6. Interpret each of the beta coefficients in terms of the direction and magnitude of the predictions. For example, if body mass index (BMI) was in the model with a coefficient of 0.05, we would say that each unit increase in BMI reduced the health score by an average of 0.05, meaning that BMI is inversely correlated with general health.
+
+7. Does the result for alcohol consumption agree with or defy your expectations? Propose an alternative way of measuring alcohol consumption that might better capture the known health effects of heavy alcohol use.
+
+8. According to this model, what is the predicted health score for a 45-year old male bachelor's degree holder with a family income of $88,000 who consumes alcohol daily?
+
+9. According to this model, what type of person (in terms of age, sex, income, education, and alcohol consumption) would be expected to have the best health score? The worst?
+
+10. Someone reviews these model results and says "You are telling me that just because I am 75 years old I likely have poor health. But I rate my health as excellent. This model is worthless". How would you respond to this criticism?
+underpredicted? 

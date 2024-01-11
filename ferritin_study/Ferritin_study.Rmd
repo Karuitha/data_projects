@@ -1,0 +1,267 @@
+---
+title: "**Plasma Ferritin Concentration Study**"
+author: "John Karuitha; diakingathia2005@gmail.com"
+date: "`r format(Sys.Date(), format ='%A %B %d, %Y')`"
+output:
+  html_document:
+      theme: cosmo
+      number_sections: True
+      toc: True
+      toc_float: True
+      toc_depth: 3
+      code_folding: hide
+  pdf_document:
+      number_sections: True
+      toc: True
+      toc_depth: 3
+subtitle: '*Which factors affect plasma ferritin concentration (Ferr) among Australian athletes*?'
+bibliography: "citations.bib"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+## Load the allowed package- download if not available
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+pacman::p_load(car, tidyverse, kableExtra, performance)
+
+## Load the dataset
+ferritin_data <- read.csv("interview-problem/Sports Data CW 2021.csv")
+```
+
+\newpage 
+
+# **Background**
+
+In this article, we assess the effect of a collection of explanatory variables on the plasma ferritin concentration (Ferr) in `r nrow(ferritin_data)` Australian athletes. The file `Sports Data CW 2021.csv` contains the data on the plasma ferritin concentration as well as a selection of demographic variables of `r nrow(ferritin_data)` male and female athletes. In particular, the data set comprises observations on the following `r ncol(ferritin_data)` variables: Sex, Sport, LBM, RCC, WCC, Hc, Hg, BMI, SSF, X.Bfat, Ferr.  Table 1 shows the desciption of the variables. 
+
+```{r, echo = FALSE}
+tribble(~ Variable, ~ Description,
+        "Sport", "Type of Sport.",
+        "Sex", "Sex of athlete; male or female.",
+        "LBM", "Lean body mass of athlete.",
+        "RCC", "Red blood cells count.",
+        "WCC", "White blood cells count.",
+        "Hc (%)", "Hematocrit (Hc) is the volume percentage (vol%) of red blood cells in blood. It is normally 47% ± 5% for men and 42% ± 5% for women.",
+        "Hg (g/dl)", "Hemoglobin (Hg) is the protein contained in red blood cells that is
+responsible for delivery of oxygen to the tissues. The normal Hg level for
+males is 14 to 18 g/dl; that for females is 12 to 16 g/dl.", 
+"BMI", "Body mass index = weight/height^2.",
+"SSF (mm)", "Sum of skin folds.",
+"% Bfat", "% Body fat.",
+"Ferr (mol/L)", "Plasma ferritin concentration.") %>% 
+    kbl(., booktabs = TRUE, caption = "Description of Variables") %>% 
+    kable_classic(full_width = TRUE, latex_options = "hold_position") %>% 
+    column_spec(1, width = "7em", bold = TRUE, italic = TRUE)
+```
+# **Objective**
+
+The broad objective of the study is to uncover factors that are related to the level of ferritin concentration among Australian athletes. 
+
+# **Summary of Results**
+
+1. There is a significant difference in mean ferritin concentration between male and female athletes in Australia. 
+
+2. Sex, lean body mass (LBM) and body mass index (BMI) are the significant drivers of ferritin concentration among athletes in Australia.
+
+3. The regression model using the raw variables has outliers, is not homoscedastic, and fails the multivariate normality test. A transformation of the variables could make the model a better fit. 
+
+
+# **Is there a Significant Difference in Average Ferritin Concentration Between Male and Female Athletes in Australia?**
+
+In this section, we test if plasma ferritin concentration differs between male and female athletes while making sure that the assumptions of the test are satisfied. I start by visualizing the ferritin concentration levels between male and female athletes. Indeed, Figure 1 (below) shows a substantial gap in the median ferritin concentration between the genders with males on the higher side. But is the observed difference significant? To answer this question we have to conduct a hypothesis test. 
+
+```{r, fig.cap = "Ferritin Concentration for Male and Female Athletes"}
+boxplot(Ferr ~ Sex, data = ferritin_data, 
+        main = "Ferritin Concentration for Male and Female Athletes",
+        col = c('#0000FF', '#CCCCFF'))
+
+```
+
+We conduct a independent sample t-test for the mean difference in ferritin concentration between male and female athletes [@xu2017differences]. Note that this is a two-tailed test. 
+
+The hypotheses for the t-test are as follows;
+
+H0: The true difference in mean ferritin concentration between group female and group male is equal to 0.
+HA: The true difference in mean ferritin concentration between group female and group male is **NOT** equal to 0.
+
+We then conduct the t-test. 
+
+```{r}
+t.test(Ferr ~ Sex, data = ferritin_data)
+```
+
+The results of the t-test shows a significant difference in mean ferritin levels between male and female athletes (*t = -6.5043, df = 163.96, p-value = 9.033e-10*). Hence we reject the NULL hypothesis and conclude that the difference in mean ferritin concentration between male and female athletes is NOT equal to zero. 
+
+## Checking Assumptions of the Independent Sample T-test
+
+The independent samples t-test has several assumptions:
+
+- The dependent variable must be continuous (interval/ratio).
+- The observations are independent of one another.
+- The dependent variable should be approximately normally distributed.
+- The dependent variable should not contain any outliers.
+
+### Continous Dependent Variable
+
+The dependent variable meets this assumption as it is numeric and continous.
+
+
+### Independence of observations
+
+The independence of observations will depend upon the data collection process. If the selection of the subjects was random without replacement, then we can safely assume independence between observations. 
+
+### Normality of Independent variable
+
+To check for the normality of residuals, we plot the dependent variable. The plot is in figure 2.
+
+```{r, fig.cap = "Checking normality of Dependent Variable- Ferritin Concentration", fig.height=10}
+
+par(mfrow = c(2, 1))
+x_values <- seq(min(ferritin_data$Ferr), max(ferritin_data$Ferr), 
+                length = nrow(ferritin_data))
+
+fun <- dnorm(x_values, mean = mean(ferritin_data$Ferr), sd = sd(ferritin_data$Ferr))
+####################################
+hist(ferritin_data %>% filter(Sex == "male") %>% pull(Ferr), 
+     main = "Distribution of Ferritin Concentration - Male Athletes",
+     xlab = "Ferritin Concentration", prob = TRUE)
+
+lines(x_values, fun, lwd = 1.5)
+
+#############################################
+hist(ferritin_data %>% filter(Sex == "female") %>% pull(Ferr), 
+     main = "Distribution of Ferritin Concentration - Female Athletes",
+     xlab = "Ferritin Concentration", prob = TRUE)
+
+lines(x_values, fun, lwd = 1.5)
+
+par(mfrow = c(1, 1))
+```
+
+The dependent variable is not normally distributed based on the shape of the histogram. Transformation of the variable would make the variable normally distributed. In this case, I take the logatithm of the variable and rerun the t-test. 
+
+```{r}
+t.test(log(Ferr) ~ Sex, data = ferritin_data)
+```
+
+The results of the t-test remain the same even after transforming the variable. Hence, we conclude that there is a significant difference in ferritin concentration between male and female athletes in Australia. 
+
+### Outliers
+
+The histogram shows that the dependent variable has outliers. 
+
+# **Regression Analysis: Drivers of Ferritin Concentration Among Athletes in Australia**
+
+We start by randomly divide the dataset into two sets, training (n1 = 141) and testing (n2 = 61). 
+
+```{r}
+set.seed(123) ## To allow for reproducibility
+index <- sample(nrow(ferritin_data), size = 141, replace = FALSE)
+
+training_set <- ferritin_data[index, ]
+testing_set <- ferritin_data[-index, ]
+```
+
+## Simple Linear Regression
+
+We regress Ferririn Concentration (Ferr) against other variables as predictors except for the Sport variable [@draper1998applied].
+
+```{r}
+## Specifying regression model of ferritin against all variables except sport
+my_regression_model <- lm(Ferr ~ . - Sport, data = training_set)
+```
+
+We can view the summary of the model.
+
+```{r}
+summary(my_regression_model)
+```
+
+The model shows that Sex, lean body mass (LBM) and body mass index (BMI) are the significant associated with ferritin levels. Specifically, all other factors remaining constant, male athletes have higher average ferritin levels than females. Again, all other factors remaining constant, athletes with higher LBM have lower ferritin levels, and vice versa. Higher BMI corresponds to higher ferritin levels. Finally, the model is significant foing by the F-statistic. 
+
+## Choosing a Model Using Backward Stepwise Regression
+
+Next, we run a backward stepwise regression model- gradually removing insignificant predictors until all the variables in the model are statistically significant. 
+
+```{r}
+final_model <- step(my_regression_model, direction = 'backward')
+```
+
+In this case, we would choose the model `ferritin = Sex + LBM + BMI + error_term` as it has a lower AIC(1063.3) compared to the full model with an AIC of 1069.36. See the output summary for the chosen model below. 
+
+```{r}
+lm(Ferr ~ Sex + LBM + BMI, data = training_set) |> summary()
+```
+
+The model can be summarised as follows:
+
+$Ferr = 0.6637 + 72.1522Sex - 2.2423LBM + 8.1551BMI + error$
+
+## Regression Diagnostics
+
+We then check the linear regression assumptions for the model fitted above.
+
+Linear regression models draw from five key assumptions:
+
+- Linear relationship.
+- Multivariate normality.
+- No or little multicollinearity.
+- No auto-correlation.
+- Homoscedasticity.
+
+The model fails to meet the multivariate normality and homoscedasticity assumptions. The data also has extreme values. 
+
+The easiest way to check whether the model violates these assumptions is by plotting the model. Figure 3 below shows the diagnostics plots. 
+
+
+### Linear Relationship
+
+The relationship between the dependent variable (Ferritin concentration) and the dependent variables should be approximately linear. The `residual vs fitted` plot shows a roughly horizontal trend with no distinct pattern. Hence we conclude that the model meets this assumption.  
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Checking Regression Model Assumptions", fig.width = 12, fig.height=8, echo=FALSE}
+
+performance::check_model(lm(Ferr ~ Sex + LBM + BMI, data = training_set))
+```
+
+\newpage
+\elandscape
+
+### Multivariate normality.
+
+The second plot `Normal Q-Q` shows the normality of residuals. In an ideal situation, the residuals should fall along the straight line. The figure shows a departure from this, more so at the edges. The model does not meet this assumption and cannot reliably be applied for forecasting. Indeed, the `Residuals vs Leverage` plot shows the existence of outliers. 
+
+### No or little multicollinearity.
+
+The variance inflation factor shows that multicollinearity is not an issue in the model. The rule of thumb is a VIF of less than 5 as the threshold for multicollinearity. 
+
+```{r}
+vif(lm(Ferr ~ Sex + LBM + BMI, data = training_set))
+```
+
+
+### No auto-correlation
+
+This assumption is not relevant as our data has no time series dimension.
+
+### Homoscedasticity
+
+The `scale-location` plot shows a rising trend instead of a horizontal pattern with equally spread points. Again, the regression model does not meet this assumption. The model is heteroscedastic. 
+
+# **Conclusion**
+
+In this article, we assess the effect of a collection of explanatory variables on the plasma ferritin concentration (Ferr) among athletes in Australia. Sex, lean body mass (LBM) and body mass index (BMI) are the significant drivers of ferritin concentration among athletes. The difference in ferritin concentration is especially notable between male and female athletes. However, the regression model is is neither multivariate normal nor homoscedastic with notable outliers. Transforming the independent variables could improve the model. 
+
+# **References**
+

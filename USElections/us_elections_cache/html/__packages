@@ -1,0 +1,16 @@
+base
+knitr
+rmdformats
+data.table
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+kableExtra
+readxl
+janitor

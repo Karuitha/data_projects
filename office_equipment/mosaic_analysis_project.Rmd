@@ -1,0 +1,96 @@
+---
+title: "Purchase of Office Equipment"
+subtitle: "From Which Outlet Should We Buy Office Equipment?"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output: 
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.cap = TRUE, message = FALSE, 
+                      
+                      warning = FALSE)
+## Install and load package manager
+## NB: This section requires an internet connection
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+        
+}
+
+## Load required packages, installing them if not available
+pacman::p_load(tidyverse, ggthemes, GGally, janitor, skimr, kableExtra, 
+               
+               huxtable, flextable, knitr, rmarkdown, officedown, 
+               
+               officer, corrplot, dendextend, flexclust, NbClust,
+               
+               here, questionr, ggmosaic, OddsPlotty, tidymodels,
+               
+               lift, data.table,  dfidx, mlogit, lmtest, officedown,
+               
+               markdown, devtools, remotes, mosaic, thematic
+               
+               )
+
+## Install bbplot
+devtools::install_github('bbc/bbplot')
+## Set theme for plots
+theme_set(bbplot::bbc_style())
+
+## Set number of significant digits
+options(digits = 2)
+
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+## Background
+
+When procuring goods and services, there are many options from the variety of the goods and services to the different vendors. In this project, we examine the choice of vendor. We use data from a survey of 200 respondents regarding the importance of several store attributes when choosing where to buy office equipment.
+
+## Objectives 
+
+
+## Data
+
+```{r}
+## Read the data
+office <- read_csv("office (2).csv") %>% 
+        
+        clean_names()
+
+```
+
+
+
+```{r, eval = FALSE}
+## Examine first six rows of the data.
+office %>% 
+        
+        head() %>% 
+        
+        kbl(., caption = "First Six Rows of the Data") %>% 
+        
+        kable_classic(full_width = TRUE)
+```
+
+## Session Information
+
+I owe this report to the following R packages. My appreciation to the R Foundation, R Studio and the Free Software Movement. 
+  
+```{r echo=FALSE}
+sessionInfo()  # could use devtools::session_info() if you prefer that
+```
+  

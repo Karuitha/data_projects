@@ -1,0 +1,552 @@
+---
+title: "Financial Analysis"
+subtitle: "Assigment"
+author: "Omar Sherif"
+date: today
+prefer-html: true
+date-format: long
+format:
+  pdf:
+    toc: true
+    toc-depth: 3
+    toc-title: Contents
+    number-sections: true
+    number-depth: 3
+  docx:
+    reference-doc: FNCE2003_Case_study_booklet.docx
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-depth: 3
+    toc-title: Contents
+editor: visual
+csl: chicago.csl
+bibliography: references.bib
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+\newpage
+
+# **Question 1**
+
+***Assume that you are analyzing the financial statements of BHP for the year 2022. Where can you find the information to examine its performance? How would you comment on the performance of BHP for the year 2022? What more information do you need to draw a reasonable conclusion about the performance of the firm?***
+
+```{r}
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+p_load(tidyverse, janitor, remotes, rJava, kableExtra)
+
+if(!require(tabulizer)){
+  remotes::install_github(c("ropensci/tabulizerjars", "ropensci/tabulizer"))}
+
+options(digits = 2)
+options(scipen = 999)
+```
+
+The key source of information to analyze the financial performance of BHP is the 2022 annual section 11 titled "Financial statements" (pp 126-192). This section consists of the core financial statements of BHP.
+
+-   The income statement.
+
+-   The Statement of financial position (Balance sheet).
+
+-   The statement of cash flows.
+
+-   The statement of changes in equity.
+
+-   Notes to the accounts.
+
+The summary of financial performance for the year 2022 for BHP are as follows;
+
+-   The revenue of US\$65,098 Million is an increase of 14.4% relative top the year 2021.
+
+-   The profit after taxation from continuing operations in 2022 rose by about 64% to US\$ 22,400 Million compared to 2021.
+
+-   The profit after taxation from continuing and discontinued operations in 2022 rose by about 146% to US\$ 33,055 Million compared to 2021.
+
+-   The asset base of the company dropped by 12.6% to US\$ 95,166 million driven primarily by the discontinued operation that resulted in the disposal of property, plant and equipment.
+
+-   The cash and cash equivalents, net of overdrafts, at the end of the financial year 2022 increased to US\$ 17,236 million, a 13% increase relative to 2021.
+
+![Financial Analysis for BHP](q1.png)
+
+To draw a reasonable conclusion about the performance of the firm, we need additional information of the following nature [@trucco2015; @inv_2022];
+
+-   Economic information.
+
+-   Industry information.
+
+Economic information mainly deals with the general macroeconomic conditions in the country or region of operation. Some variables of interest include interest rates, inflation, GDP growth rates, exchange rates, and GDP per capita growth rates.
+
+```{r}
+#| eval: false
+extract_tables("BHP_annual_report_2022.pdf")
+```
+
+Additionally, we may require information regarding companies in the same industry/sector to make a meaningful peer group comparison. Put another way, we analyze the performance of a company relative to its peers, mainly in the same industry or of the same magnitude and geographic reach.
+
+# **Question 2**
+
+***Assume that you are analyzing the financial statements of ZIP for the year 2022. What information can you obtain from MD&A? How can it help you to evaluate the performance of ZIP?***
+
+Management discussion and analysis (MD&A) section within a company's financial report analyzes the company's performance and financial condition from the viewpoint of top management.
+
+The analysis may also include a discussion of the following items;
+
+-   Business overview including the legal, political, and economic environment.
+-   Results of operations.
+-   Liquidity and financial condition.
+-   Acquisitions.
+-   Restructuring activities.
+-   Pertinent Risks.
+-   Regulatory compliance.
+-   Future plans, such as goals and new projects planned by the management.
+-   Other relevant information like charges for impairments, accounting estimates and assumptions.
+
+In the case of ZIP, we can see a highlight of the financial performance in the previous year (see pp4-5).
+
+-   Total transaction volume of US\$8.7b went up by 51% compared to the previous years.
+-   Number of customers at 11.4m rose by 56% compared to the previous year.
+-   The number of merchants and total revenues rose by 67% and 77% respectively relative to the previous year.
+
+Next, we have the **chair's report** and the **CEO Report** addressed to the shareholders. The report reiterates the financial performance of the firm but also summarize the following matters.
+
+1.  The operating political and economic environment. In this case, the company faced rising interest rates and inflation due to the COVID 19 pandemic and the war in Ukraine.
+2.  The strategy adopted by the company. The strategies include;
+
+-   Giving consumers a zero-interest payment option that enables spreading costs over time.
+-   Adjusting risk settings with both new and existing customers to lower credit losses back to target levels.
+-   Geographic diversification into new markets outside ANZ and US.
+-   acquisition of Sezzle as part of the US strategy
+-   Strengthening of governance frameworks.
+-   Compliance to regulations.
+-   A focus on people-centric culture of knowledge, innovation, diversity, equity and inclusion.
+
+3.  To this end, we also see that the company raised US\$172.7 million through a fully underwritten institutional placement and share purchase plan to finance the strategy.
+
+4.  Overall, the company aims to strengthen growth and accelerate attaining profitability by focusing on core markets, on boarding new enterprise merchants, and focusing on customers.
+
+5.  We also see FY23 Priorities & Growth Outlook for ZIP. This can give shareholders and investors a basis for evaluating the future of the firm.
+
+# **Question 3**
+
+**What are 'Big Bath Accounting' and 'Earning smoothing'? What are the motivations for such accounting choices? Explain with examples.**
+
+**Income smoothing** is a technique employed by the management to level out fluctuations in incomes, often by moving revenues and expenses from one period to another. Stocks of companies that exhibit high income fluctuations are deemed riskier by investors, which, in turn, could raise make it harder for the firm to raise capital by raising the cost of capital for the firm. Investors will always prefer less risk to more and fluctuations in earnings are a primary indicator of risk [@subramanyam2014financial].
+
+**Big bath** accounting is a deliberate income smoothing strategy by the management to make poor financial results to appear even worse in order to improve future financial outcomes. For instance, if due to social or economic reasons (like COVID 19) the financial results of a company would have been bad anyway, is it not tempting to add into the mess other items that could negatively influence financial outcomes in the future? For instance, the management could write off the obsolete inventory, write off debts before they are due for writing off, or even expense some assets to cut down on future depreciation charges. The primary motivation for this unethical practice is to inflate future earnings which could mean higher stock prices that has implications for the returns of shareholders, ease of raising capital, and a higher value for the stock options held by the management and employees.
+
+# **Question 4**
+
+**What are the motivations associated with low financial reporting quality? Explain with examples.**
+
+Financial reports of high quality paint the real picture of the company's transactions in the reporting period and the financial condition of the company at the end of the financial period. High quality reports contain relevant, correct, complete, and unbiased information. Poor quality financial reports could not only be biased or incomplete but also possibly fictitious (management fraud).
+
+Motivations for presenting poor quality reports include the following;
+
+-   Mask poor economic, social, and governance performance.
+
+-   Boost the stock price by, for example, smoothing earnings to create a perception that the company stock has low risk.
+
+-   Increase personal compensation through stock options and bonuses due to high profits and stock market values.
+
+-   Avoid violation of debt indentures. This may happen when the debt has restrictive covenants.
+
+Low quality financial reporting is likely to arise in jurisdictions that have;
+
+-   Lax capital markets regulation.
+
+-   Cultural environment that condones less than optimal financial disclosures while failing to adequately penalize financial misreporting.
+
+-   Emphasis on legal compliance (tick the box approach) over fair presentation and ethics.
+
+# **Question 5**
+
+Calculate the company's basic and diluted EPS for the year ended 30 June 2022 using the information below.
+
+![Basic and Diluted Earnings per Share](EPS.png)
+
+# **Part B: Company-specific Questions**
+
+This part requires you to conduct financial statement analysis of a publicly listed company for the year 2022. By now, one of the following companies should be allocated by your local lecturer (if not, please contact your local lecturer ASAP).
+
+-   Wesfarmers Limited (Stock Code: WES)
+-   Woolworths (Stock Code: WOW)
+
+An important element of this project is the requirement of identifying and obtaining relevant, publicly available information. Therefore, you should ensure that you are able to access sufficient information for your selected company. I have uploaded the relevant annual reports on Blackboard for your convenience.
+
+## **Q1**
+
+**What is the name of the company that you/your group members were assigned to complete this project? What is the industry in which your company belongs to? What is the view of the management of the company about the future outlook and performance of the company?**
+
+Our assigned company is Woolworths Group. The company is in the food industry as captured in their statement.
+
+> Connecting customers with good food and more everyday through convenient stores, services, seamless digital experiences and a leading loyalty program.
+
+The outlook about the future performance of the company is largely positive. Even with high operating costs, employee absenteeism, and high inflation, Woolworths has acquired 80% of the online market place `myDeal` to drive online shopping. The desire to later acquire `Shopper Media` in July 2022 further underlines this optimism.
+
+## **Q2**
+
+**Identify two (2) pieces of information not included in the major financial statements (but still in the annual report) that you think would be important to someone considering whether to invest the company. Discuss your reasons for believing that this information would be important in making an investment decision.**
+
+-   Human resources: In the case of Woolworths, human resources are the core of the operations, with 198,000 employees (see pp. 68). Yet, accounting principles use the monetary unit principle. Because it is hard to account for people in terms of money, this very important component of any business is left out. The CEO of Woolworths does note that employee absenteeism is an issue that can affect business operations greatly.
+
+-   Woolworth's as a brand: As an intangible assets a company brand is never recorded as an asset. Instead, the money used to build and sustain the brand are immediately charged to expense (see for example, marketing expenses and other social activities). This policy leads to a substantial underestimation of the value of a business, especially where a large amount of resources is used to build a brand image or to develop new products. The same applies to any intellectual property created by the organization. The entire financial report centers on Woolworths as a brand although the value of the brand does not appear in mainstream financial statements.
+
+These issues are important in the following ways:
+
+-   Employees can make or break an organization. First, employees are the first point of contact with consumers in the case of Woolworths. A demotivated workforce could lead to poor customer service that can seriously hurt sales and profits.
+
+-   Intangible assets like brands do drive sales. A weak or deteriorating brand image could signal poor future financial performance. This is especially important for a customer facing organization such as Woolworths.
+
+## **Q3**
+
+**Analyse your allocated company's investing and financing activities for the year 2022 as identified in the statement of cash flows, specifically identifying the two largest investing activities and the two largest financing activities. Evaluate the cash flow from operating activities of the firm (specifically analyse whether the company is performing better over the years, discuss whether cash flow from operating activities appears to be satisfactory given the current business environment and firms' stage in life cycle).**
+
+The two largest investing activities in 2022 are;
+
+-   Payments for property, plant and equipment and intangible assets: 2415.
+
+-   Proceeds and advances from the sale of property, plant and equipment: 332.
+
+The two largest financing activities in 2022 are;
+
+-   Proceeds from borrowings: 2513
+-   Payments for share buy-back: 2000
+
+In the current environment of high operating costs, high inflation, and persistent employee absenteeism, is largely satisfactory. It is notable that cash from operations decreased by 36.9% driven largely by the 12.6% decrease in sales (receipts from customers) between 2021 and 2022. Except for income tax that rises all the other cash outflows reduce substantially, offsetting the reduced cash inflows from sales.
+
+## **Q4**
+
+**Assume that you are evaluating your allocated company. Only use the MOST appropriate ratios for the year 2022 from the annual report and evaluate whether one should provide long-term loan to this company \[Use at least 4 ratios\].**
+
+```{r}
+# tabulizer::extract_tables("Woolworths_Annual_report_2022_split.pdf")
+
+ratios = tibble(
+  Year = c(2022, 2021),
+  Current_assets = c(27163, 23450),
+  Current_liabilities = c(10750, 23117),
+  BasicEPS = c(126.7, 125.7),
+  DilutedEPS = c(127.7, 127.1),
+  Inventory = c(3593, 3132),
+  TotalLiabilities = c(27169, 37467),
+  Equity = c(6104, 1739),
+  Earnings = c(1547, 1606),
+  Sales = c(60849, 55733),
+  TotalAssets = c(33273, 39236),
+  Cash_flow_operations = c(3378, 4624))
+```
+
+-   Debt Ratios
+-   Debt to Equity Ratio
+
+A company could be borrowing too much, which can increase fixed charges, reduce earnings available for dividends, and trigger financial distress that is a risk to shareholders. We can capture this indebtedness using the debt to equity ratio. In this case we see a drastic drop in the debt to equity ratio between 2021 and 2022 which is a good trend.
+
+$debt_equity_ratio = \frac{Total Liabilities}{Shareholders Equity}$
+
+```{r}
+ratios %>% 
+  mutate(DebtEquity = TotalLiabilities / Equity) %>% 
+  select(Year, TotalLiabilities, Equity,
+         DebtEquity) %>% 
+  kbl(
+    caption = "Debt to Equity Ratio",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+  
+```
+
+-   Debt to Assets Ratio
+
+    This ratio captures the ratio of debt to assets, assuming that the assets have been pledged as collateral in case of default. The higher the level, the more the lender would be hesitant to advance the loan. In this case, we see the debt is relatively high although the debt levels relative to assets have reduced significantly between 2022 and 2023.
+
+$debt_asset_ratio = \frac{Total Liabilities}{Total assets}$
+
+```{r}
+ratios %>% 
+  mutate(DebtAssets = TotalLiabilities / TotalAssets) %>% 
+  select(Year, TotalLiabilities, TotalAssets,
+         DebtAssets) %>% 
+  kbl(
+    caption = "Debt to Assets Ratio",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+```
+
+-   Assets to Equity Ratio
+
+This is the ratio of total assets to the shareholders equity. A higher ratio signals room for more lending. Here, we see a rapid decline between 2021 and 2022 which is a good sign that the creditworthiness of the company has risen substantially.
+
+```{r}
+ratios %>% 
+  mutate(AssetsEquity = TotalAssets / Equity) %>% 
+  select(Year, TotalAssets, Equity,
+         AssetsEquity) %>% 
+  kbl(
+    caption = "Assets to Equity Ratio",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+```
+
+-   Liquidity Ratios:
+
+Evaluating a company for investing purposes should involve measuring its liquidity; how quickly a firm can turn assets into cash to settle short term obligations. Being able to cover short term obligations is key to continued operations and ability to also pay long term obligations. There are two key ratios in this respect:
+
+-   Current ratio: This is the ratio of current (short term) assets to current liabilities.
+
+$Current Ratio = \frac{Current assets}{Current liabilities}$
+
+-   Quick Ratio: This ratio is an extension of the current ratio, except that we do not include inventories.
+
+$Current Ratio = \frac{Current assets - Inventory}{Current liabilities}$
+
+In this case, we see that the company has ample current assets to cover any short term obligations.
+
+```{r}
+ratios = tibble(
+  Year = c(2022, 2021),
+  Current_assets = c(27163, 23450),
+  Current_liabilities = c(10750, 23117),
+  BasicEPS = c(126.7, 125.7),
+  DilutedEPS = c(127.7, 127.1),
+  Inventory = c(3593, 3132),
+  TotalLiabilities = c(27169, 37467),
+  Equity = c(6104, 1739),
+  Earnings = c(1547, 1606),
+  Sales = c(60849, 55733),
+  TotalAssets = c(33273, 39236),
+  Cash_flow_operations = c(3378, 4624))
+
+ratios %>% 
+  select(Year, Current_assets, 
+         Current_liabilities,
+         Inventory) %>% 
+    mutate(
+      Current_ratio = Current_assets / Current_liabilities %>% round(2),
+      Quick_ratio = (Current_assets - Inventory) / Current_liabilities %>% round(2)) %>% 
+  kbl(
+    caption = "Liquidity",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+-   Return on Equity
+
+Return on equity (ROE) measures returns and how effectively a company converts shareholder equity to profit. Hence, ROE is expressed as a percentage of shareholders equity. In this case, I use earnings from continuing operations as it reflects more sustainable earnings.
+
+$ROE = \frac{Net Earnings}{Shareholders Equity}$
+
+```{r}
+ratios %>% 
+  mutate(ROE = Earnings / Equity) %>% 
+  select(Year, Earnings, Equity,
+         ROE) %>% 
+  kbl(
+    caption = "Return on Equity Ratio",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+## **Q5**
+
+**Assume that you want to buy stock of this company. Use the most appropriate efficiency and profitability ratios from the annual report and use these data to evaluate whether this company is a suitable candidate for investment purpose \[Use at least 4 ratios for efficiency and 4 ratios for profitability\].**
+
+### Efficiency Ratios
+
+We evaluate the following efficiency ratios,
+
+-   Days' sales in Inventory: This ratio captures the number of days, on average, that inventory is held by the firm before it is sold out. We see a very high turnover of goods in the store and which is relatively stable in 2021 and 2022.
+
+$DSI = \frac{Inventory}{Cost of Goods Sold}$
+
+```{r}
+tibble(
+  year = c(2022, 2021),
+  Cost_of_sales = c(42807, 39405),
+  Inventory = c(3593, 3132)
+) %>% 
+  mutate(DSI = Inventory / Cost_of_sales) %>% 
+  kbl(
+    caption = "Days' Sales in Inventory",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+-   Inventory turnover ratio: This ratio captures the turnover of inventory in a given period. It is the ratio of the cost of goods sold to the average inventory.
+
+$Inventory turnover ratio = \frac{Cost of Goods Sold}{Average Inventory}$
+
+The cost of sales for woolworths in 2022 is 42807. To get the average inventory, we get the average inventory for 2022 and 2021, `3593` and `3132` respectively. The mean is `r (3593 + 3132) / 2`.
+
+$ITR = 42807 / 3362.5$
+
+We get an ITR of 12.7, meaning that in a given year, the company is able to move its turnover an average of 13 times.
+
+-   Accounts payable turnover ratio: This ratio captures the average number of times a firm pays off its creditors in a given period. The higher the number of times, the better the indicator of financial health.
+
+$APT = \frac{Net Credit Purchases}{Average Accounts Payabe}$
+
+Where credit purchases is the the cost of sales add starting inventory balance and then subtract the ending inventory balance. We do this computation for Woolworths in 2022.
+
+```         
+Net credit purchases = 42807 + 3132 - 3593 = 42346
+```
+
+The average accounts payables is the mean account payables for 2021 and 2022 (6467 and 7002, respectively) which equals 6734.5.
+
+Hence the APT is 6.3.
+
+It means that on average, the company pays off its creditors six times in a year, or once every two months on average.
+
+-   Asset Turnover Ratio captures the extent to which a firm is able to convert its assets into sales in a given accounting period.
+
+$Assets Turnover Ratio = \frac{Net Sales}{Average Total Assets}$
+
+In this case, we do the analysis for 2022. We start by getting the average total assets from the assets in 2021 and 2022.
+
+```         
+(33273 + 39236) / 2 = 36254.5
+```
+
+The net sales for the period (2022) are 60,849.
+
+```         
+60849 / 36254.5 = 1.678385
+```
+
+Hence, woolworths can convert assets into sales on average 1.7 times in a year.
+
+### Profitability Ratios
+
+We examine the following profitability ratios.
+
+-   Return on assets which captures the extent to which Woolworths converts its assets into profit. This ratio indicates how well the management is utilizing assets to generate profits. This efficiency will assist investors in making decisions.
+
+$ROA = \frac{Net Earnings}{Assets}$
+
+-   Return on equity which captures how well the firm converts owners capital into profits. This ratio is relevant to investors as it indicates the return each investor potentially gets from their investment in the company.
+
+$ROE = \frac{Net Earnings}{Equity}$
+
+-   Cash flow margin is a ratio that shows how well the firm converts the cash flow from operations into cash. Cash is useful for making capital investments, paying dividends or future share repurchases which directly benefit investors.
+
+$Cash flow margin = \frac{cash flow from operations}{Sales}$
+
+-   Net profit margin that captures the ratio of net profits to total sales showing the rate at which sales convert to net profit.
+
+$Net profit margin = \frac{Net profit}{Sales}$
+
+```{r}
+ratios %>% 
+  mutate(
+    Net_profit_margin = Earnings / Sales,
+    Cash_flow_margin = Cash_flow_operations / Sales,
+    ROA = Earnings / TotalAssets,
+    ROE = Earnings / Equity
+  ) %>% 
+  
+  select(Year, Net_profit_margin,
+         Cash_flow_margin, 
+         ROA, ROE) %>% 
+  kbl(
+    caption = "Profitability Ratios",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+Overall, the profitability ratios are useful to investors as they give an indication of the returns (in cash or future capital gains) that the firm is likely to generate to the investors.
+
+## **Q6**
+
+**Assume that you are also considering to invest in the stock of CSL. You have limited fund to invest and therefore, you can invest in either of the company (CSL or your allocated company). Compare your company's financial statements, and performance, with those of the CSL. If you were making a decision to invest in one of the two companies, which company would you choose? Discuss. \[In evaluating and comparing the companies, use appropriate ratios and other analysis. Provide clear justification as to why you believe your approach to evaluation is appropriate for investment decision purpose\].**
+
+-   Earnings per Share
+
+In buying stock in a company, you participate in the future earnings and risks of the company. To gauge the earnings potential, we can use the EPS. We have both the basic EPS and the diluted EPS in the table below which capture the earnings per unit of stock, with diluted EPS taking into account potential dilutions. We see that Woolworths has a higher EPS and hence our preference for Woolworths.
+
+-   Returns Ratios
+
+    When we examine returns, that is return on assets (ROA) and return on Equity (ROE), we see that the trajectory for Woolworths is upward while CSL is heading down. Again, based on this metric, we pick Woolworths.
+
+-   Margin Ratios
+
+    We turn to net profit margin and cash flow margin. Although these margins favor CSL, we see a rapid decline in CSL margin ratios compared to Woolworths. In this respect, we again choose Woolworths.
+
+-   Debt to Equity Ratio
+
+    While the debt to equity ratio for CSL is rising, that for Woolworths is trending downwards. Hence, we again choose Woolworths.
+
+CAVEAT: The Price to earnings ratio would also be useful, although we do not have the stock prices data in this respect. Also, it is important to consider other factors like the age and intangible assets held by the company. CSL could be investing in R&D that could yield substantial dividends in the future.
+
+```{r}
+comparisons <- tibble(
+  Company = c("Woolworths", "Woolworths", "CSL", "CSL"),
+  Year = c(2022, 2021, 2022, 2021),
+  Assets = c(33273, 39236, 28346, 18156.9),
+  Earnings = c(2447, 2454, 2129.6, 2657.3),
+  Equity = c(7981, 9715, 14577.5, 8381.3),
+  EPS = c(207.8, 214.1, 4.81, 5.22),
+  Operating_cash_flow = c(2301, 3383, 2628.7, 3621.9),
+  TotalLiabilities = c(19290, 16499, 13768.5, 9775.6),
+  Revenue = c(36388, 33941, 10136.3, 9979.5)
+) %>% 
+  mutate(
+    ROA = Earnings / Assets * 100,
+    ROE = Earnings / Equity * 100,
+    NetProfitMargin = Earnings / Revenue * 100,
+    CashFlowMargin = Operating_cash_flow / Revenue * 100,
+    DebtEquity = Assets / TotalLiabilities * 100
+  )
+  
+comparisons %>% 
+  select(Company, Year, ROA, EPS,
+           ROE, NetProfitMargin,
+           CashFlowMargin,
+           DebtEquity) %>% 
+  kbl(
+    caption = "Financial Analysis- Woolworths vs CSL",
+    booktabs = TRUE,
+    
+  ) %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = "hold_position")
+
+```
+
+## Q7
+
+**Perform a valuation of your allocated company using an appropriate discounted cash flow model \[You should follow the template used in lecture 7 to complete the calculation; Free cash flows for the forecasted period are given below; Assume the cost of debt is 6% for Woolworths and Wesfarmers\]. Carefully explain other assumptions used to select inputs for your model. On the basis of your work make an investment recommendation.**
+	
+
+# **References** {.unnumbered}

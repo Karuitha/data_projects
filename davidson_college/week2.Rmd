@@ -1,0 +1,127 @@
+---
+title: "Exploring College Scorecard Dataset"
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+pacman::p_load(tidyverse, janitor, Amelia, 
+               GGally, rvest, datapasta, kableExtra,
+               leaflet)                                                                                               
+```
+
+## Background
+
+In this data analysis project, I examine college admission rates in the United States using data from the US Department of [Education](US Department of Education, https://collegescorecard.ed.gov/data/) on <https://collegescorecard.ed.gov/data/>.
+
+```{r, echo = FALSE}
+tibble::tribble(
+       ~Column.Name,                                                                                                  ~Description,
+           "UNITID",                                                                                 "Unit ID for the institution",
+           "INSTNM",                                                                                            "Institution name",
+             "CITY",                                                                                                        "City",
+           "STABBR",                                                                                                       "State",
+              "ZIP",                                                                                                    "ZIP code",
+     "ACCREDAGENCY",                                                                                  "Accreditor for institution",
+         "LATITUDE",                                                                                                    "Latitude",
+        "LONGITUDE",                                                                                                   "Longitude",
+          "MENONLY",                                                                                            "Men-only college",
+        "WOMENONLY",                                                                                          "Women-only college",
+         "ADM_RATE",                                                                                              "Admission rate",
+          "SAT_AVG",                                                           "Average SAT equivalent score of students admitted",
+             "UGDS",                                      "Enrollment of undergraduate certificate/degree-seeking students (size)",
+       "UGDS_WHITE",                            "Total share of enrollment of undergraduate degree-seeking students who are white",
+       "UGDS_BLACK",                            "Total share of enrollment of undergraduate degree-seeking students who are black",
+        "UGDS_HISP",                         "Total share of enrollment of undergraduate degree-seeking students who are Hispanic",
+       "UGDS_ASIAN",                            "Total share of enrollment of undergraduate degree-seeking students who are Asian",
+        "UGDS_AIAN",    "Total share of enrollment of undergraduate degree-seeking students who are American Indian/Alaska Native",
+        "UGDS_NHPI", "Total share of enrollment of undergraduate degree-seeking students who are Native Hawaiian/Pacific Islander",
+        "UGDS_2mor",                "Total share of enrollment of undergraduate degree-seeking students who are two or more races",
+         "COSTT4_A",                "The average annual total cost of attendance, including tuition and fees, books and supplies,",
+        "AVGFACSAL",                                                                            "Average faculty salary per month",
+        "AGE_ENTRY",                                                                                        "Average age of entry",
+           "FEMALE",                                                                                    "Share of female students",
+        "FIRST_GEN",                                                                          "Share of first-generation students",
+    "MEDIAN_HH_INC",                                                                                     "Median household income",
+     "POVERTY_RATE",                                                                               "Poverty rate, via Census data",
+       "UNEMP_RATE",                                                                          "Unemployment rate, via Census data"
+    ) %>% 
+    
+    kbl(booktabs = TRUE, 
+        
+        caption = "Variables Definition") %>% 
+    
+    kable_classic(full_width = FALSE)
+```
+
+## Importing the Data
+I load the data and clean the column names to remove special characters and spaces. 
+
+```{r}
+my_data <- read_csv("datasets/college_scorecard_data.csv", 
+                    
+                    na = c("NULL", "")) %>% 
+    
+    janitor::clean_names() %>% 
+    
+    rename(state = stabbr) %>% 
+    
+    mutate(avg_facsal_year = avgfacsal*12)
+```
+
+## Sample Data
+
+In this section, I check the contents of the dataset.
+
+```{r}
+my_data %>% glimpse()
+```
+
+## Missing Data
+ Next, I map out the missing data using the `Amelia` package.
+ 
+```{r}
+missmap(my_data)
+```
+ 
+The map shows substantial missing data. I examine the columns with the highet incodence of missing data.
+
+```{r}
+my_data %>% 
+    sapply(is.na) %>% 
+    colSums() %>% 
+    tibble(names = names(my_data), missing = .) %>% 
+    filter(missing > 0) %>% 
+    arrange(desc(missing)) %>% 
+    
+    kbl(booktabs = TRUE, 
+        
+        caption = "Missing Data") %>% 
+    
+    kable_classic(full_width = FALSE)
+```
+
+## mapping out the colleges
+
+```{r}
+my_data %>% 
+    drop_na(latitude, longitude) %>% 
+    filter(state == "CA") %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    addCircleMarkers(lng = ~longitude,
+                     lat = ~latitude, 
+                     popup=~instnm, 
+                     radius = ~costt4_a/10000)
+```
+
+
+

@@ -1,0 +1,109 @@
+---
+title: "Q2: Financial Condition of Banks"
+author: "G Park"
+date: '`r format(Sys.Date(), format = '')`'
+always_allow_html: true
+reference_docx: Advanced_Business_Application_Development_Final_Exam_Fall_2022.docx
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+
+
+```{r setup, include=FALSE}
+###################################################
+## Load required packages 
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, KableExtra)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+```
+
+# **Question Two**
+
+The file banks.csv includes data on a sample of 20 banks. The “Financial Condition” column records the judgment of an expert on the financial condition of each bank. This outcome variable takes on of two possible values –weak (1) or strong (0)– according to the financial condition of the bank. The predictors are two ratios used in the financial analysis of banks: TotLns&Lses/Assets is the ratio of total loans and leases to total assets and TotExp/Assets is the ratio of total expenses to total assets. The target is to use the two ratios for classifying the financial condition of a new bank.  
+
+## 2.1 Partition records into 60% for training and 40% for validation sets. Then fit a logistic regression to Financial_Condition as function of TotLns&Lses/Assets and TotExp/Assets on training sets and show summarized logistic results. (10 points) 
+
+I have used the tidymodels `initial_split`, `training` and `testing` functions to split the data into training and validation sets. I then use the glm function to fit a logistoc regression and summarise the results.
+
+```{r}
+## Read in the data
+banks <- read_csv("banks.csv")
+## Training and testing set
+bank_split <- initial_split(banks, prop = 0.6, 
+                            strata = "Financial_Condition")
+
+bank_training_set <- bank_split %>% training()
+bank_testing_set <- bank_split %>% testing()
+## Fit a logistic regression on the training set
+set.seed(134)
+bank_logit <- glm(Financial_Condition ~ . -Obs, 
+                  family = binomial(link = 'logit'), 
+                  data = bank_training_set)
+
+## Summary of the regression model
+summary(bank_logit)
+
+```
+
+
+
+## 2.2 Now based on the logistic regression results, make predicted probability for validation set and show their predicted probability. (10 points)
+
+I make predictions on the validation set and print the predicted probabilities below.
+
+```{r}
+## Predicted probability
+set.seed(134)
+predict(bank_logit, newdata = bank_testing_set, 
+        type = "response")
+```
+
+
+
+## Now, create a data frame for the first 5 actual records of validation sets along with their predicted probability. (10 points) 
+
+Using a cutoff of 50% (0.5), I make show the predictions from the model. If probability is at least 0.5, I predict 1, else I predict 0.
+
+```{r}
+## Get the predictions
+## If prob >= 0.5 then 1, else 0
+bank_testing_set %>% 
+    select(Financial_Condition) %>% 
+    mutate(predicted_probs = predict(bank_logit, newdata = bank_testing_set, 
+        type = "response"),
+        
+        predicted_outcomes = if_else(predicted_probs >= 0.5, 1, 0)
+        
+        ) %>% 
+    
+## See the first 5 predictions
+    head(5)
+```
+

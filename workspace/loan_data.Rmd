@@ -1,0 +1,199 @@
+---
+title: "**Analyzing `lendingclub.com` Loan Data**"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+always_allow_html: true
+number_sections: true
+output:
+  html_document: 
+    theme: yeti
+    code_folding: hide
+    toc: true
+    toc_depth: 4
+  pdf_document: 
+    toc: true
+    toc_depth: 4
+subtitle: "*What Kind of Customers Take Loans? For What Purpose?*"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1,T2A]{fontenc}
+- \usepackage{amsmath}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(skimr)
+library(tidyverse)
+library(knitr)
+library(GGally)
+library(ggthemes)
+library(tibble)
+library(magrittr)
+library(gghalves)
+library(patchwork)
+
+options(digits = 4)
+options(scipen = 999)
+theme_set(theme_clean())
+
+## loaddata
+loans <- readr::read_csv('data/loans.csv.gz') %>% 
+  
+  mutate(purpose = factor(purpose),
+         
+         not_fully_paid = factor(not_fully_paid, levels = c(0 , 1),
+                                 
+                                 labels = c("Fully Paid", "Not Fully paid")),
+         
+         credit_policy = factor(credit_policy))
+```
+
+
+```{r, echo = FALSE}
+knitr::read_chunk("code/my_loan_script.R")
+```
+
+
+```{r loaddata, echo = FALSE}
+```
+
+
+```{r, child = "text/Background.Rmd"}
+
+```
+
+```{r, child = "text/Objectives.Rmd"}
+
+```
+
+```{r, child = "text/Data.Rmd"}
+
+```
+
+# Exploratory Data Analysis
+In this section, I load the data and do exploratory data analysis. I start with data visualisation followed by summary statistics aimed at uncovering the insights stated in the objectives section above. 
+
+
+```{r loandatastructure}
+```
+
+## Data Visualization
+
+### The Correlation Matrix
+Figure () below shows the correlation matrix of the numeric explanatory variables and the response variable. I will refer to this correlation matrix in the analysis that follows. 
+
+### What type of customers does the lender perceived to be risky? Are they as risky?
+In this section, I use data vislualisation techniques assess the types of customers that the lender percieves to be riskiest and whether this perception is supported by the data. The interest rate is proxies the risk assessment of the customer by the lender. 
+
+The correlation matrix in table () shows a high correlation between fico score and interest rates charged on loans (-0.71). Given that the interest rate has a very high correlation with fico score, it appears like the lender, to a large extent relies on fico scores to assess credit risk. Also, fico score has a high negative correspondence with revol_util(the amount of credit utilised relative to the total credit available) at -0.541. This observation means that individuals with high fico scores tend to utilize their lines of credit less than individuals with a low fico score. However, there are a few outliers as figure () shows. The outliers are individuals with high fico scores who also a high loan utilisation rate. These customers could be targeted with relationship banking to offer personalised services. 
+
+However, there is a high positive correlation between revol_util and interest rates. This observation implies that the lender views people with high loan utilisation as presenting a greater risk of default. However, as we have seen, people with high fico scores present low default risk and yet have high utilisation rate. 
+
+>Take away 1: Most people with a high fico score present have a low rate of loan utilisation. This could mean that credit rating agencies consider high loan utilisation rate a signal of high default risk. However, there are outliers representing customers with high fico scores and, simultaneously, high loan utilisation. This segment of customers has a high return to risk ratio and could be targeted with personalised services. 
+
+Figure () supports this observation, showing that high fico scores correspond to lower loan delinquency. 
+
+>Take away 2: Segment customers with high loan utilisation rate using the fico scores. Charge a lower rate of interest to those customers with high fico scores and retain higher interest rates to customers with lower scores. In my assessment, the lender should use a fico cut off rate of 750 and a loan utilisation cap of 30%. The institution could then focus on customers who exceeed these two thresholds for targeted marketing. 
+
+```{r ggallyvisual, fig.width=6, fig.height=8, fig.cap = "Correlation Matrix for Numeric Predictors"}
+```
+
+\newpage
+
+\blandscape
+
+```{r whoisrisky, fig.width=9, fig.height=6}
+```
+
+\elandscape
+
+\newpage
+
+\blandscape
+
+```{r bank_risk_perception, fig.width=9, fig.height=6}
+```
+
+\elandscape
+
+\newpage
+
+## Summarising the Data
+
+### Basic Modelling
+
+```{r, child = "text/Conclusion.Rmd"}
+
+```
+
+My analysis will consider these customers that have a high fico credit score but a high loan utilization rate. As noted above fico scores have a negative correlation with loan utilisation at `r with(loans, cor(revol_util, fico))`. Specifically, I examine the following issues.
+
+- Do high fico-high loan utilisation clients pose substantial credit default risk?
+- What types of loans do high fico-high loan utilisation clients demand?
+- If high fico-high loan utilisation clients pose substantial credit default risk, what types of loans present the highest risk?
+
+To get going, I define define a high fico customer as having at least a score of 700. Customers with a loan utilisation rate over 30% are in the high loan utilisation category. 
+
+```{r}
+loans %>% 
+  
+  filter(fico > 700 & revol_util > 30) %>% 
+  
+  ggplot(mapping = aes(x = delinq_2yrs)) + 
+  
+  geom_histogram(bins = 30, col = "black", fill = "skyblue")
+```
+
+```{r}
+loans %>% 
+  
+  filter(fico > 700 & revol_util > 30) %>% 
+  
+  ggplot(mapping = aes(x = inq_last_6mths)) + 
+  
+  geom_histogram(bins = 30, col = "black", fill = "skyblue")
+```
+
+```{r}
+loans %>% 
+  
+  filter(fico > 700 & revol_util > 30) %>% 
+  
+  ggplot(mapping = aes(x = pub_rec)) + 
+  
+  geom_histogram(bins = 30, col = "black", fill = "skyblue")
+```
+
+
+```{r}
+
+loans %>% 
+  
+  filter(fico > 700) %>% 
+  
+  summarise(default = mean(delinq_2yrs),
+            
+            inquiries = mean(inq_last_6mths),
+            
+            derog = mean(pub_rec),
+            
+            interest = mean(int_rate))
+#######################################################################################
+
+loans %>% 
+  
+  filter(fico > 700 & revol_util > 30) %>% 
+  
+  summarise(default = mean(delinq_2yrs),
+            
+            inquiries = mean(inq_last_6mths),
+            
+            derog = mean(pub_rec),
+            
+            interest = mean(int_rate))
+```
+

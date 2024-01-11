@@ -1,0 +1,16 @@
+---
+title: 'Web Scrapping in R: An Example Using World Population Data'
+author: "John Karuitha"
+date: "30/05/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Introduction**
+
+Have you come accross some valuable data on the internet and wish you could access it for your research? Did you get discouraged from using useful data from a website because you found the job of writing it down by hand and then transfering it to a spreadsheet scary? have you ever spent a substantial amount of time trying to copy and paste data from the web with plenty of frustration and headache? If you have found yourself in any of these and similar situations, then this write up is for you. I will highlight the basics of harvesting data from websites, commonly known as web scraping using `R` programming language. I will start with the moist common form of data that most financial analysts and economists have interest in: tabular data. In future write ups, I will delve deeper into scrapping websites for text and other types of data and scrapping data that spans multiple web pages of a website. The basics in this section should meet the needs of most unsophisticated users but watch out for more advanced applications of webscraping. 
+
+I have conviniently chosen [wikipedia world population data site](https://en.wikipedia.org/wiki/World_population). The webpage is titled `World population` and contains sveral tables with world population data broken down by time and continents ^[You can visit the site on https://en.wikipedia.org/wiki/World_population].

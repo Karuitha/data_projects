@@ -1,0 +1,315 @@
+---
+author: "John Karuitha"
+---
+
+# Can you help reduce employee turnover?
+
+## Key Insights
+
+1. `IT` department has the highest staff turnover, followed closely by the `logistics`.
+2. `Finance` department has the lowest incidence of staff turnover with `admin` a close second. 
+3. There is high positive correlation between `tenure` which captures the length of time an employee has been with the organisation and the `avg_hours_month`, the average number of hours an employee clocks per month. 
+
+## Recommendations
+
+
+
+## 📖 Background
+You work for the human capital department of a large corporation. The Board is worried about the relatively high turnover, and your team must look into ways to reduce the number of employees leaving the company.
+
+The team needs to understand better the situation, which employees are more likely to leave, and why. Once it is clear what variables impact employee churn, you can present your findings along with your ideas on how to attack the problem.
+
+## 💾 The data
+The department has assembled data on almost 10,000 employees. The team used information from exit interviews, performance reviews, and employee records.
+
+- "department" - the department the employee belongs to.
+- "promoted" - 1 if the employee was promoted in the previous 24 months, 0 otherwise.
+- "review" - the composite score the employee received in their last evaluation.
+- "projects" - how many projects the employee is involved in.
+- "salary" - for confidentiality reasons, salary comes in three tiers: low, medium, high.
+- "tenure" - how many years the employee has been at the company.
+- "satisfaction" - a measure of employee satisfaction from surveys.
+- "avg_hrs_month" - the average hours the employee worked in a month.
+- "left" - "yes" if the employee ended up leaving, "no" otherwise.
+
+
+```{r message = FALSE}
+
+library(tidyverse)
+library(glue)
+
+df <- readr::read_csv('./data/employee_churn_data.csv') %>%
+  
+  mutate(left = factor(left, levels = c("yes", "no")))
+```
+
+
+## 💪 Competition challenge
+
+Create a report that covers the following:
+
+1. Which department has the highest employee turnover? Which one has the lowest?
+2. Investigate which variables seem to be better predictors of employee departure.
+3. What recommendations would you make regarding ways to reduce employee turnover?
+
+## Exploring the Data
+I start by examining the data, starting with missing values and possible duplicates. 
+
+```{r}
+sapply(df, is.na) %>%
+  
+  colSums() %>%
+  
+  tibble(variables = names(df), missing = .) %>%
+  
+  arrange(desc(missing))
+```
+
+```{r}
+df %>%
+  
+  filter(duplicated(.))
+```
+
+The data set has no missing values and duplicated records. I next delve into the analysis. 
+
+Figure () below shows a pairs plot between the ten variables in the dataset. Two issues come up particularly strongly from the plot.
+
+1. There is a low prevalence of workers who left versus those that remain in the organisation. Prevalence can have impact on the generalizability of machine learning models. Hence, it is always good to ensure data balance by up sampling or down sampling the data. 
+
+2. There is an extremely strong correlation between `tenure` and `working hours per month`. The observation means that workers that have stayed longer in the organisation tend to put in more hours. The implication is that workers who remain in the organisation have a higher motivation to work. 
+
+```{r, fig.width = 12, fig.height = 8, fig.cap = "Visualisation of the Variables", warning = FALSE, message = FALSE}
+
+library(GGally)
+
+df %>%
+  
+  GGally::ggpairs(ggplot2::aes(col = left, fill = left))
+  
+```
+
+## Summary Statistics
+
+In this section, I summarise the data and present the correlation matrix.
+
+The correlation matrix in Table () shows a very high correlation between `average hours per month` worked and `tenure`as noted earlier in figure (). The data further shows some substantial correlation between `tenure` and `review`, `satisfaction` and `review`, `average hours per month` and review`, `satisfaction` and `tenure`, and finally, `average hours per month` and `satisfaction`. 
+
+```{r}
+library(corrplot)
+
+df %>%
+  
+  select(where(is.numeric)) %>%
+  
+  cor() %>%
+  
+  corrplot(type = "lower")
+```
+
+Table () below shows the summary statistics for the numeric predictor variables. 
+
+```{r}
+library(kableExtra)
+
+df %>%
+  
+  select(where(is.numeric)) %>%
+  
+  skimr::skim_without_charts() %>%
+  
+  select(-n_missing, -complete_rate, -skim_type) %>%
+  
+  rename(Variable = skim_variable, Mean = numeric.mean,
+         
+         SD = numeric.sd, Min = numeric.p0, Q1 = numeric.p25,
+         
+         Median = numeric.p50, Q3 = numeric.p75, 
+         
+         Max = numeric.p100) %>%
+  
+  kbl(., booktabs = TRUE, caption = "Summary Statistics") %>%
+  
+  kable_classic(position = "left")
+```
+
+
+```{r}
+
+df %>%
+  
+  select(where(is.character)) %>%
+  
+  skimr::skim_without_charts() %>%
+  
+  select(-n_missing, -complete_rate, -skim_type) %>%
+  
+  rename(Variable = skim_variable) %>%
+  
+  kbl(., booktabs = TRUE, 
+      
+      caption = "Summary Statistics for categorical Variables") %>% 
+  
+  kable_classic(full_width = TRUE)
+```
+
+
+# Which Department Has the Highest/ Lowest Turnover
+
+In this section, I examine the employee turnover by department. I define staff turnover as the ratio of the number of employees who left the organisation to the total number of employees in the organisation (including those who have left). using this ratio alows us to standardise employee turnover so that it is comparable across departments. 
+
+Table () shows the number of that employee turnover is highest in the IT department, followed by logistics. Finance, followed by administration have the lowest incidence of staff turnover. However, the gap in turnover ratios is not that great. For instance, the gap in staff turnover between IT and finance is only `r glue::glue("{30.9-26.87}%")`, which indicates that staff turnover is a problem in all departments. 
+
+```{r}
+
+df %>% 
+  
+  ## Group by department
+  group_by(department) %>%
+  
+  ## Count the people who have left/ remained
+  count(left) %>%
+  
+  ## Get the proportion of people who left/ remained
+  mutate(prop = n / sum(n) * 100 %>% round(2)) %>%
+  
+  ungroup() %>%
+  
+  filter(left == "yes") %>%
+  
+  arrange(desc(prop)) %>%
+  
+  kbl(., booktabs = TRUE, 
+      
+      caption = "Staff Turnover by Department") %>%
+  
+  kable_classic(position = "left")
+```
+
+## Which Variables Best Predict Staff Turnover?
+
+In this section I use statistical learning models to examine variables that best predict staff turnover. I proceed by first creating a training set and a testing set from the given data. Given that the data set has a problem of imbalance in the target (dependent) variable, `left`, I upsample the data. I then run the following models. 
+
+1. Logistic regression model. 
+2. Decision tree model.
+3. Random forest model. 
+4. K-Nearest neighbours model (KNN).
+5. XG-Boost Model.
+6. An ensemble of all the models. 
+
+### Creating the Training and Testing Sets. 
+
+In this step, I create a training and testing set. The training set has 75% of the data, while the testing set has the remaining 25% of the data points. 
+
+```{r}
+## Max Kuhn is leading the tidymodels project
+library(tidymodels)
+
+set.seed(100, sample.kind = "Rounding")
+## Create a split object consisting 75% of data
+split_object <- initial_split(df, prop = 0.75, 
+                              
+                              strata = left)
+
+## Generate the training set
+df_train <- split_object %>%
+  
+  training()
+
+## Generate the testing set
+df_test <- split_object %>%
+  
+  testing()
+
+```
+
+### Data Pre-processsing and Feature Engineering
+Next, I set up a recipe object that will allow for data pre-processing and feature engineering where required. In this step, I make a recipe object that does the following.
+
+1. Up-samples the data so that the target variable (`left`) has the same proportion of workers who left and remained with the organisation. 
+
+2. Converts all character variables into factors. 
+
+3. In a pair of highly correlated variables, drops one of the variables with a threshold correlation of 0.85 (absolute).
+
+
+```{r}
+library(themis)
+
+df_recipe <- recipes::recipe(left ~ ., 
+                             
+                             data = df_train) %>%
+  
+  ## I upsample the data to balance the outcome variable
+  themis::step_upsample(left, 
+                        
+                        over_ratio = 1, 
+                        
+                        seed = 500) %>%
+  
+  ## I make all character variables factors
+  step_string2factor(all_nominal_predictors()) %>%
+  
+  ## I remove one in a pair of highly correlated variables
+  ## The threshold for removal is 0.85 (absolute) 
+  ## The choice of threshold is subjective. 
+  step_corr(all_numeric_predictors(), 
+            
+            threshold = 0.85) %>%
+  
+  ## Train these steps on the training data
+  prep(training = df_train)
+
+## multicollinearity 
+## Unstable coefficients. The model is not stable. 
+```
+
+Finally, I apply these transformations to the training and testing data sets.
+
+```{r}
+###############################
+df_baked_train <- df_recipe %>%
+  
+  bake(new_data = NULL)
+
+###############################
+df_baked_test <- df_recipe %>%
+  
+  bake(new_data = df_test)
+```
+
+Next, I fit the models and evaluate their performance. 
+
+## Logistic Regression
+
+I start by defining the model. 
+
+```{r}
+logistic_model <- logistic_reg() %>%
+  
+  set_engine("glm") %>%
+  
+  set_mode("classification")
+```
+
+Next, I fit the model on the training set.
+
+```{r, results='asis'}
+logistic_results <- logistic_model %>%
+  
+  fit(left ~ ., data = df_baked_train)
+
+broom::tidy(logistic_results)
+
+stargazer::stargazer(glm(left ~ ., data = df_baked_train, family = "binomial"), type = "html", title = "Results of Logistic Regression", align = TRUE)
+```
+
+The results of the regression in Table () show the following variables being instrumental in determining whether or not staff leave the organisation.
+
+- Promoted.
+- Review.
+- Tenure.
+- Satisfaction.
+- Salary.
+
+The `promoted`, `tenure`, and `satisfaction` variables are major predictors staff turnover. Specifically, staff that have received a promotion have a higher likelihood of leaving, presumably for greener pastures. In contrast, staff that have higher scores in past job reviews, with a longer tenure, and a higher job satisfaction score in the past have a lower chance of leaving. Compared to staff with high salaries, staff with a lower salary are more likely to leave while those with medium salaries are more likely to stay. 

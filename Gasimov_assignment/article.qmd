@@ -1,0 +1,206 @@
+---
+title: "Assignment: Regression Analysis"
+author: "Eldar Asimov"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+format: 
+    pdf:
+        toc: true
+        toc-depth: 3
+        toc-title: "Contents"
+        toccolor: "black"
+---
+
+# **Question One**
+
+```{r}
+#| include: false
+#| message: false
+#| warning: false
+#| echo: false
+if(!require(pacman)){install.packages("pacman")}
+
+pacman::p_load(tidyverse, janitor, skimr, kableExtra, Amelia, GGally, stargazer, strucchange, wooldridge)
+sleep <- read_csv("sleep75.csv")
+
+if(!require(firatheme)){
+    remotes::install_github("vankesteren/firatheme")
+}
+```
+
+The following model is a simplified version of the multiple regression model used by Biddle and Hamermesh (1990) to study the trade-off between time spent sleeping and working and to look at other factors affecting sleep:
+
+$sleep = \beta_{0} + \beta_{1} totwrk + \beta_{2} educ + \beta_{3} age + u$
+
+where `sleep` and `totwrk` (total work) are measured in minutes per week and `educ` and `age` are measured in years.
+
+a.  If adults trade off sleep for work, what is the sign of $\beta_{1}$?
+
+***The expected sign should be negative because an increase in sleep implies reduced hours of work and vice versa.***
+
+b.  What signs do you think $\beta_{2}$ and $\beta_{3}$ will have?
+
+***I hypothesise that*** $\beta_{2}$ is positive because skilled labour often performed by better educated individuals affords them more sleep time unlike for unskilled laborers.
+
+***For*** $\beta_{3}$ will have a negative sign indicating an inverse relationship between sleep and age. Older working class people may have less time to sleep.
+
+a.  Using the data in `SLEEP75.csv`, the estimated equation is;
+
+$sleep = 3638.25 − 0.148totwrk − 11.13educ + 2.20age$,
+
+$n = 706$
+
+$R^{2} = 0.113$
+
+If someone works five more hours per week, by how many minutes is sleep predicted to fall? Is this a large trade-off?
+
+***If a person works five more hours per week, she or he sleeps approximately `r 5 * 60 * 0.148` LESS minutes.***
+
+d.  Discuss the sign and magnitude of the estimated coefficient on educ.
+
+***There is an inverse relationship between education and sleep (the negative sign). This means that more educated people tend to get less sleep on average, all else remaining the same. Specifically, a one year rise in education corresponds to 11.13 minutes of reduced sleep holding the other variables in the model constant.***
+
+e.  Would you say `totwrk`, `educ`, and `age` explain much of the variation in `sleep`? What other factors might affect the time spent sleeping? Are these likely to be correlated with totwrk?
+
+***The variables `totwrk`, `educ`, and `age` may not explain much of the variation in sleep going by the adjusted*** $R^{2}$ of 0.113. These three variables explain about 11.3% of the variation in sleep patterns. The other factors that may affect sleep quantity include the health of the individual, sleeping environment, and the use of drugs, including mild drugs like caffeine.
+
+# **Question Two**
+
+Using the same data of previous problem (SLEEP75.csv ), we obtain the estimated equation.
+
+$sleep = 3840.83 − 0.163totwrk − 11.71educ − 8.70age + 0.128age^{2} + 87.75male$,
+
+The standard errors for the coefficients are 235.11, 0.018, 5.86, 11.21, .134, and 34.33. The number of observations, n is 706, $R^{2} = 0.123$ and adjusted $R^{2} = 0.117$
+
+The variable sleep is total minutes per week spent sleeping at night, totwrk is total weekly minutes spent working, educ and age are measured in years, and male is a gender dummy.
+
+a.  All other factors being equal, is there evidence that men sleep more than women? How strong is the evidence?
+
+We can compute the p-value as follows:
+
+$p = \frac{x - \mu}{\delta^{2}}$
+
+```{r}
+my_coefficients <- c(3840.83, -0.163, -11.71, -8.7, 0.128, 87.75)
+my_std_errors <- c(235.11, 0.018, 5.86, 11.21, .134, 34.33)
+
+t_stat <- my_coefficients / my_std_errors
+
+pt(t_stat, df = 706 - length(my_coefficients) - 1)
+```
+
+***There is insufficient evidence that men sleep more than women. The evidence against the hypothesis that men sleep more than women is very high with a p-value of 0.995.***
+
+b.  Is there a statistically significant trade-off between working and sleeping? What is the estimated trade-off?
+
+***There is a statistically significant relationship between working and sleeping. Each additional minute of work corresponds to 0.163 less minutes of sleep.***
+
+c.  What other regression do you need to run to test the null hypothesis that, holding other factors fixed, age has no effect on sleeping?
+
+***We could omit the variable*** $age$ and $age^{2}$ are rerun the regressions. I have done so in the example below and indeed the regression remains significant going by the F-statistic. Hence, the removal of age did not significantly alter the regression interpretation. Hence we conclude that age did not significantly contribute to the model.
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+lm_no_age <- lm(sleep ~ totwrk + educ + yngkid, data = sleep)
+#names(sleep)
+summary(lm_no_age)
+```
+
+# **Question Three**
+
+Use the data in SLEEP75.csv 1 for this exercise. The equation of interest is;
+
+$sleep = \beta_{0} + \beta_{1} totwrk + \beta_{2} educ + \beta_{3} age + \beta_{4} age 2 + \beta_{5} yngkid + u$
+
+a.  Estimate this equation separately for men and women and report the results in the usual form. Are there notable differences in the two estimated equations?
+
+```{r}
+#| include: false
+#| message: false
+#| warning: false
+#| echo: false
+
+
+Amelia::missmap(sleep)
+# sleep %>% 
+#     
+#     select(sleep, totwrk, educ, age, yngkid) %>% 
+#     
+#     GGally::ggpairs()
+
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+lm_men <- lm(sleep ~ totwrk + educ + age + + age^2 + yngkid, 
+             data = sleep %>% filter(male == 1))
+
+lm_women <- lm(sleep ~ totwrk + educ + age + age^2 + yngkid, 
+               data = sleep %>% filter(male == 0))
+
+stargazer(lm_men, lm_women, align=TRUE, 
+          
+          dep.var.labels= "Sleep: Male vs Female",
+          
+          covariate.labels = c("Total work", "Education", "Age", 
+                               "Age Squared", "Young Kid"),
+          
+          intercept.bottom = TRUE,
+          
+          type = "text",
+          
+          title = "Table 1: Summary Statistics of Regression Analysis for Sleep Patterns")
+```
+
+b.  Compute the Chow test for equality of the parameters in the sleep equation for men and women. Use the form of the test that adds male and the interaction terms $male * totwrk \cdots male * yngkid$ and uses the full set of observations. What are the relevant df for the test?
+
+***The null hypothesis for the Chow test is that there is no structural break in the data, meaning no difference in the models for females and males.***
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+regression_chow_test <- lm(sleep ~ totwrk + educ + age + yngkid + male + male:totwrk + male:educ + male:age + male:yngkid, data = sleep)
+
+
+sctest(regression_chow_test, type = "Chow", point = 3500)
+
+```
+
+Should you reject the null at the 5% level?
+
+***We fail to reject the null hypothesis and conclude that there is no difference between the models involving males and females.***
+
+# Appendix
+
+## Appendix 1: Total Work vs Sleep
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+sleep %>% 
+    ggplot(mapping = aes(x = totwrk, y = sleep, color = factor(male))) + 
+    
+    geom_point(shape = 1, size = 5, stroke = 2, alpha = 0.5) + 
+    
+    geom_smooth(se = FALSE) +
+    
+    scale_colour_fira() + 
+    
+    theme_classic() + 
+    
+    labs(x = "Total Work", y = "Sleep",
+         title = "Sleep vs Total work")
+```
+
+```{r}
+glimpse(sleep)
+sleep %>% GGally::ggpairs()
+
+```

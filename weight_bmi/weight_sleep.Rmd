@@ -1,0 +1,349 @@
+---
+title: "Weight and Sleeping Patterns in the UK"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+always_allow_html: true
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    toc: yes
+    toc_depth: 4
+  pdf_document:
+    toc: yes
+    toc_depth: 4
+  html_document:
+    theme: united
+    highlight: tango 
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: hide
+  word_document:
+    toc: yes
+    toc_depth: '4'
+bibliography: citations.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      
+                      message = FALSE, 
+                      
+                      warning = FALSE)
+
+
+
+if(!require(pacman)){
+   
+  install.packages("pacman")
+  
+}
+
+pacman::p_load(tidyverse, readxl, janitor, skimr, tidyquant, gghalves,
+               
+               performance)
+
+theme_set(tidyquant::theme_tq())
+options(knit.kable.NA = "-")
+options(digits = 4)
+```
+
+## Background
+With sedentary lifestyles, obesity has become a significant health issue globally. Overweight individuals have a higher risk of developing heart disease, stroke, cancer, kidney disease, among others [@shah2021association]. These health issues place additional strain on health facilities and state financial resources. Consequently, much research goes into tracking obesity, mapping out possible health complications associated with obesity, establishing the factors contributing to obesity. Critically, many resources go to the design of measures to minimise the prevalence of obesity [@fruh2017obesity; @malik2013global; @lopez2007neighborhood]. 
+
+In this project, we explore the link between age, sleep, and body mass index in a sample of individuals from the United Kingdom. 
+
+```{r}
+## Read in the data
+weight_data <- read_csv("dataset.csv") %>% 
+  
+## Clean names by removing special characters and capital letters
+  janitor::clean_names() %>% 
+  
+  mutate(sleep = factor(sleep,
+                        
+                        ordered = TRUE,
+                        
+                        levels = 5:10,
+                        
+                        labels = c("five", "six", "seven", "eight", "nine", "ten")))
+
+```
+
+## Objective
+
+The broad objective of the project is to explore the relationship between age, sleeping patterns and the weight of individuals, as captured using the body mass index (BMI). Specifically, the study seeks answers to the following questions. 
+
+## Summary of Results
+
+1. Age and sleep are the significant drivers of BMI.
+2. Older people tend to have higher BMI and a higher risk of diabetes due to obesity.
+3. People who sleep fewer hours tend to have high BMI. 
+4. People who sleep 5 hours or less or sleep are likely to have higher BMI than average. 
+5. Older, sleep defficient people are at an even higher risk of diabetes due to obesity. 
+
+## Data Description and Validation
+
+In this section, we briefly describe the data, including the steps taken to validate the data. 
+
+### The general structure of the dataset
+The data consists of `r length(names(weight_data))` variables. The first variable is the ID which serves as an identifier of the respondents. The second is age in years that has been discretized by rounding off to the nearest whole number. similarly, the third variable, sleep in hours, has been discretized into a whole number. The last variable is the body mass index, the ratio of weight in kilograms to height in metres squared. Further there are `r nrow(weight_data)` observations. The following two tables confirm the structure of the data. 
+
+```{r}
+##Get the first six rows of the dataset
+head(weight_data) %>% 
+  
+## Convert the row names to upper case
+  set_names(names(.) %>% str_to_upper()) %>% 
+
+## Make a table
+  knitr::kable(booktabs = TRUE, 
+
+## Insert table title                            
+    caption = "The First Six Rows of the BMI-Sleep-Age Data set from the UK") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                            bootstrap_options = "striped")
+```
+
+
+```{r}
+str(weight_data)
+```
+
+## Exploring the data
+In this section we explore the data first by visualizing it and then computing some summary statistics. The central hypothesis in this case is whether there is a relationship on the one side, and age and hours of sleep among the respondents on the other.
+
+### Data validation
+To validate the data, I check for two issues.
+
+- Missing values. 
+- Unreasonable observations and extreme values. 
+- Duplicates or repeated values. 
+
+The data has no missing values, as the table below shows. 
+
+```{r}
+sapply(weight_data, is.na) %>% 
+  
+  colSums() %>% 
+  
+  tibble(Variables = names(weight_data), missing_values = .) %>% 
+  
+  mutate(Variables = (Variables %>% str_to_upper())) %>% 
+  
+  knitr::kable(booktabs = TRUE, caption = "Missing Values") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                            bootstrap_options = "striped")
+```
+
+Next, I generate a summary of the data and inspect it for unreasonable values. For instance, we do not expect that an individual sleeps for more than 24 hours in a day. Typically, a value that lies too far off the average sleep hours and age in the dataset is a potential error or otherwise an outlier. 
+
+```{r}
+summary(weight_data)
+```
+
+The ID column shows `r max(weight_data$id)` observations, yet there are `r nrow(weight_data)` rows in the dataset. Thus the ID column has a discrepancy. Otherwise, there are repeated individuals in the dataset. 
+
+
+```{r}
+weight_data %>% 
+  
+  filter(duplicated(.)) %>% 
+  
+  knitr::kable(booktabs = TRUE, caption = "Duplicate Values") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                            bootstrap_options = "striped")
+```
+
+It appears that individuals coded by IDs 10, 11, 12, 41, 42, and 43 appear twice in the dataset. These 6 extra observations are the source of the discrepancy. 
+
+We examine whether the repeated observations are duplicates. It turns out all are duplicates as the table below shows. 
+
+```{r}
+weight_data %>% 
+  
+  filter(id %in% c(10, 11, 12, 41, 42, 43)) %>% 
+  
+  arrange(id) %>% 
+  
+  knitr::kable(booktabs = TRUE, 
+               
+               caption = "Duplicate Values") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                  bootstrap_options = "striped")
+```
+
+We clean the data by removing all the duplicates to get a clean dataset. 
+
+```{r}
+weight_data <- weight_data %>% 
+  
+  filter(!duplicated(.))
+```
+
+Now we have a clean dataset with `r nrow(weight_data)` observations. In the next section, we visualize the data. 
+
+### Descriptive Statistics
+The table blow shows the summary statistics for the variables, except for the ID. 
+
+```{r}
+weight_data %>% 
+  
+  select(-id) %>% 
+  
+  skimr::skim_without_charts() %>% 
+  
+  select(-complete_rate, -skim_type) %>% 
+  
+  rename(Variable = skim_variable, Mean = numeric.mean, 
+         
+         SD = numeric.sd, Missing = n_missing,
+         
+         Min = numeric.p0, Q1 = numeric.p25, Median = numeric.p50, 
+         
+         Q3 = numeric.p75, Max = numeric.p100) %>% 
+  
+  mutate(Variable = (Variable %>% str_to_upper())) %>% 
+  
+   knitr::kable(booktabs = TRUE, caption = "Summary Statistics") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                            bootstrap_options = "striped")
+```
+
+Next, I convert sleep to an ordinal categorical variable. 
+
+
+
+Next, I then Produce make a frequency table for the variable “Sleep”.
+
+```{r}
+table(weight_data$sleep) %>% 
+  
+  knitr::kable(booktabs = TRUE, caption = "Frequency Table for Sleep") %>% 
+  
+  kableExtra::kable_styling(full_width = TRUE, 
+                            
+                            bootstrap_options = "striped")
+```
+
+
+### Data Visualization
+
+#### Age vs BMI
+
+Produce a scatter plot using ggplot2 package for the following:
+
+- Age vs. BMI, adjust the transparency (alpha) for the points to 0.5.
+- Use white background theme (theme_bw).
+- Add title for the graph and coordinates.
+- Describe the relationship between the two variables.
+
+```{r}
+weight_data %>% 
+  
+  ggplot(aes(x = bmi, y = age, 
+             
+             col = factor(sleep), size = factor(sleep))) + 
+  
+  geom_point(shape = 1, stroke = 3) + 
+  
+  labs(x = "BMI", y = "Age", 
+       
+       title = "Scatterplot of Age vs BMI") + 
+  
+  scale_color_viridis_d()
+```
+
+There appears to be a substantial positive correlation between age and BMI, with older people more likely to have higher BMI. 
+
+#### BMI vs Sleep
+
+Produce a boxplot using ggplot2 package for the following:
+
+- BMI factored over the variable Sleep.
+- Use white background theme.
+- Add title for the graph and coordinates.
+- Describe the graph provided.
+
+```{r}
+weight_data %>% 
+  
+  ggplot( aes(x = fct_reorder(sleep, bmi, median), y = bmi, fill = sleep)) +
+  
+    geom_half_violin(width=1.4) +
+  
+    geom_boxplot(width=0.1, color="black", alpha=0.4) +
+  
+    scale_fill_viridis_d() +
+  
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+  
+    ggtitle("Hours of Sleep versus BMI") +
+  
+    xlab("Hours of Sleep") +
+  
+    ylab("BMI")
+```
+
+More hours of sleep appear to correlate with lower levels of BMI. Individuals who sleep 5 to 7 hours of sleep have a higher likelihood of high BMI. 
+
+#### Age vs BMI
+Produce a scatter plot using ggplot2 using the following:
+
+- Age vs. BMI factored over the variable Sleep.
+- Adjust transparency to 0.6.
+- Add linear models to graphs without the standard error area.
+- Use white background.
+- Add title for the graph and coordinates.
+- Describe the graph produced.
+
+```{r}
+weight_data %>% 
+  
+  ggplot(aes(x = bmi, y = age, col = sleep)) + 
+  
+  geom_point(alpha = 0.6) + 
+  
+  geom_smooth(se = FALSE, method = "lm") + 
+  
+  labs(x = "BMI", y = "Age", 
+       
+       title = "BMI vs Age Faceted by Sleep") + 
+  
+  theme_bw()
+```
+
+Although there is a relationship between age and BMI, the effect varies by sleep habits. For people who sleep 10 hours and those that sleep 5 hours, there is a notably higher chance of having a greater BMI. 
+
+## Regression Analysis
+
+```{r}
+weight_lm <- lm(bmi ~ age + sleep, data = weight_data)
+
+summary(weight_lm)
+```
+
+## Regression Diagnostics
+
+The regression diagnostics results do not indicate a poor fit. Hence, we can rely on the model for fairly accurate predictions. However, there is not enough data to do an out of sample check of accuracy.
+
+```{r, fig.width=12, fig.height=8}
+performance::check_model(weight_lm)
+```
+
+
+## References
+

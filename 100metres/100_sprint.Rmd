@@ -1,0 +1,252 @@
+---
+title: "Who's the Fastest of All? Analyzing the 100 Metres Men's Sprint Data"
+runningheader: "Analysis of 100 Metres Men's Race Best Times" # only for pdf output
+subtitle: "100 Metres Sprint Best Times, 1958 - Present" # only for html output
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_html: default
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+if(!require(pacman)){
+        
+        install.packages("pacman")
+}
+
+pacman::p_load(tufte, knitr, tidyverse, rvest, janitor, lubridate,
+               
+               skimr, countrycode, kableExtra, Amelia)
+
+# invalidate cache when the tufte version changes
+knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
+
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+options(htmltools.dir.version = FALSE)
+```
+
+# **Background**
+
+I use data from [World Athletics](https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20) on the best times posted by male athletes in the 100 metres sprint from 1958  to present  ^[The data is available on this link <https://www.worldathletics.org/records/all-time-toplists/sprints/100-metres/outdoor/men/senior?regionType=world&timing=electronic&windReading=regular&page=21&bestResultsOnly=false&firstDay=1900-01-01&lastDay=2021-09-20>]. 
+
+**Objectives**
+
+I examine the following questions in this article.
+
+1. Which countries have produced the most successful 100 meters male sprinters?
+2. Of the elite 100 meters sprinters, which sprinters have run the most number of races?
+3. Is there a relationship between the age of a sprinter and the best times posted in the 100 meters sprint?
+4. Is there a relationship between the number of races in a year and the time posted?
+
+**Summary of Results**
+
+1. The United States has the most male athletes who have posted best times in the 100 meters sprint. Jamaica comes a distant second.
+2. Usain BOLT has ran the fastest 3 times in the 100 meters sprint. 
+2. Michael Rodgers from the United States has run the highest number of races while posting some of the best times.
+3. The peak performance age for male 100 meters sprinters is in the mid-20s.
+3. There appears to be a non-linear relationship between the number of races and times posted.
+4. Regression analysis (Linear Model and Generalized Additive Model, GAM) confirms that both age and number of races are significant drivers of athlete performance. However, the result may be affected by omitted variables bias. 
+
+**Exploring the Data**
+
+The raw data consists of the following variables;
+
+- `rank`: Starting from the athlete that has posted the best time to date.
+- `mark`: The time (in seconds) posted by the athlete.
+- `wind`: The wind assist. Negative speeds indicate the athlete was running against the wind. 
+- `competitor`: The name of the athlete.
+- `dob`: Date of birth of the athlete.
+- `nat`: Nationality of the athlete.
+- `pos`: position of the athlete in the given race. 
+- `venue`: Venue of the race.
+- `date`: Date the race happened. 
+- `results_score`: The athlete's score in the race by World Athletics. 
+
+Note that many athletes appear multiple times provided the times. For instance, Usain Bolt posted the top 3 best times in different races. 
+
+```{r}
+read_chunk("code/sprints.R")
+```
+
+
+## **Exploring the Data**
+
+As noted, the data is available on the World Athletics website. This data spans two hundred and twenty-four (224) web pages as at the time I am writing this article (`r Sys.Date()`). Tellingly, it would take ages to copy-paste this data. Hence, the first exercise is to scrap the data. 
+
+Please refer to my previous project on [web scrapping](https://rpubs.com/Karuitha/web_scrapping_1) available on <https://rpubs.com/Karuitha/web_scrapping_1>. I outline the steps in scrapping the data next. 
+
+### **Web Scrapping**
+
+The scrapping process takes considerable time. For this reason, I have commented out the last two lines of code that do the scrapping. 
+
+*NOTE*: To repeat the scrapping process, remove the # before the two lines of code. 
+
+```{r webscrap}
+
+```
+
+### **Feature Engineering**
+
+The resultant dataset has 22,400 rows and 14 columns. The data cleaning process involves converting the date of `birth` (dob) and `date` to the date/ time format. After this, I did feature engineering, adding the following variables. 
+
+- Age of athletes at the time of the race in days.
+
+- Age of athletes at the time of the race in years. I divided the age in days by 365.25 to get years. 
+
+- Venue country code: The code of the country where the race happened. 
+
+- Venue country name: I used the `countrycode` package in R to convert the country codes into country names. Where missing, I used information available on  <https://www.olympiandatabase.com/index.php?id=1670&L=1> to fill in the country names. 
+
+
+```{r data_cleaning}
+
+```
+
+### Missing Data
+
+Only four variables have missing data- wind, dob, age_days, age_years, and pos. However, the extent of missingness is not great, as the proportion of missing data shows in the table below. 
+
+```{r nas, fig.cap = "Visualisation of Missing Data"}
+
+```
+
+
+## Exploratory Data Analysis
+This section begins by examining the distribution of times posted by the athletes.  Next, I discuss the countries with the most athletes who posted the best times in the 100 metres dash. 
+
+### Distribution of 100 Meters Male Sprint Best Times
+
+The graph below shows the distribution of the times posted by male athletes in the 100 metres sprint. It shows the razor-thin margins that separate the world beaters like `Usain Bolt` and other athletes. The maximum difference between the world record holder and the worst time recorded in the dataset is `r max(my_100_dash_data$mark) - min(my_100_dash_data$mark)`. 
+
+```{r best_times_graph}
+
+```
+
+I also examine the trend in world-leading times. The figure below shows a gradual decline in the best times posted by male sprinters over 100 meters. There is no telling whether this trend will continue. 
+
+```{r records_over_time}
+
+```
+
+
+### Most Successful Countries
+
+The table below shows the countries with the highest number of athletes among the top sprinters. The United States leads, as the table below shows. However, as noted earlier, the athletes are repeated, given that one athlete may have posted multiple times. In the next table, I remove the duplicates to get the country with the most athletes. 
+
+```{r most_athletes_country}
+
+```
+
+### World Record Holders
+
+The table below shows the ten athletes who have posted the best times in the 100 metres dash. Note that Usain Bolt appears in this list four times. 
+
+```{r top_athletes_best_times}
+
+```
+
+
+## Top 10 100 Metres Dash Athletes
+It is common knowledge that Usain Bolt is the record holder. Usain Bolt holds four of the ten best times in the 100 meters dash. But who are the other top contenders? I remove duplicates so that we have one entry per athlete. With that, the top 10 athletes are in table below. 
+
+```{r top_all_time_best}
+
+```
+
+### Athletes With the Most appearances in the Fastest Athletes List
+
+The issue here is to examine the athlete that has appeared in the list of elite athletes the most times. In other words, which athlete has had the most races that appear in the dataset of the fastest 100 meters athletes? Here, `Michael Rodgers` from the USA leads the way, having participated in 267 races and posting some of the best times in the World that appear in this dataset. 
+
+```{r top_athlete_appearances}
+
+```
+
+### The Age Structure of Athletes
+
+This section examines the ages of the athletes featured in the data. The average age is 25.119 years, while the median is 24.65, with a standard deviation of 3.835. The Nigerian sprinter `Chinedu ORIALA` is the youngest athlete in the dataset, while `Kim Collins` is the oldest at around 41 years. We refer to the athlete's age when they participated in a race and **not** how old the athlete is currently. 
+
+```{r age_structure_times}
+
+```
+
+The figures below show the age structure of the athletes in this dataset. Note that the age determination is the length between the time a race occurs and the date of birth of a given athlete. Here, we see a slight increase in both the mean and median ages of athletes after 1980. Afterwards, the mean and median ages stabilize between 25 and 26 years.
+
+```{r mean_median_age_athletes_time}
+
+```
+
+Next, I examine the overall age structure of the athletes using a histogram. The plot shows that most athletes tend to be in their early 20s when they post leading times. After 30 years of age, the performance of athletes declines markedly with minor exceptions. 
+
+```{r age structure_data_vis}
+
+```
+
+### Slight Detour: A Focus on Usain Bolt
+
+In this section, I delve deeper into the performance by Usain Bolt, the most successful 100 meters athlete of all time. First, I examine the times Usain posted for each year. The figure below shows that the years that Usain recorded the best times also exhibit higher a standard deviation. The table below confirms this observation.
+
+```{r Evolution_of_Usain_Bolt}
+```
+
+
+```{r usain_bolt_sds}
+
+```
+
+## Age, Number of Races per Year and the Perfromance of Athletes
+
+In this section, I use regression analysis to examine whether age and the number of races an athlete participates in any given year has a bearing on their performance. The figure below indicated that age matters for 100 meters sprinters, with peak performance, observed in the mid-20s. 
+
+Similarly, there appears to be a relationship between the number of races and the times posted by athletes. The next figure shows this relationship. As the number of races increases, generally, athletes perform better. But this trend stabilizes beyond a point. Note, however, that these models could suffer from omitted variables bias and can only serve as a basis for further analysis. 
+
+```{r races_time_data}
+
+```
+
+
+```{r races_time_plot}
+
+```
+
+The regression analysis shows that both age and number of races significantly correlate with times posted. However, we should take this result with a grain of salt due to the possibility of omitted variables bias.  
+
+```{r regression_analysis, results='asis'}
+
+```
+
+
+```{r reg_summary_stats, results='asis'}
+
+```
+
+Overall, the GAM model outperforms the linear model in all metrics. 
+
+```{r reg_summary_plots}
+
+```
+
+
+## Conclusion
+
+This article examined the performance of male 100 meters athletes using data from `World Athletics`. Results show a gradual improvement in times posted by athletes. The peak performance age for athletes is the mid-20s. The United States has the highest number of athletes in the dataset, followed by Jamaica. The races are very close, with just over half a second separating the world record holder Usain Bolt world record time with the lowest performance in the dataset. The number of races an athlete runs in a year has a non-linear impact on performance. 
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,304 @@
+---
+title: '**Analyzing Sales Data in Python and Pandas: Unveiling Regional Leaders, Top Sales Representatives, Best-selling Items, and Peak Sales Month**'
+subtitle: "***Independent Data Analysis Project***"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957
+        city: Karatina
+        state: Nyeri, Kenya
+        postal-code: 10101
+      - name: University of the Witwatersrand, Johannesburg, School of Construction Economics \& Management
+      - address: 1 Jan Smuts Ave, Braamfontein
+      - city: Johannesburg
+      - state: Gauteng, South Africa
+      - postal-code: 2017
+format: 
+  html:
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-depth: 3
+editor: visual
+date: today
+date-modified: today
+code-fold: true
+date-format: long
+bibliography: references.bib
+execute: 
+  echo: true
+  warning: false
+  message: false
+abstract: |
+  "This analysis, conducted using Python and Pandas, delves into a dataset comprising 43 observations and 8 variables related to sales transactions. The primary objectives include identifying the region with the highest sales, pinpointing top-performing sales representatives, determining the best-selling item, and uncovering monthly variations in sales. The results highlight the exceptional dominance of the Central region, contributing over 60% of total sales. Sales representatives Kivell and Parent emerge as frontrunners, while binders stand out as the most popular item. Furthermore, the analysis unveils seasonal variations, with December and July recording peak sales, and March experiencing a notable dip. These findings offer actionable insights for strategic decision-making, emphasizing the significance of regional, individual, and temporal considerations in optimizing sales efforts and business performance. The use of Python and Pandas demonstrates the efficacy of data-driven approaches in extracting meaningful patterns and trends from complex datasets, paving the way for informed decision-making in dynamic business environments."
+abstract-title: "**Executive Summary**"
+---
+
+# **Background**
+
+In today's dynamic business landscape, data-driven insights play a pivotal role in informed decision-making. The analysis at hand delves into a comprehensive exploration of sales data, utilizing the power of Python and Pandas to unravel key patterns and trends. Focused on variables such as 'orderdate,' 'region,' 'sales rep,' 'item,' 'units sold,' 'unit cost,' 'total,' and 'month,' this study seeks to address critical questions surrounding regional sales dominance, the performance of sales representatives, the most sought-after items, and the identification of peak sales months. By leveraging the capabilities of Python and the versatility of Pandas, this analysis aims to provide actionable insights that will empower strategic business decisions, contributing to enhanced sales performance and overall organizational success.
+
+# **Questions**
+
+The analysis seeks answers to the following questions.
+
+1.  Which region has the highest sales?
+
+2.  Which sales representative has the highest sales?
+
+3.  Which item sold the most?
+
+4.  Which month has the highest sales.
+
+# **Summary of results**
+
+Summary of Sales Analysis:
+
+1.  **Regional Sales Dominance:**
+    -   The sales data reveals that the Central region stands out as the front runner, commanding over 60% of the total sales. Following closely is the East region, contributing significantly to the overall sales landscape.
+2.  **Top Sales Representatives:**
+    -   The analysis identifies Kivell and Parent as the top-performing sales representatives, demonstrating the highest sales figures. Their consistent performance showcases their effectiveness in driving sales within the analyzed dataset.
+3.  **Best-Selling Item:**
+    -   Binders emerge as the standout product, demonstrating an exceptionally high sales volume. This insight indicates a strong market demand for binders, making them a key contributor to overall sales.
+4.  **Peak Sales Months:**
+    -   December emerges as the month with the highest sales, suggesting a seasonality effect or potential holiday-related sales boosts. Following closely is July, indicating another period of heightened sales activity. In contrast, March records the lowest sales, presenting an opportunity for further investigation into the factors influencing this dip.
+
+In conclusion, the analysis provides a comprehensive overview of the sales landscape, highlighting the dominance of the Central region, the exceptional performance of sales representatives Kivell and Parent, the popularity of binders as the best-selling item, and the varying sales patterns across different months. These insights offer valuable strategic considerations for optimizing sales efforts, inventory management, and overall business planning.
+
+# **Data and variables**
+
+```{python}
+## Import libraries ----
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+## Load the data ----
+sales = pd.read_excel("data/SampleData.xlsx", 
+                      sheet_name = "SalesOrders")
+
+```
+
+The dataset under consideration comprises 43 observations and encompasses 8 distinct variables, each offering valuable insights into the sales dynamics.
+
+```{python}
+sales.shape
+
+```
+
+```{python}
+sales.info()
+```
+
+Here's a brief description of the key variables:
+
+1.  **orderdate:** This variable denotes the date when the sales transactions occurred, providing a chronological context to the data.
+
+2.  **region:** This categorical variable represents the geographical regions associated with the sales transactions. Analyzing this variable can unveil patterns in regional sales performance.
+
+3.  **rep:** Designating the sales representatives involved in each transaction, this variable allows for an assessment of individual sales performance.
+
+4.  **item:** Describing the specific products or items sold, this categorical variable enables the identification of the most popular or frequently purchased items.
+
+5.  **units:** This quantitative variable denotes the number of units of each item sold in a given transaction, providing a measure of sales volume.
+
+6.  **unit cost:** Reflecting the cost per unit for the items sold, this variable is crucial for understanding the financial aspects of the transactions.
+
+7.  **total:** Likely representing the total sales revenue for each transaction, this variable is a key metric for assessing overall sales performance.
+
+8.  **month:** This variable categorizes the transactions by month, allowing for a temporal analysis of sales patterns over the dataset.
+
+In summary, the dataset captures a snapshot of sales activities with a focus on the date, regional distribution, sales representatives, specific items, sales volume, unit costs, total revenue, and temporal aspects. Exploring these variables will facilitate a nuanced understanding of the sales dynamics, enabling actionable insights for strategic decision-making in the analyzed domain.
+
+Let us look at the first and last few observations of the data.
+
+```{python}
+sales.head()
+```
+
+```{python}
+sales.tail()
+```
+
+# **Exploring and Cleaning the data**
+
+I check the data for missing values and duplicates. First, we see that the data has no missing values.
+
+```{python}
+sales.isna().sum()
+```
+
+Neither are there duplicates.
+
+```{python}
+sales.duplicated().sum()
+```
+
+I Then summarise the data. First, I look at summary statistics for numeric valriables.
+
+```{python}
+sales.describe()
+```
+
+Then I do a summary of character variables.
+
+```{python}
+sales.describe(include = 'object')
+```
+
+To see the correlation between the numeric variables, I run a correlation test. We see a positive correlation between units sold and total sales in US\$. There is a negative correlation between unit cost and the number of units sold in line with the law of demand.
+
+```{python}
+sales.corr(numeric_only = True)
+```
+
+I convert the column names into lower case and eliminate gaps in cloum names with an underscore.
+
+```{python}
+## Clean column names ----
+sales.columns = sales.columns.str.lower()
+sales.rename({"unit cost":"unit_cost"}, inplace=True)
+sales.head()
+```
+
+Finally, I create a pairs plot of all variables in the data set, just to get a picture of their overall distribution.
+
+```{python}
+#| fig-cap: "Pairs Plot for all Variables"
+## Pairs plot ----
+sns.pairplot(sales, corner=True, palette="rocket")
+```
+
+Just to get a taste of what is to come, let us see the regions and their associated sales. We see how dominant the central region is. More on that later.
+
+```{python}
+## Pairs plot ----
+sales['region'].value_counts().plot(kind = "barh")
+plt.title("Sales by Region")
+plt.xlabel("Region")
+plt.ylabel("Count")
+
+```
+
+# **Analysis**
+
+**Regional Sales Dominance:**
+
+The analysis underscores the substantial dominance of the Central region in total sales, surpassing the contributions of other regions. With over 60% of the total sales attributed to the Central region, strategic considerations should be given to understanding the factors driving this regional success. Potential avenues for further exploration include regional consumer preferences, targeted marketing strategies, or unique economic conditions that contribute to this remarkable performance.
+
+```{python}
+#| fig-cap: "Pairs Plot by Region"
+### Total sales by region
+sns.pairplot(sales, hue = "region", 
+             corner=True, palette="rocket")
+
+
+```
+
+Let us look at the graph of sales by region.
+
+```{python}
+#| fig-cap: "Total Sales by Region"
+sales.groupby("region")["total"].sum().plot(kind="pie")
+plt.title("Total Sales by Region")
+
+```
+
+**Top Sales Representatives:**
+
+The identification of Kivell and Parent as the top-performing sales representatives emphasizes the impact of individual contributions to overall sales success. Recognizing and leveraging the strengths of these sales representatives can inform training programs, mentorship initiatives, or even incentive structures to encourage similar high-performance behavior across the sales team. Understanding the tactics and strategies employed by these top performers may also provide valuable insights for improving the overall effectiveness of the sales force.
+
+```{python}
+#| fig-cap: "Pairs Plot by Sales Rep"
+### Total sales by rep
+sns.pairplot(sales, hue = "rep", corner=True, palette="rocket")
+
+```
+
+```{python}
+#| fig-cap: "Total Sales by Sales Rep"
+sales.groupby("rep")["total"].sum(). sort_values().plot(kind="barh")
+plt.title("Total Sales by Sales Rep")
+
+
+```
+
+**Best-Selling Item:**
+
+The prominence of binders as the best-selling item suggests a notable market demand for this product. Leveraging this insight, businesses can tailor marketing campaigns, optimize inventory management, or explore opportunities for bundling and cross-selling related items. Understanding the factors contributing to the popularity of binders can guide product development and procurement strategies to align more closely with customer preferences.
+
+```{python}
+#| fig-cap: "Pairs Plot by Item"
+### Total sales by item
+sns.pairplot(sales, hue = "item", 
+             corner=True, palette="rocket")
+
+
+
+```
+
+```{python}
+#| fig-cap: "Total Sales by Item"
+sales.groupby("item")["total"].sum(). sort_values().plot(kind="barh")
+plt.title("Total Sales by Item")
+
+
+```
+
+**Peak Sales Months:**
+
+The variation in sales across different months highlights the importance of understanding and adapting to seasonal trends. December and July emerge as peak sales months, suggesting potential seasonality effects, such as holiday-related purchases. Conversely, the dip in sales observed in March warrants further investigation into potential contributing factors. Strategies such as targeted promotions, inventory adjustments, or marketing campaigns tailored to capitalize on peak months and mitigate slumps can be considered based on these findings.
+
+```{python}
+#| fig-cap: "Pairs Plot by Month"
+### Total sales by month
+sales["month"] = sales["orderdate"].dt.month
+sns.pairplot(sales[["units", "total", "month"]], hue = "month", 
+             corner=True, palette="rocket")
+
+```
+
+```{python}
+#| fig-cap: "Total Sales by Month"
+sales.head()
+sales.groupby("month")["total"].sum(). sort_values().plot(kind="barh")
+plt.title("Total Sales by Month")
+
+
+```
+
+```{python}
+#| fig-cap: "Total Sales by Item and Month"
+### Total Sales by Item and Month 
+sales.groupby(["month", "item"])["total"].sum().sort_values().plot(kind="barh")
+plt.title("Total Sales by Item and Month")
+
+
+```
+
+**Overall Implications:**
+
+The collective insights drawn from these results provide a comprehensive understanding of the sales dynamics. Businesses can use this information to refine their sales strategies, optimize inventory management, and tailor approaches to regional and temporal variations. The combination of Python and Pandas in the analysis showcases the efficacy of data-driven decision-making in extracting actionable insights from complex datasets, highlighting the importance of leveraging technology for informed strategic choices in the evolving business landscape.
+
+# **Conclusion**
+
+In conclusion, the analysis of the sales dataset, conducted using Python and Pandas, has yielded valuable insights into the dynamics of the business. The examination of 43 observations across 8 variables shed light on key aspects of regional sales, sales representative performance, popular items, and monthly variations. These findings offer actionable information for strategic decision-making and business optimization [@mckinney2022python; @petrelli2021introduction; @van1995python; @reback2020pandas; @Hunter2007; @Waskom2021].
+
+The standout revelation is the remarkable dominance of the Central region, contributing to over 60% of total sales. This underscores the importance of tailoring sales strategies to regional nuances, with a potential focus on expanding operations or marketing efforts in the Central region. Additionally, the identification of Kivell and Parent as top-performing sales representatives emphasizes the significance of recognizing and leveraging individual strengths within the sales team.
+
+The popularity of binders as the best-selling item signifies a market demand that can be capitalized upon, whether through targeted marketing campaigns or inventory management strategies. Furthermore, the variation in sales across months, with December and July recording peak sales and March experiencing a dip, highlights the importance of understanding and adapting to seasonal trends.
+
+Overall, the analysis equips decision-makers with actionable insights to enhance sales performance, refine inventory management, and tailor strategies to regional and temporal variations. The utilization of Python and Pandas has facilitated a robust exploration of the dataset, showcasing the power of data-driven decision-making in driving business success. As the business landscape continues to evolve, leveraging such analytical tools becomes imperative for staying ahead and making informed, strategic choices.
+
+# **Version Information**
+
+I have used the following system.
+
+```{r}
+Sys.info()
+```
+
+# **References** {.unnumbered}

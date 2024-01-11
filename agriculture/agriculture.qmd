@@ -1,0 +1,371 @@
+---
+title: "**What Is The State of Food Security and Nutrition in the US?**"
+subtitle: "***Analyzing household level food security situation in the United States***"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957
+        city: Karatina
+        state: "Nyeri, Kenya"
+        postal-code: 10101
+      - name: University of the Witwatersrand, School of Construction Economics & Management
+      - address: Private Bag, Wits
+      - city: Johannesburg
+      - state: South Africa
+      - postal-code: 2195
+format: 
+        html:
+                toc: true
+                number-sections: true
+                code-fold: true
+                toc-depth: 3
+                toc-title: 'Contents'
+date: today
+editor: visual
+date-modified: today
+date-format: long
+number-sections: true
+number-depth: 3
+bibliography: references.bib
+execute: 
+  echo: true
+  warning: false
+  message: false
+---
+
+\newpage
+
+# **Introduction**
+
+The United Nations Food and Agriculture Organization's report, ["The State of Food Security and Nutrition in the World 2022,"](https://www.fao.org/documents/card/en/c/cc0639en) often makes people think that food insecurity is a problem only in other parts of the world, not in the United States. However, this article takes a closer look at the situation here at home. It argues that malnutrition and hunger affect people in the United States, not just in other places. By focusing on the complexities of food security within the country, we aim to show that this issue isn't only about faraway locations but also about challenges faced by people right here in the United States when it comes to having enough nutritious food [^1].
+
+[^1]: Find the full report on this site <https://www.fao.org/documents/card/en/c/cc0639en>.
+
+The issue of food security is critical. Insufficient access to nutritious and balanced meals can lead to nutritional deficiencies during critical stages of growth and development. This may result in stunted growth, delayed cognitive development, and a higher susceptibility to health issues [@thomas2019food]. Let us look at these effects in turns. These deficiencies can lead to physical, social, and economic impacts on children now and in the future.
+
+# **Objective**
+
+This essay seeks explores the landscape of food security in the United States, scrutinizing the accessibility, availability, and adequacy of food resources. By navigating this terrain, the aim is to contribute to the dialogue on food security in the United States and not just "elsewhere". The end result are insights that can inform evidence-based strategies to address existing vulnerabilities and promote resilience within the nation's food systems.
+
+The analysis has the following specific aims;
+
+1\. Explore the state of food security and nutrition by state broken down by men, women, children and by age groups.
+
+2\. Demonstrate correlations that exist between level of poverty and food insecurity, malnutrition and starvation.
+
+3\. Implications of food insecurity for children as they mature into adults. (that is, Will they become fully functional citizens or will they require continued support?).
+
+4\. Your data visualizations need to tell the story for a political audience that you were lobbying to address the issue of food insecurity in the US.
+
+# **Summary of Results**
+
+1.  There is a sharp rise in the proportion of households with low food security from 2021.
+
+2.  About 17% of households are food insecure. Of these households;
+
+-   7.8% of children live in households with low food security.
+
+-   1% of children live in households with low food security, exposing them to starvation.
+
+3.  There is a direct link between poverty and food insecurity. Over 30% of people in the poorest households food insecure and this proportion has risen steeply between 2021 and 2022.
+
+4.  Food insecurity is highest in households with single parents. 33% of female headed households were food insecure in 2022.
+
+5.  Failure to address food insecurity in children could have profound physical, social and economic impacts on children as they mature into adults.
+
+# **Definitions**
+
+Food security: Food security means access by all people at all times to enough food for an active, healthy life [@USDA:2023].
+
+Household: A house and its [occupants](https://www.google.com/search?client=ubuntu-sn&hs=uYV&sca_esv=587611622&channel=fs&sxsrf=AM9HkKn-ifPWEt3lxe0zap3dcsFpw585bQ:1701687057007&q=occupants&si=ALGXSlYl_e3TsZvERASNGAvnwCgjTgD09uqIF7oAvza-3_FR2gv21aHFCqpX0Ia7v0Srav-mnrExW5eomGd3Ypcad4KagYrIvMxJKEP3-7s0c72ej9avvbk%3D&expnd=1) regarded as a unit [@dictionary1989oxford].
+
+Children: a young human being below the legal age of majority [@dictionary1989oxford].
+
+# **Data**
+
+We source data from the [United States Department of Agriculture (USDA)](https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s/). The data capture the prevalence of food insecurity among children in households with various characteristics. For instance, we have data on food security among male headed households (no spouse). We also have data on households broken down by race and regions across the United States[^2].
+
+[^2]: The USDA website is <https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s/>
+
+::: callout-important
+## USDA and Food Security
+
+USDA's Economic Research Service (ERS) plays a leading role in research on food security and food security measurement in U.S. households and communities. USDA, ERS provides data and support to scholars' research on food security.
+:::
+
+```{r}
+if(!require(pacman)){
+        install.packages('pacman')
+}
+
+p_load(tidyverse, janitor, skimr, 
+       ggthemes, gt, correlationfunnel,
+       mice, doParallel, tidymodels,
+       klaR, ranger, rpart, kknn,
+       kernlab, LiblineaR, brulee,
+       conflicted, themis, xgboost,
+       usemodels, AppliedPredictiveModeling,
+       discrim, baguette, nnet, patchwork,
+       kableExtra, caret, corrplot, readxl)
+
+p_load_gh('datarootsio/artyfarty')
+
+theme_set(artyfarty::theme_scientific())
+options(digits = 2)
+options(scipen = 999)
+
+## Speed
+## Hasten code execution by parallel computing
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makeCluster(all_cores)
+registerDoParallel(cl)
+
+```
+
+```{r}
+## Get general food security ----
+food_security <- readxl::read_xlsx('dataset/foodsecure_pie2022.xlsx') %>%
+  set_names(c("food_security_status", "prop")) %>% 
+  dplyr::filter(!is.na(prop),
+                !is.na(food_security_status)) %>% 
+  mutate(prop = prop %>% as.numeric() %>% round(1))
+
+
+## Get household food security ----
+household <- readxl::read_xlsx("dataset/household_pie2022.xlsx") %>% 
+  set_names("household_food_security", "prop") %>% 
+  dplyr::filter(!is.na(household_food_security),
+                !is.na(prop)) %>% 
+  mutate(prop = prop %>% as.numeric() %>% round(1))
+
+## Trends in food insecurity ----
+trends <- readxl::read_xlsx('dataset/trends2022.xlsx') %>% 
+  set_names(c("year", "Food_security_low_and_very_low",
+              "Food_security_very_low")) %>% 
+  mutate(
+    year = parse_integer(year),
+    Food_security_low_and_very_low = as.numeric(Food_security_low_and_very_low),
+    Food_security_very_low = as.numeric(Food_security_very_low)
+  ) %>% 
+  dplyr::filter(
+    !is.na(year),
+    !is.na(Food_security_low_and_very_low),
+    !is.na(Food_security_very_low)
+  ) %>% 
+  pivot_longer(-year, names_to = "state")
+
+## Food insecure ----
+insecure <- readxl::read_xlsx('dataset/insecurity2022.xlsx') %>% 
+  set_names(c('class', 'subclass', 
+              'perc_2021', 'perc_2022', "perc", "sig")) %>% 
+  dplyr::filter(!is.na(class),
+         !is.na(subclass),
+         !is.na(perc_2021))
+
+##  very low security----
+very_low <- readxl::read_xlsx('dataset/verylow2022.xlsx') %>% 
+  set_names(c('class', 'subclass', 
+              'perc_2021', 'perc_2022', "perc", "sig")) %>% 
+  dplyr::filter(!is.na(class),
+         !is.na(subclass),
+         !is.na(perc_2021))
+```
+
+\newpage
+
+# **State of Food Security in the United States**
+
+Figure 1 below shows that while food insecurity among households has been falling from 2010, there is a steep rise in food insecurity from 2020. The rise is evident among the households with `very low` food insecurity and the households with both `low` and `very low` food security. Importantly, the households with very low food security have consistently been above 3% and above 10% for households with low and very low food security. This observation means that there no measures in place to address food insecurity among the poor. Alternatively, measures in place to address food insecurity are either badly executed or ineffective in addressing the persistent food insecurity. Food insecurity among the very vulnerable has hit a high of 5% that was prevalent in between 2007 and 2015. This rise in food insecurity is a cause for concern. It is important to establish the factors that lead to the uptick in the cases of food insecurity from around 2020. If not addressed, this rise is likely to take the United States back to the years of high food insecurity of the 2010's. COVID 19 economic slowdown could explain some of the observed rise in food insecurity. Steps to mitigate this reversal is critical.
+
+```{r}
+#| fig-height: 6
+#| fig-width: 8
+#| fig-cap: "Trends in Food Insecurity in the US"
+#| label: trends
+trends %>% 
+  mutate(state = case_when(
+    state == "Food_security_low_and_very_low" ~ "Low or very low",
+    .default = "Very Low"
+  )) %>% 
+  rename(Food_Security = state) %>% 
+  ggplot(mapping = aes(x = year, y = value, color = Food_Security)) + 
+  geom_line() + 
+  ylim(0, 15) + 
+  labs(x = "Year", y = "Percentage- Food Insecurity Status",
+       title = "Food Insecurity in the United States",
+       subtitle = "We see a steep rise in food insecurity from 2021 after food insecurity \ndropped between 2000 and 2010.") + 
+  scale_color_manual(values = pal("economist")) + 
+  theme(legend.position = "top")
+```
+
+\newpage
+
+## **Food Insecurity, gender (men, women, children) and age groups**
+
+A substantial number of people in the United States are food insecure. Figure 2 below shows that about 17% of households fall under this category. We also see that over 8% of adults with children are food insecure. This means that these adults are sacrificing their calorie intake to feed the children. Moreover, 7.8% of children in the United States live in households that have low food security putting their health at risk. What is more, 1% of children live in homes with very low food security. These two latter categories put the children at a high risk of malnutrition, which could further affect their future potential. Thus, more resources should be set aside to support poor households, especially households with children.
+
+```{r}
+#| fig-height: 6
+#| fig-width: 8
+#| fig-cap: "Food Insecurity among Children in the US"
+#| label: children
+food_security %>% 
+  mutate(food_security_status = case_when(
+    food_security_status == "Food insecurity among adults only in households with children" ~ "Food Insecure Adults with Children",
+    food_security_status == "Low food security among children" ~ "Children: Low security",
+    food_security_status == "Very low food security among children" ~ "Children: Very Low security",
+    .default = food_security_status
+  )) %>% 
+  mutate(prop = case_when(
+    food_security_status == "Food-secure households" ~ 100-82.7,
+    .default = prop
+  )) %>% 
+  mutate(food_security_status = case_when(
+    food_security_status == "Food-secure households" ~ "Food insecure households",
+    .default = food_security_status
+  )) %>% 
+  mutate(
+    food_security_status = fct_reorder(food_security_status, prop)
+  ) %>% 
+  ggplot(mapping = aes(x = food_security_status, y = prop, 
+                       fill = food_security_status)) + 
+  geom_col(show.legend = FALSE) + 
+  labs(
+    x = "",
+    y = "Proportion",
+    title = "Food Security Among Children"
+  ) + 
+  coord_flip() + 
+  scale_fill_manual(values = pal("economist"))
+```
+
+Households with female heads (no spouse) have a disproportionately high incidence of food insecurity, followed by households with male heads (no spouse). Figure () shows that 33.1% and 21.2% of children in houses headed by a woman (no spouse) are food insecure in 2022. This is a significant rise from 2021. Pertinent mitigation measure should also target households with single parents. These households have the highest incidence of food insecurity among all the classes. When you factor in race, the picture could get even worse.
+
+```{r}
+#| fig-height: 6
+#| fig-width: 8
+#| fig-cap: "Food Insecurity by Gender in the US"
+#| label: gender
+
+insecure %>% 
+  dplyr::filter(subclass %in% c("Female head, no spouse",
+                         "Male head, no spouse",
+                         "Women living alone",
+                         "Men living alone")) %>% 
+  dplyr::select(-class, -sig, -perc) %>% 
+  pivot_longer(-subclass, 
+               names_to = "Year") %>% 
+  mutate(Year = str_remove(Year, "^perc_"),
+         Year = as.numeric(Year)) %>% 
+  ggplot(mapping = aes(x = subclass, 
+                       y = value,
+                       fill = factor(Year))) + 
+  geom_col(position = "dodge") + 
+  theme(legend.position = "top",
+        legend.title = element_blank()) + 
+  scale_fill_manual(values = pal("economist")) + 
+  labs(x = "", y = "Proportion, %",
+       title = "Food Security by Gender",
+       subtitle = "Households with single parents are highly prone to food insecurity more than any other\ncategory of people")
+```
+
+## **Poverty, food insecurity, malnutrition and starvation**
+
+Figure 3 and 4 below shows the breakdown of food insecurity by poverty levels. The first figure shows the proportion of people with low and very low levels of food security. First, we see that the rise in food insecurity among all poverty levels between 2020 and 2021. We also see food insecurity rises the lower the level of `Household income to poverty ratio`. Specifically, poorer people have a higher incidence of low or very low food insecurity. What is worrying is that the proportion was over 30% in 2021 and rises even further in 2022. Thus, it is paramount to craft strategies that target low income earners from food insecurity. Thus, more resources should be set aside to support poor households, especially households with children.
+
+```{r}
+#| fig-height: 6
+#| fig-width: 8
+#| fig-cap: "Food Insecurity and Poverty in the US"
+#| label: poverty1
+insecure %>% 
+  dplyr::filter(class == "Household income-to-poverty ratio:") %>% 
+  dplyr::select(-perc, -sig) %>% 
+  pivot_longer(-c(class, subclass),
+               names_to = "Year") %>% 
+  mutate(Year = str_remove(Year, "^perc\\_"),
+         Year = as.numeric(Year)) %>% 
+  mutate(subclass = fct_reorder(subclass, value)) %>% 
+  ggplot(aes(x = subclass, y = value, fill = factor(Year))) + 
+  geom_col(position = "dodge") + 
+  scale_fill_manual(values = pal("economist")) + 
+  theme(legend.position = "top") + 
+  labs(x = "Household income-to-poverty ratio",
+       y = "Proportion",
+       title = "Food Security and Poverty Levels",
+       subtitle = "We see a sharp rise in food insecurity in all poverty levels between 2021 and 2022") + 
+  theme(legend.title = element_blank())
+```
+
+Figure 4 shows the incidence of `very low` food insecurity among households. The figure shows that food insecurity gets worse with poverty. More than 15% of households with a `Household income to poverty ratio` of less than 1 are food insecure.
+
+```{r}
+#| fig-height: 6
+#| fig-width: 8
+#| fig-cap: "Propoprtion of People with Very Low Food Security by Poverty Levels"
+#| label: poverty2
+very_low %>% 
+  dplyr::filter(class == "Household income-to-poverty ratio:") %>% 
+  dplyr::select(-perc, -sig) %>% 
+  pivot_longer(-c(class, subclass),
+               names_to = "Year") %>% 
+  mutate(Year = str_remove(Year, "^perc\\_"),
+         Year = as.numeric(Year)) %>% 
+  mutate(subclass = fct_reorder(subclass, value)) %>% 
+  ggplot(aes(x = subclass, y = value, fill = factor(Year))) + 
+  geom_col(position = "dodge") + 
+  scale_fill_manual(values = pal("economist")) + 
+  theme(legend.position = "top") + 
+  labs(x = "Household income-to-poverty ratio",
+       y = "Proportion",
+       title = "Proportion of People with Very Low Food Security by Poverty Levels",
+       subtitle = "We see a sharp rise in food insecurity in all poverty levels between 2021 and 2022") + 
+  theme(legend.title = element_blank())
+```
+
+## **Implications of food insecurity for children as they mature into adults.**
+
+Food insecurity during childhood can have profound and lasting effects on individuals as they mature into adults. Here are several ways in which food insecurity can impact children long-term development:
+
+### **Nutritional Deficiencies:**
+
+Insufficient access to nutritious and balanced meals can lead to nutritional deficiencies during critical stages of growth and development. This may result in stunted growth, delayed cognitive development, and a higher susceptibility to health issues [@thomas2019food]. Let us look at these effects in turns.
+
+### **Cognitive Development:**
+
+Inadequate nutrition, especially during early childhood, can negatively impact cognitive development. Children experiencing food insecurity may face challenges in concentration, memory, and academic achievement, affecting their long-term educational outcomes [@jyoti2005food; @ke2015food].
+
+### **Health Issues:**
+
+Food-insecure children are more vulnerable to a range of health problems, including iron deficiency anemia, weakened immune systems, and chronic conditions like diabetes and cardiovascular diseases. These health issues can persist into adulthood, affecting overall well-being.
+
+### **Behavioral and Emotional Challenges:**
+
+Food insecurity can contribute to increased stress and anxiety in children. Chronic exposure to uncertainty about food availability can lead to behavioral issues, emotional distress, and a higher risk of mental health problems as they grow older.
+
+### **Educational Attainment:**
+
+Children facing food insecurity may experience disruptions in their ability to concentrate and participate in school activities. This can impact their educational attainment, potentially limiting future opportunities for higher education and employment [@jyoti2005food].
+
+### **Economic Productivity:**
+
+Adults who experienced food insecurity during childhood may face challenges in terms of economic productivity. The long-term impact on physical and mental health can affect their ability to secure stable employment, leading to financial instability.
+
+### **Social Relationships:**
+
+Food insecurity can influence social relationships. Children who grow up with inadequate access to food may experience social stigma, and the stress associated with food scarcity can impact their ability to form and maintain healthy relationships later in life.
+
+### **Inter-generational Impact:**
+
+The cycle of food insecurity can perpetuate across generations. Adults who experienced food insecurity as children may face challenges in providing stable and adequate nutrition for their own families, continuing the cycle of vulnerability.
+
+Efforts to address food insecurity in childhood are crucial not only for the immediate well-being of individuals but also for breaking the cycle of poverty and improving overall community health and resilience. Comprehensive strategies that encompass nutritional support, education, and economic empowerment can play a vital role in mitigating the long-term impacts of food insecurity on individuals as they transition from childhood to adulthood.
+
+# **Conclusion**
+
+This essay seeks explored the landscape of food security in the United States, scrutinizing the accessibility, availability, and adequacy of food resources. 7.8% of children live in households with low food security. 1% of children live in households with low food security, exposing them to starvation. Single parent households are the worst affected by food insecurity. Failure to address food insecurity in children could have profound physical, social and economic impacts on children as they mature into adults.
+
+# **References** {.unnumbered}

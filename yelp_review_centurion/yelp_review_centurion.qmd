@@ -1,0 +1,70 @@
+---
+title: "**Scraping and Analyzing Online Consumer Feeback**"
+subtitle: "***Analyzing Reviews for Escape (Airport) Lounges on YELP.COM***"
+author: "John Karuitha"
+date: "`r lubridate::today()`"
+echo: true
+message: false
+warning: false
+format: 
+        html: 
+                theme: darkly
+                code-fold: true
+                toc: true
+                toc-depth: 3
+                toc-location: left
+                toc-title: "Contents"
+                number-sections: true
+                number-depth: 3
+---
+
+# Background
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+#| echo: false
+if(!require(pacman)){
+        install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, rvest, janitor)
+```
+
+# Data: Scraping Text Data
+
+```{r}
+
+my_url <- "https://www.yelp.com/biz/escape-lounges-the-centurion-studio-partner-oak-oakland?start="
+
+pages <- seq(10, 390, by = 10)
+
+yelp_scrapper <- function(url, node, type){
+        
+       Sys.sleep(2)
+       read_html(url) %>% 
+        html_nodes(node) %>% 
+        html_text() %>% 
+                tibble() %>% 
+                set_names(type)
+}
+
+
+read_html('https://www.yelp.com/biz/escape-lounges-the-centurion-studio-partner-oak-oakland?start=10') %>%
+        html_nodes(".margin-b1-5__09f24__NHcQi .css-chan6m") %>%
+        html_text()
+
+## Scrap for dates 
+
+map_dfr(paste0(my_url, pages), 
+        
+        yelp_scrapper,
+        
+        node = ".margin-b1-5__09f24__NHcQi .css-chan6m", 
+        
+        type = "date")
+```
+
+# Analysis and Results
+
+# Conclusion

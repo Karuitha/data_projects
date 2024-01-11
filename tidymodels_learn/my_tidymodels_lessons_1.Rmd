@@ -1,0 +1,99 @@
+---
+title: "Getting Started with Tidymodels"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output: 
+  html_document:
+    code_folding: hide
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+  
+  install.packages("pacman")
+  
+}
+
+pacman::p_load(tidymodels, readr, broom.mixed, dotwhisker, tidyverse, readxl)
+```
+
+# Introduction to Tidymodels
+
+I start by loading the data that we use. This is the sea urchins data that is available on this [site](“https://tidymodels.org/start/models/urchins.csv”).
+
+```{r}
+urchins_data <- read_csv('https://tidymodels.org/start/models/urchins.csv') %>% 
+  
+  # Change the names to be a little more verbose
+  setNames(c("food_regime", "initial_volume", "width")) %>% 
+  
+  # Factors are very helpful for modeling, so we convert one column
+  mutate(food_regime = factor(food_regime, 
+                              
+                              levels = c("Initial", "Low", "High")))
+```
+
+# The Data
+
+Here, I explore the data. 
+
+```{r}
+head(urchins_data)
+tail(urchins_data)
+glimpse(urchins_data)
+```
+
+I plot the data. I examine initial volume versus width colored by the food regime. 
+
+```{r}
+urchins_data %>% 
+  
+  ggplot(mapping = aes(x = initial_volume, y = width, color = food_regime)) + 
+  
+  geom_point() + 
+  
+  geom_smooth(method = "lm", se = FALSE) + 
+  
+  scale_color_viridis_d(option = "inferno", end = 0.7)
+```
+
+Here, urchins with high initial volume tended to grow bigger than those with less. We can run a model with interactions to allow for different slopes and intercepts. 
+
+```{r}
+my_model <- linear_reg() %>% 
+  
+  set_engine("lm") %>% 
+  
+  set_mode("regression")
+```
+
+I then fit the model. 
+
+```{r}
+model_fit <- my_model %>% 
+  
+  fit(width ~ initial_volume * food_regime, data = urchins_data)
+
+summary(model_fit$fit)
+```
+
+I then tidy the regression output. 
+
+```{r}
+tidy(model_fit, conf.int = TRUE)
+```
+
+We the do a dot and whiskers plot of the model. 
+
+```{r}
+tidy(model_fit) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+```
+
+
+ 

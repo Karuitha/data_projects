@@ -1,0 +1,363 @@
+---
+title: "**Analyzing Road Usage**"
+subtitle: "Which factors relate to the extent of road use?"
+author: 'John Karuitha'
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    code_folding: hide
+    theme: sandstone
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+  word_document:
+    toc: yes
+    toc_depth: '3'
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1]{fontenc}
+- \usepackage{amsmath}
+- \usepackage{subcaption}
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+if(!require(pacman)){install.packages("pacman")}
+
+pacman::p_load(tidyverse, janitor, mice, rio, kableExtra, GGally, ggthemes, 
+               Amelia, skimr)
+
+theme_set(ggthemes::theme_clean())
+
+options(digits = 2)
+```
+
+
+\newpage 
+
+# **Background**
+
+In this analysis, I use data regarding road usage to explore factors that have a relationship with the extent of road use. I start by summarising the results and stating the objectives/questions of the study. I then explore the data. In the analysis section, I delve deeper into finding answers to my questions. The analysis then concludes. 
+
+# **Summary of Results**
+
+
+1. The distribution of road length depends on the road type. 
+
+2. The usage of a road has a significant relationship with the road type. 
+
+3. Longer roads have, on average, more vehicles than shorter roads.
+
+3. National roads are, on average, longer than other road types. 
+
+4. The usage of a road has a direct relationship with the number of lanes, with 3-lane and 4-lane roads the most used.
+
+5. Which road types are dominated by trucks?
+
+
+# **Questions**
+
+The analysis seeks answers to the following questions.
+
+- What can be said about the distribution of road length?
+
+- What can be said about the distribution of road length for departmental roads?
+
+- To what extent does the number of vehicles using a road depend on the length of that road?
+
+- To what extent does the number of vehicles using a road depend on the length of that road for the different road types? 
+
+- Are departmental roads shorter on average than national roads? 
+
+- Is there a difference in length depending on the number of lanes? 
+
+
+# **Data**
+
+I import the data from the Ms Excel file and check for duplicates and missing values. 
+
+```{r}
+roads <- import("COPY_FR_donnees_routieres_simulees_avecEbaucheAnalyse.xlsx") %>% 
+  janitor::clean_names() %>% 
+  filter(!duplicated(.)) %>% 
+  mutate(type_route = factor(type_route))
+
+roads %>% head() %>% 
+  kbl(booktabs = TRUE, caption = "Data Preview") %>%
+  kable_classic(full_width = TRUE, latex_options = "hold_position")
+
+```
+
+
+The data contains `r nrow(roads)` observations of `r ncol(roads)` variables. Table 1 describes the variables. 
+
+```{r, echo=FALSE}
+tribble(~ Variable, ~ Description,
+        
+"code_route", "A code representing the route, e.g. A1.", 
+"type_route", "A classitication of route type like autorute, nationale.", 
+"longueur_km", "The length of the route in Kiliometers.", 
+"n_voies", "Number of channels or lanes in the route.",
+"n_voitures_par_jour", "Number of cars using the route per day.", 
+"n_camions_par_jour", "Number of trucks using the route per day.", 
+"n_deux_roues_par_jour","Number of 2 wheel vehicles using the route per day.", 
+"n_vehicules_par_jour", "The sum of vehicles of all types on the route per day.") %>% 
+  
+  kbl(booktabs = TRUE, caption = "Variables Description") %>%
+  kable_classic(full_width = FALSE, latex_options = "hold_position")
+```
+
+Next, I visualise the data for missing values. The visualisation shows that there are no missing values. 
+
+```{r, fig.cap="Missingness Map"}
+roads %>% 
+  Amelia::missmap()
+```
+
+Finally, I summarise the data. 
+
+```{r}
+## Summary of numeric variables
+roads %>%
+  select(where(is.numeric)) %>%
+  skimr::skim_without_charts() %>%
+  select(-skim_type, -n_missing, -complete_rate) %>%
+  set_names(c("Variable", "Mean", "SD", "Min", "Q1", "Median", "Q3", "Max")) %>%
+  kbl(booktabs = TRUE, caption = "Summary Statistics") %>%
+  kable_classic(full_width = FALSE, latex_options = "hold_position")
+```
+
+
+
+
+# **Analysis**
+
+For the analysis, I start by creating a pairs plot for all the variables except for code route that has too many levels. 
+
+
+\newpage
+
+\blandscape
+
+
+```{r, fig.width=12, fig.height=8, fig.cap="Pairs Plot for the Variables", echo=FALSE}
+roads %>% select(-code_route) %>% ggpairs()
+```
+
+\elandscape
+
+\newpage
+
+Figure 1 shows strong correlation between the variables. This observation means that, for example, when there are more cars in the route, it is also highly probable that there will be more trucks. We now delve into our questions. 
+
+
+## What can be said about the distribution of road length?
+
+I use a histogram to visualise road length. A histogram (together with density plots) are useful for visualizing the distribution of a single quantitative variable. Figure 2 shows that most roads are less than 100 km long, with another small up tick around 200 kilometres.  
+
+
+```{r, fig.cap = "Distribution of Road length"}
+roads %>%
+  ggplot(mapping = aes(x = longueur_km)) + 
+  geom_histogram() + 
+  labs(x = "Road Length in KMs", y = "Count", title = "Distribution of Road length")
+
+
+
+```
+
+I also slice the length of roads into chunks of 10km. The output shows that there are 270 roads that are at most 10 km further illustrating the skewness of the variable.
+
+```{r}
+cut(roads$longueur_km, breaks = seq(from = min(roads$longueur_km), 
+                                    to = max(roads$longueur_km),by = 10)) %>% 
+  table()
+```
+
+
+## What is the distribution of departmental roads?
+
+Again, I use a histogram to visualise the distribution of departmental roads. Figure 4 shows that departmental roads are more evenly distributed with peaks between 25 kms to 50 kms. This distribution is closer to the normal distribution unlike the distribution of all roads that is heavily skewed to the right. 
+
+```{r, fig.cap = "Distribution of Road length for Departmental Roads"}
+roads %>%
+  filter(type_route == "departementale") %>%
+  ggplot(mapping = aes(x = longueur_km)) + 
+  geom_histogram() + 
+  labs(x = "Road Length in KMs", y = "Count", title = "Distribution of Departmental Road length")
+```
+
+We can extend this analysis to all departments. Figure 5 shows that while national roads have a more even distribution, other road types are heavily skewed. 
+
+
+```{r, fig.cap="Distribution of Road length by Road Type"}
+roads %>%
+  ggplot(mapping = aes(x = longueur_km)) + 
+  geom_histogram() + 
+  labs(x = "Road Length in KMs", y = "Count", title = "Distribution of Road length by Road Type") + 
+  facet_wrap(~ factor(type_route), scales = "free_y") 
+```
+
+## To what extent does the number of vehicles using a road depend on the length of that road?
+
+In this case, I test whether the relationship between the two variables is significant. I start by visualizing the two variables using a scatter plot because we have two quantitative variables. The scatter plot shows a general upward trend in the number of vehicles as the length of the roads increases (see Figure 6).  
+
+```{r, fig.cap="Number of Vehicles versus Road Length"}
+roads %>%
+  ggplot(mapping = aes(x = n_vehicules_par_jour, y = longueur_km)) + 
+  geom_point(alpha = 0.5, size = 3) + 
+  geom_smooth(se = FALSE, method = "lm") + scale_color_tableau() + 
+  labs(title = "Number of Vehicles versus Road Length", 
+       x = "Number of Vehicles", y = "Road Length")
+```
+
+I also do a correlation test for the significance of the correlation between the length of the road (longueur_km) and the number of vehicles (n_vehicules_par_jour). This hypothesis is useful when dealing with two quantitative variables that have an approximate linear relationship as is the case here. 
+
+\newpage
+
+```{r}
+with(roads, (cor.test(n_vehicules_par_jour, longueur_km)))
+```
+
+The output shows that we reject the null hypothesis of no relationship between the road (longueur_km) and the number of vehicles (n_vehicules_par_jour) at 1% level of significance. 
+
+## Is this ratio the same for the different road types? 
+
+In this section, I examine the correlation between the road (longueur_km) and the number of vehicles (n_vehicules_par_jour) for different road types. Figure () already shows that this correlation is different for different road types. 
+
+The extent of this relationship depends on the road type, with auto-route and departmental roads showing little correlation between road length and number of vehicles. Communal and national roads show a negative correlation between the length of the road and the number of vehicles. National roads have the highest negative correlation between road length and number of vehicles (see Figure 7).
+
+```{r}
+roads %>%
+  summarise(
+    
+    correlation = cor(n_vehicules_par_jour, longueur_km),
+    
+    .by = type_route
+  ) %>%
+  
+  arrange(desc(correlation))
+```
+
+\newpage
+\blandscape
+
+```{r, fig.cap="Number of Vehicles versus Road Length and Road Type", fig.width=12, fig.height=6}
+roads %>%
+  ggplot(mapping = aes(x = n_vehicules_par_jour, y = longueur_km, color = type_route)) + 
+  geom_point(alpha = 0.5, size = 3) + geom_smooth(se = FALSE, method = "lm") + scale_color_tableau() + 
+  labs(title = "Number of Vehicles versus Road Length and Road Type", 
+        x = "Number of Vehicles", y = "Road Length") + theme(legend.title = element_blank())
+```
+
+
+\elandscape
+\newpage
+
+
+## Are departmental roads shorter on average than national roads? 
+
+I create a summary table showing the mean and median road length for departmental and national roads. The analysis shows that departmental roads are,on average, about 5 times shorter than national roads. 
+
+```{r}
+roads %>%
+  filter(type_route %in% c("departementale", "nationale")) %>%
+  summarise(
+    
+    Mean_length = mean(longueur_km),
+    Median_length = median(longueur_km),
+    .by = type_route
+  ) %>% 
+  
+  set_names(names(.) %>% str_to_title()) %>%
+  
+  mutate(Type_route = str_to_title(Type_route)) %>%
+  
+  kbl(booktabs = TRUE, caption = "Road Lengths for National/Departmental Roads") %>%
+  kable_classic(full_width = TRUE, latex_options = "hold_position")
+```
+
+
+I also carry out a t-test to examine whether the observed difference is statistically significant. We reject the null hypothesis at 1% significance level which means that there is a significant relationship between road type (national versus departmental) and the length of the road. 
+
+```{r}
+roads %>%
+  filter(type_route %in% c("departementale", "nationale")) %>%
+  mutate(type_route = factor(type_route, levels = c("departementale", "nationale"))) %>%
+t.test(longueur_km ~ type_route, data = .)
+```
+
+
+## Is there a difference in length depending on the number of lanes? 
+
+There is a notable difference in the length of roads depending on the number of lanes. Single lane roads are the rarest while 3 lane roads are the most abundant followed by 4 lane roads.
+
+
+```{r}
+roads %>%
+  mutate(n_voies = factor(n_voies)) %>%
+  summarise(
+    
+    Mean_length = mean(longueur_km),
+    Median_length = median(longueur_km),
+    .by = n_voies
+  ) %>% 
+  
+  set_names(names(.) %>% str_to_title()) %>%
+  
+  mutate(N_voies = str_to_title(N_voies)) %>%
+  
+  kbl(booktabs = TRUE, caption = "Mean and Median Road Lengths by Number of lanes") %>%
+  kable_classic(full_width = TRUE, latex_options = "hold_position")
+```
+
+
+I visualise this difference in road lengths by the number of lanes in Figure 8. Again, the figure confirms that 3 lane and 4 lane roads dominate the data. 
+
+```{r, fig.cap ="Road Length vs Number of Lanes" }
+roads %>%
+  ggplot(mapping = aes(y = longueur_km, x = factor(n_voies))) + 
+  geom_boxplot() + geom_jitter(shape = 'x') + scale_fill_tableau() + 
+  labs(title = "Road Length vs Number of Lanes", x = "Lanes", y = "Road length")
+```
+
+\newpage
+
+
+## Which road types are dominated by trucks?
+
+In this section, I examine the roads mostly used by trucks. I visualise the data in Figure () below. The graph shows that trucks are far more dominant on autoroutes followed at a distance by national roads. 
+
+```{r}
+roads %>% 
+  ggplot(mapping = aes(x = type_route, y = n_camions_par_jour)) + 
+  geom_boxplot() + geom_jitter(shape = "x") + 
+  labs(x = "Route Type", y = "Number of Trucks", title = "Road Type and Number of Trucks")
+```
+
+
+# **Conclusion**
+
+In this analysis, I utilised road usage data to explore several questions. The output shows the following;
+
+1. The distribution of road length depends on the road type. 
+
+2. The usage of a road has a significant relationship with the road type. 
+
+3. Longer roads have, on average, more vehicles than shorter roads.
+
+3. National roads are, on average, longer than other road types. 
+
+4. The usage of a road has a direct relationship with the number of lanes, with 3-lane and 4-lane roads the most used.
+
+The analysis would be useful for traffic management. 
+

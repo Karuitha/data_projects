@@ -1,0 +1,126 @@
+---
+title: "transformation and decomposition"
+output: html_document
+date: "2023-01-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(fpp3)
+```
+
+
+# Lab : transformation and decomposition
+
+```{r label, options}
+ dgoog <- gafa_stock |>
+  filter(Symbol == "GOOG", year(Date) >= 2018) |>
+  mutate(trading_day = row_number()) |>
+  update_tsibble(index = trading_day, regular = TRUE) |>
+  mutate(diff = difference(Close))
+
+dgoog |> autoplot(diff)
+dgoog |>
+  ACF(diff) |>
+  autoplot()
+```
+
+```{r label, options}
+global_economy |>
+  autoplot(GDP / Population, alpha = 0.3) +
+  guides(colour = FALSE)
+
+avg_gdp_pc <- global_economy |>
+  as_tibble() |>
+  group_by(Country) |>
+  summarise(
+    # Average GDP per capita for each country
+    gdp_pc = mean(GDP / Population, na.rm = TRUE),
+    # Most recent GDP per capita for each country
+    last = last((GDP / Population)[!is.na(GDP / Population)])
+  )
+top_n(avg_gdp_pc, 5, gdp_pc)
+
+max_gdp_pc <- global_economy |>
+  semi_join(
+    avg_gdp_pc |>
+      filter(gdp_pc == max(gdp_pc, na.rm = TRUE)),
+    by = "Country"
+  )
+```
+
+```{r label, options}
+# install.packages("ggrepel")
+# Using goem_label_repel() gives nicer label positions than geom_label()
+# If the ggrepel package is not available, you can use geom_label() instead
+library(ggrepel)
+global_economy |>
+  ggplot(aes(x = Year, y = GDP / Population, group = Country)) +
+  geom_line(alpha = 0.3) +
+  geom_line(colour = "red", data = max_gdp_pc) +
+  geom_label_repel(
+    aes(label = Country, x = 2020, y = last),
+    data = top_n(avg_gdp_pc, 5, last),
+  )
+
+holidays <- tourism |>
+  filter(Purpose == "Holiday") |>
+  group_by(State) |>
+  summarise(Trips = sum(Trips))
+
+holidays |>
+  model(stl = STL(Trips ~ season(window = 13) + trend(window = 21))) |>
+  components() |>
+  autoplot()
+
+```
+
+
+# Lab Session 7
+
+```{r label, options}
+global_economy |>
+  filter(Code == "USA") |>
+  autoplot(box_cox(GDP, 0.3))
+
+aus_livestock |>
+  filter(
+    State == "Victoria",
+    Animal == "Bulls, bullocks and steers"
+  ) |>
+  autoplot(log(Count))
+
+vic_elec |>
+  autoplot(log(Demand))
+
+aus_production |>
+  autoplot(box_cox(Gas, 0.1))
+
+canadian_gas |> autoplot()
+
+```
+
+
+```{r label, options}
+canadian_gas |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
+  components() |>
+  autoplot()
+
+## Changing the size of the windows changes the trend and seasonal components
+## A smaller window gives a more flexible (fast changing) component
+## A longer window gives a smoother (slow changing) component
+
+canadian_gas |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
+  components() |>
+  gg_season(season_year)
+
+canadian_gas |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
+  components() |>
+  select(Month, season_adjust) |>
+  autoplot(season_adjust)
+```
+

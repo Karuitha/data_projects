@@ -1,0 +1,181 @@
+---
+title: "Examining the Quality of Water in the Narrabeen Lagoon"
+author: "Jinyuan Qin: 520145126"
+date: "`r format(Sys.Date(), format ='%A %B %d, %Y')`"
+output:
+  html_document:
+      theme: cosmo
+      number_sections: True
+      toc: True
+      toc_float: True
+      toc_depth: 3
+      code_folding: hide
+bibliography: citations.bib
+csl: apa.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+pacman::p_load(tidyverse, kableExtra, janitor)
+
+formatting_function <- function(data, booktabs = TRUE, caption = "My Table", full_width = FALSE){
+    
+    data %>% 
+        
+        kbl(booktabs = booktabs, caption = caption) %>% 
+        
+        kable_classic(full_width = full_width)
+}
+```
+
+# **Executive Summary**
+
+This report is based on the analysis of data provided by the NSW Department of Planning and Environment. The first objective of the analysis is to examine the fluctuations of water quality (proxied by Enterococci concentration) by month. The report also explores the differences in water quality by site. Lastly the report evaluates whether there is a significant difference in the quality of water in the two sites that have the lowest quality of water (Birdwood Park and Bilarong Reserve).
+
+The main findings of the study are as follows. 
+
+- Water quality varies greatly over months. This variability could be due to differences in rainfall in different months. 
+- The quality of water varies by site with Birdwood Park and Bilarong Reserve in Narrabeen Lagoon having the lowest median quality of water.
+- The difference in water quality in Birdwood Park and Bilarong Reserve in Narrabeen Lagoon is not statistically significant. 
+
+We recomend further research to determine factors associated with water quality in this lagoon. 
+
+# **Full Report**
+
+## Background
+
+This report is based on the analysis of data provided by the NSW Department of Planning and Environment. The broad aim is to explore some of the factors that determine the quality of water in Narrabeen Lagoon. We proxy water quality using the level of Enterococci concentration per 100ml with higher Enterococci concentrations corresponding to lower water quality.  
+
+## Objectives
+
+The report has three objectives:
+
+1. To examine monthly fluctuations in water quality in the Narrabeen Lagoon. 
+2. To explore how water quality varies by site of the Narrabeen Lagoon where a sample of water is drawn.
+2. To evaluate whether there is a significant difference in water quality between the two sites of Narrabeen Lagoon with the lowest water quality. 
+
+## The Data
+
+The data consists of the following variables.
+
+```{r, echo = FALSE}
+tribble(~ Variable, ~ Description,
+        "Beach_id", "Identification number for every beach.",
+        "Region", "Region here the beaches are located.", 
+        "Council", "Local governing counci.l", 
+        "Site", "The monitored sites.", 
+        "Longitude", "The sample collection site latitude.",
+        "Latitude", "The sample collection site longitide.", 
+        "Date", "Date of sample collection.",
+        "Enterococci (cfu/100ml)", "Enterococci concentration measured as units per 100 mL of sample (cfu/100 mL)", 
+        "Month", "Month of the Year, January through December",
+        "Day of Week", "Day of the Week, like Monday, Tuesday, and so on.") %>% 
+    formatting_function(caption = "Table 1: Variables Description")
+```
+
+
+```{r}
+lagoon_data <- read_csv("beachesçå¯æ¬.csv") %>% 
+    janitor::clean_names()
+
+lagoon_data$month <- factor(lagoon_data$month, levels = c(
+    "January", "February", "March", "April",
+    "May", "June", "July", "August", "September",
+    "October", "November", "December"
+))
+
+head(lagoon_data) %>% formatting_function(caption = "Table 2: An Overview of the Data")
+```
+
+## **Research Question 1: How does the quality of water vary by month?**
+
+Figure 1 and table 3 below shows that the concentration of highest median of Enterococci concentration is highest in June followed by January and March in that order. These three months have the worst water quality. 
+
+```{r}
+boxplot(log(enterococci_cfu_100ml + 0.01) ~ month, data = lagoon_data, main = "Which Months Have the Worst Water Quality?", xlab = "", ylab = "Enterococci Concentration (Log Scale)")
+```
+```{r}
+monthly_impurity <- aggregate(enterococci_cfu_100ml ~ month, data = lagoon_data, FUN = median) 
+
+monthly_impurity[order(monthly_impurity$enterococci_cfu_100ml), ] |> formatting_function(caption = "Table 3: Median Enterococci Concentration by Month")
+```
+
+
+Table 4 shows the dispersion in water quality levels. In this table, we compute the standard deviation of Enterococci Concentration per 100ml after removing outliers (sites with a concentration greater than 100 enterococci_cfu per 100ml). 
+
+The results show that the variability in water quality is highest in January, June and March in that order. The reason for this instability in water quality in these months is unclear and warrants further research. 
+
+
+```{r}
+dispersion_data <- lagoon_data[lagoon_data$enterococci_cfu_100ml <= 100, ]
+
+dispersion_rank <- aggregate(enterococci_cfu_100ml ~ month, data = dispersion_data, FUN = sd)
+
+dispersion_rank[order(dispersion_rank$enterococci_cfu_100ml), ] |> formatting_function(caption = "Table 4: Dispersion in Water Quality")
+```
+
+
+
+Hoever, based on previous research such as @nsw_government_2022, @nsw_rainfall_2022, and @lagoon, we can hypothesise that low water quality and the large dispersion observed in the months of January, June and March is due to the high rainfall experienced in the period except for June. The causes of low poor quality in June is not clear and could be researched further. 
+
+## **The relationship between the sites and the Quality of Water**
+
+Most beaches have a very low median Enterococci concentration. However, Birdwood Park and Bilarong Reserve have much higher median concentrations and hence have the lowest water quality. These two sites in Narrabeen Lagoon also exhibit the highest dispersion are more sparse and have the highest (maximum) enterococci concentrations compared to other sites. Again, the concentration of Enterococci is not normally distributed. 
+
+```{r, fig.cap = "Figure 2: Water Quality by Site", fig.idth = 12}
+
+
+boxplot(log(enterococci_cfu_100ml + 0.01) ~ beach_id, data = lagoon_data, main = "Which Sites Have the Worst Water Quality (With Outliers)?", xlab = "", ylab = "Enterococci Concentration per 100ml")
+
+
+#boxplot(enterococci_cfu_100ml ~ site, data = #data[data$enterococci_cfu_100ml <= 1000, ], main = "Which #Sites Have the Worst Water Quality (Without Outliers)?", xlab #= "", ylab = "Enterococci Concentration per 100ml")
+
+```
+To see the sites with highest Enterococci concentration in ater, we do a Table 5 below. 
+
+```{r}
+agg_data <- aggregate(enterococci_cfu_100ml ~ site, data = lagoon_data, FUN = median) 
+
+agg_data[order(agg_data$enterococci_cfu_100ml), ] |> formatting_function(caption = "Table 5: Median Enterococci Concentration by Site")
+
+```
+
+
+## **Is the concentration of Enterococci in Birdwood Park significantly different from that in Bilarong Reserve**
+
+In this section, we evaluate whether the mean concentration of Enterococci in Birdwood Park is significantly different from that in Bilarong Reserve. To achieve this, we conduct a t-test.
+
+The hypotheses for this test are as follows: 
+
+**H0**: There is no difference of means of sample of Bilarong Reserve (Narrabeen Lagoon) and the sample of Birdwood Park (Narrabeen Lagoon).
+
+**H1**:There is a difference between the means of two samples of Birdwood Park (Narrabeen Lagoon) and Bilarong Reserve (Narrabeen Lagoon).
+
+Further, we assume that;
+
+1. Continuous Dependent Variable
+2. All observed individuals are independent
+2. Two samples have same spread.
+3. Two sample means follow normal distribution.
+4. There are no outliers.
+
+
+Further, we use a significance level of 0.05. 
+
+```{r}
+t_test_data <- lagoon_data[lagoon_data$site == "Birdwood Park (Narrabeen Lagoon)" | lagoon_data$site == "Bilarong Reserve (Narrabeen Lagoon)", ]
+
+t.test(enterococci_cfu_100ml ~ site, data = t_test_data)
+```
+
+
+The p-value is 0.2093 is bigger than the significance level 0.05. Hence, we fail to reject the null hypothesis.
+
+# References
+

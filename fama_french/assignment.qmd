@@ -1,0 +1,56 @@
+---
+title: "CAPM, APT, Fama and French Five Factor Model"
+author: "Eldar Gasimov"
+format: html
+editor: visual
+---
+
+# CAPM
+
+The CAPM is as follows.
+
+$R_{s} - R_{f} = R_{f} + \beta (R_{m} - R_{f})$
+
+In this case, we need.
+
+-   Prices for ETF funds.
+
+-   Risk free rate - prices or returns on short term government bonds (ECB T-bills yield).
+
+-   ETF market index for 10 years.
+
+# Arbitrage Pricing Theory
+
+In APT, we seek to explain excess returns on a stock based on a series of macro-economic factors. The APT does not give a full list of relevant factors. However, some of the useful factors include;
+
+-   GDP growth rates.
+
+-   Interest rates.
+
+-   Inflation rates.
+
+-   Corporate bond spreads.
+
+-   Exchange rates.
+
+# Fama and French 5 factor Model
+
+$R=\alpha + \beta_{m} MKT + \beta_{s} SMB + \beta_{h} HML + \beta_{r} RMW + \beta_{c} CMA$
+
+The Fama and French 5 factor model requires the following.
+
+-   Book value per share: Value (MKT)
+
+-   Total Equity: Size (SMB)
+
+-   Operating profit margin: Quality (HML)
+
+-   ROE: Return on Equity to proxy Profitability (RMW)
+
+-   Total Assets: proxy TotalAssetsGrowth: Investment Pattern (CMA)
+
+-   Equity
+
+-   Operating profits.
+
+-   ECB Treasury bills yield.

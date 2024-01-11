@@ -1,0 +1,293 @@
+---
+title: "**Estimating Systematic Risk Using the Capital Asset Pricing Model (CAPM)**"
+subtitle: "***Applying CAPM to IBM and Microsoft Stocks, 2002-2007***"
+author: "Eldar Gasimov"
+date: "`r format(Sys.Date(), format ='%A %B %d, %Y')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output:
+  html_document:
+    theme: cosmo
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+    code_folding: hide
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+#bibliography: citations.bib
+csl: apa.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+pacman::p_load(tidyverse, kableExtra, janitor, 
+               readxl, skimr, tidyquant,
+               stargazer, performance)
+
+formatting_function <- function(data, booktabs = TRUE, caption = "My Table", full_width = FALSE){
+    
+    data %>% 
+        
+        kbl(booktabs = booktabs, caption = caption) %>% 
+        
+        kable_classic(full_width = full_width, latex_options = "hold_position")
+}
+```
+
+\newpage
+
+# Summary
+
+- The regression equation estimate for GM is $gm_premium = -0.005876 + 1.181982Market Premium$ while that of Microsoft is $microsoft_premium = -0.003122 + 0.983402Market Premium$. 
+- Both Microsoft and GM have a $\beta$ of that do not differ signifcantly from 1. 
+- This observation means that the returns from these stocks are as volatile as the returns of a market portfolio.
+- The $\alpha$ for both stocks is not statistically significant.
+- The regressions could suffer from omitted variable bias. 
+
+
+# **Question A: Download the Data into R and Provide Summary Statistics for Each variable.**
+
+I load the data into R using the following line of code. Table 1 summarises the variables contained in the dataset;
+
+```{r}
+capm_data <- readxl::read_xlsx("capm.xlsx") 
+```
+
+
+```{r, echo = FALSE}
+tribble(~ Variable, ~ Description,
+        "Date", "The date of data collection.",
+        "SP500", "S&P 500 Index at the corresponding date",
+        "GM", "Stock price for General Motors on the correponding date.",
+        "MICROSOFT", "Stock price for Microsoft on the correponding date.",
+        "USTB3M", "US 3 month treasury bills coupon rate.") %>% 
+    formatting_function(caption = "Variables Description")
+```
+Table 2 below shows the first 6 rows in the data. 
+
+```{r}
+
+head(capm_data) %>% 
+    
+    formatting_function(caption = "An Overview of the Data")
+
+capm_data <- capm_data %>% 
+    
+    clean_names()
+```
+
+
+## ***Exploring the Data***
+
+I start by plotting the data trends from 2002 and then summarise the data. 
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Trends in GM, Microsoft, S&P 500, and 90 Days US T-Bill Rate, 2002-2007", fig.height=5, fig.width=12}
+capm_data %>% 
+    pivot_longer(-date, names_to = "stock", values_to = "price") %>% 
+    ggplot(mapping = aes(x = date, y = price, color = stock)) + 
+    geom_line() + facet_wrap(~stock, scales = "free_y") + 
+    theme_tq() + theme(legend.position = "none") + 
+    labs(x = "", y = "", title = "Trends in GM, Microsoft, S&P 500, and 90 Days US T-Bill Rate, 2002-2007", caption = "Note the different y-scales")
+```
+
+\elandscape
+\newpage
+
+```{r}
+capm_data %>% 
+    select(-date) %>% skimr::skim_without_charts() %>%
+    select(-skim_type, -complete_rate) %>% 
+    rename(Variable = skim_variable, Missing = n_missing, 
+           Mean = numeric.mean, SD = numeric.sd, Min = numeric.p0, 
+           Q1 = numeric.p25, Median = numeric.p50, 
+           Q3 = numeric.p75, Max = numeric.p100) %>% 
+    formatting_function(caption = "Descriptive Statistics") %>% 
+    footnote(number = c("sp500: S&P 500 Index.", "gm: General Motors Stock Pirces.", "microsoft: MicroSoft Stock Prices.", "ustb3m: US 3 month Treasury bills."))
+```
+# **Question B: Computing the Returns, Excess Returns of market and each of the companies over the risk free rate.**
+
+## ***Returns***
+We compute the log returns for the market (S&P500), Microsoft, and GM.
+
+```{r}
+returns <- capm_data %>% 
+    summarise(rgm = diff(log(gm), lag = 1),
+              
+              rmt = diff(log(microsoft), lag = 1),
+              
+              rm = diff(log(sp500), lag = 1),
+              
+              rf = diff(log(ustb3m), lag = 1)) 
+
+head(returns) %>% 
+    formatting_function(caption =  "Overview of Returns")
+```
+
+
+## ***Excess Returns of the Market and Each of the companies and the CAPM Model***
+
+The CAPM model is as follows (Bodie, Z., et al, 2018):
+
+$r_{s} - r_{f} = \alpha + \beta (r_{m} - r_{f})$
+
+The left hand side consists of the difference beteen the returns of stock s and the risk free rate proxied by the US 3 month treasury bill rate. $\alpha$ and $\beta$ are the coefficients of the equation that e estimate in this exercise. The term $r_{m} - r_{f}$ is the market risk premium computed as the return of the market portfolio less the risk free rate. 
+
+This section starts by computing the market premium, defined as the return of the market (S&P) index less the risk free rate. 
+
+$market premium = rm - rf$
+
+
+Next, from the returns of each of the stocks (GM - rgm and Microsoft- rmt), we subtract the risk free rate (rf) to get the Microsoft premium (mt_premium) and the General Motors premium (gm_premium). 
+
+$mt_premium = rmt - rf$
+
+$gm_premium = rgm - rf$
+
+```{r}
+regression_data <- returns %>% 
+    transmute(market_premium = rm - rf,
+           microsoft_premium = rmt - rf,
+           gm_premium = rgm - rf)
+
+head(regression_data) %>% 
+    formatting_function(caption = "Sample Data for Regression Analysis")
+```
+
+
+# **Question C: Regression Analysis of the CAPM equations**
+
+The regression analysis for GM stock and Microsoft stock are as follows. 
+
+## ***GM stock***
+
+```{r}
+gm_regression <- lm(gm_premium ~ market_premium, data = regression_data)
+
+summary(gm_regression)
+```
+
+## ***MicroSoft Stock***
+
+```{r}
+microsoft_regression <- lm(microsoft_premium ~ market_premium, data= regression_data)
+
+summary(microsoft_regression)
+```
+
+# **Question D: Interpreting the Results of the Regression** 
+
+The coefficient for the GM stock ($\beta$) is 1.181982. This means that GM stock is riskier than the market. Specifically, when the market risk premium rises by 1 unit, the risk premium for the GM stock increases by 1.181982, ceteris paribus. Put another ay, the GM stock is more volatile or riskier  than the market given it has a $\beta > 1$. Hence, the inclusion of the GM stock to a market portfolio will raise its risk. 
+
+The coefficient for the Microsoft stock ($\beta$) is 0.983402. This means that Microsoft stock is marginally less riskier than the market. Specifically, when the market risk premium rises by 1 unit, the risk premium for the Microsoft stock increases by 0.983402 units all else remaining constant. Put another way, the Microsoft stock is marginally less volatile or less riskier  than the market portfolio given it has a $\beta < 1$. Hence, the inclusion of the Microsoft stock to a market portfolio will marginally lower its risk. 
+
+# **Question E: Hypothesis Testing $\beta = 1$ at 5% Level of Confidence**
+
+## ***GM stock***
+
+In this case, e test the following hypothesis. 
+
+Ho: $\beta = 1$
+HA: $\beta \neq 1$
+
+Note that this is two sided test. We compute the t-statistic. Note that e draw the figures from the regression output- the coefficient ($\beta$), standard error and degrees of freedom. We conclude that $\beta = 1$ given that 0.8499535 > 0.05. 
+
+$t-stat = \frac{(\beta - hypothesized_Beta)}{se(\beta)}$
+
+```{r}
+t_stat_gm = (1.181982 - 1) / 0.174126
+t_stat_gm
+pt(t_stat_gm, df = 61)
+```
+
+
+## **Microsoft Stock**
+
+We repeat the same exercise for Microsoft and again fail to reject the NULL hypothesis. We conclude that $\beta = 1$ because 0.4307496 > 0.05. 
+
+```{r}
+t_stat_microsoft = (0.983402 - 1) / 0.094735
+t_stat_microsoft
+pt(t_stat_microsoft, df = 61)
+```
+
+# **Question F: 95% Confidence Interval for the Variance**
+
+In this section, we compute a 95% confidence interval for the variance or volatility of both stocks. Given a random sample with sample variance $S^{2}$, estimating the population variance follos from the equation below.
+
+$Q = \frac{(n - 1)S^{2}}{\sigma^{2}} ~ Chisq(df = n - 1)$
+
+Thus, the 95% confidence interval is:
+
+## ***GM Stock***
+
+```{r}
+gm_var = var(regression_data$gm_premium)
+
+n = nrow(regression_data)
+
+((n - 1) * gm_var) / qchisq(c(0.975, 0.05), n - 1)
+```
+
+## ***Microsoft Stock***
+
+```{r}
+mt_var <- var(regression_data$microsoft_premium)
+
+((n - 1) * mt_var) / qchisq(c(0.975, 0.05), n - 1)
+```
+
+
+# **Checking the model assumptions**
+
+Given that there is only one independent variable, the relevant assumtions are:
+
+- Linearity
+- Homogeneity of variance
+- Normality of residuals
+
+Overall, both models appear to meet the regression assumptions except for  normality of residuals for the GM stock. 
+
+There is possibility of omitted variables bias in the analysis.
+
+\newpage
+
+\blandscape
+
+```{r, fig.cap= "Regression Assumptions - GM Model", fig.height=8, fig.width=12, echo = FALSE}
+check_model(gm_regression)
+```
+
+
+\newpage
+
+
+```{r, fig.cap= "Regression Assumptions - Microsoft Model", fig.height=8, fig.width=12, echo = FALSE}
+check_model(microsoft_regression)
+```
+
+
+\newpage
+
+\elandscape
+
+
+# Conclusion
+
+In this analysis, we estimated the $\beta$ for GM and Microsoft stocks using the CAPM. The results show that both stocks are as volatile as the market portfolio. However, the analysis could suffer from omitted variables bias. 
+
+# References
+
+Bodie, Z., Kane, A., Marcus, A.J. and Mohanty, P. (2018) Investments. 6th Edition, Tata McGraw-Hill Publishing Company, New Delhi. 

@@ -1,0 +1,362 @@
+---
+subtitle: "**Analyzing Top Companies in the World with Python and Pandas**"
+title: "Unveiling Corporate Titans: Navigating Global Business Landscapes through Python Data Analysis"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957-00100
+        city: Karatina
+        state: Kenya
+        postal-code: 10101
+      - name: Graduate School of Business Administration, University of the Witwatersrand
+        address: 2nd St Davids Pl & St Andrew Rd, Parktown
+        city: Johannesburg
+        state: South Africa
+        postal-code: 2193
+title-block-banner: "images.jpeg"
+self-contained: true
+date: today
+date-modified: today
+date-format: long
+format: 
+  html:
+    theme: cerulean
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    smooth-scroll: true
+    code-fold: false
+execute: 
+  message: false
+  warning: false
+  echo: fenced
+bibliography: references.bib
+csl: apa.csl
+---
+
+# **Background**
+
+In this analysis, we use data from Kagle[@top2000companies] to illustrate the use of Python and Pandas in data analysis[@vanderplas2016python]. The data captures the top 2000 companies in the world and is available for free upon registration on the [Kagle website](https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally).
+
+# **Objectives**
+
+The primary goal of this exercise is to illustrate how to use Python, pandas and other libraries in Python programming to analyse data for meaningful insights.
+
+Specifically, we seek to;
+
+1.  Rank companies by their performance. 
+2.  Rank countries and continents based on the concentration of large companies.
+2.  Compute the correlation between company size (in terms of assets) and financial performance.
+3.  Uncover regional patterns in company performance based on continent.
+4.  Establish the companies, continents with the highest returns on assets and profit margins.
+
+# **Summary of Results**
+
+1.  Most large companies in the sample are located in the United States.
+2.  The continent with the highest number of large companies is Asia.
+3.  There is a positive relationship between company size and financial performance (sales, profits, market value). However, this relationship varies across continents.
+4.  Companies from North America and Asia have the highest sales and profits.
+5.  Companies from Europe and Asia have the highest asset base.
+6.  Companies in Africa and North America are more efficient in converting sales and assets into profits.
+
+::: callout-tip
+Please visit my \[rpubs site\](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link \<www.rpubs.com/Karuitha\> into your browser. You can also view my \[linkedin\](www.linkedin.com/in/Karuitha) site for my skills and education.
+
+My \[Tableau public profile\](https://public.tableau.com/app/profile/john.karuitha) contains my data visualizations.
+
+My Shiny web apps are available on this \[site\](<https://karuitha.shinyapps.io/>). You can copy-paste this web address instead <https://karuitha.shinyapps.io/>
+:::
+
+Skills & Technologies Applied: Python, Pandas, Geopandas, Matplotlib, Quarto, Data Science.
+
+# **Data**
+
+The data is available on [kagle](https://www.kaggle.com/datasets/joebeachcapital/top-2000-companies-globally) as a csv file (registration is required to access the data). I start by loading the necessary packages for the analysis: pandas, numpy, matplotlib, and seaborn [@borjigin2023].
+
+```{python}
+#| echo: true
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+from shapely.geometry import Point
+```
+
+Next I read in the data using pandas and set the index column as the name of the company given it is a unique and meaningful identifier.
+
+```{python}
+company = pd.read_csv("Top2000CompaniesGlobally.csv", 
+index_col = "Company")
+
+company.columns
+```
+
+Next, I rename the columns using names that are easier to work with. I create a dictionary of old names versus new names and then rename the columns.
+
+```{python}
+## Create a dictionary of old names vs new names
+names = {'Global Rank':'rank', 
+'Sales ($billion)':'sales', 
+'Profits ($billion)':'profits',
+'Assets ($billion)':'assets', 
+'Market Value ($billion)':'market_value', 
+'Country':'country', 
+'Continent':'continent',
+'Latitude':'latitude', 
+'Longitude':'longitude'}
+
+# Rename the columns in place
+company.rename(columns = names, inplace = True)
+```
+
+# **Data Exploration**
+
+We now explore the data.
+
+## Number of rows and columns
+
+We start with the number of rows and columns in the data.
+
+```{python}
+company.shape
+```
+
+We see that the data has 1924 rows (records) and 9 columns (variables).
+
+## First and Last Rows of the Data
+
+Next, lets examine the first 5 rows.
+
+```{python}
+company.head(5)
+```
+
+We also check the last 7 rows.
+
+```{python}
+company.tail(7)
+```
+
+## Visual Summary
+
+let us use seaborn pairplot() function to create a summary picture of the data using all variables, colored by country.
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (A)"
+sns.pairplot(company[['country', 'continent', 'sales', 'profits', 'assets', 'market_value']], hue = "continent", corner = True, palette = "Dark2", kind = "scatter")
+```
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (B)"
+sns.pairplot(company[['country', 'continent', 'sales', 'profits', 'assets', 'market_value']], hue = "continent", corner = True, palette = "Dark2", kind = "kde")
+```
+
+## Variable Types
+
+The variable types are also an important data component.
+
+```{python}
+company.info()
+```
+
+```{python}
+company.dtypes
+```
+
+## Missing Values
+
+Let us check the data for any missing values for sales, profits, assets, market_value, longitude, and latitude.
+
+```{python}
+company[company['sales'].isna()]
+```
+
+```{python}
+company[company['profits'].isna()]
+```
+
+```{python}
+company[company['assets'].isna()]
+```
+
+```{python}
+company[company['market_value'].isna()]
+```
+
+```{python}
+company[company['longitude'].isna()]
+```
+
+```{python}
+company[company['latitude'].isna()]
+```
+
+This is a conveniently clean data without missing values which is a rare occurrence in data science.
+
+## Summary Statistics
+
+We use the describe method to make summary statistics for numeric and character variables separately.
+
+```{python}
+company.describe(include = "float64")
+```
+
+We also do the same for string data types.
+
+```{python}
+company.describe(include = "object")
+```
+
+Here we see that there are 1924 observations with 60 unique countries across 6 continents. The country with the most companies is the USA (535), while the continent with the most companies is Asia (719).
+
+# Analysis
+
+In this section, we explore some key issues from the data, listed in order.
+
+## **Which Companies are the Best Performing in the Sample Data?**
+
+We start by examining sales. Wal-mart and Shell lead the pack in this case. Overall petroleum companies and motor vehicle manufacturing companies do very well. 
+
+```{python}
+company.nlargest(10, "sales")["sales"]
+```
+In terms of profits, Exxon Mobil and Apple come up tops.
+```{python}
+company.nlargest(10, "profits")["profits"]
+```
+Apple tops the ranking of most valuable company followed by Exxon Mobil and Google. 
+```{python}
+company.nlargest(10, "market_value")["market_value"]
+```
+
+## Which Countries and Continents Have the Highest Concentration of Large Companies?
+
+In this section, we utilize the global rank in size variable to identify the countries and continents with the highest number of top-ranking companies. We see that companies from USA, Japan, China, UK, Canada, and South Korea dominate the rankings. Note that these are countries mainly from North America and Asia (with the exception of the UK) which illustrates the dominance of these two continents in global trade.
+
+```{python}
+company['country'].value_counts()
+```
+
+Just to confirm, let us see the concentration of companies by continent.
+
+```{python}
+company['continent'].value_counts()
+```
+
+We then visualize this information on a world map using latitude and longitude data to show the geographic distribution of these companies. The size of the dots represents profits. We find that while there are the profitable companies are mainly in Asia, Europe, and North America. The rest of the world generates very few profits.
+
+```{python}
+# Create a GeoDataFrame
+geometry = [Point(lon, lat) for lon, lat in zip(company['longitude'], company['latitude'])]
+gdf = gpd.GeoDataFrame(company, geometry=geometry, columns=['company', 'sales', 'profits', 'assets'])
+
+```
+
+```{python}
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+```
+
+```{python}
+#| fig-cap: "Top Companies by Sales on a World Map"
+# Create a subplot
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Plot the world map
+world.boundary.plot(ax=ax, color = "lightgrey")
+
+# Plot your data on the map
+gdf.plot(ax=ax, marker='o', color='red', markersize='profits', label='Companies')
+
+# Add labels and legend
+ax.set_title('Top Companies by Profits on World Map')
+ax.set_xlabel('Longitude')
+ax.set_ylabel('Latitude')
+ax.legend()
+
+plt.show()
+
+```
+
+## Is There a Correlation Between Company Size (in terms of assets) and Financial Performance?
+
+Here, we analyze the relationship between the asset base of companies, which is a proxy for size and financial metrics such as sales, profits, and market value. The goal is to determine if larger companies tend to have higher sales, profits, and market value, or if there are exceptions. Overall, there appears to be a positive link between the size of a company and its financial performance in terms of sales, profits, and market value. However, this relationship varies by continent.
+
+```{python}
+#| fig-cap: "Pairs plots for the Variables (C)"
+sns.pairplot(company[["continent", "assets", "sales", "profits", "market_value"]], hue = "continent")
+```
+
+```{python}
+company[["assets", "sales", "profits", "market_value"]].corr()
+```
+
+## Are There Regional Patterns in Company Performance Based on Continent?
+
+In this section, I group the data by continent and analyze the average sales, profits, and assets for companies in each continent. North America and Asia have the highest sales and profits. In terms of asset base, companies in Europe and North America lead. This implies that companies in North America are more efficient in converting their sales and assets into profits.
+
+```{python}
+#| fig-cap: "Sales by Companies"
+company.groupby("continent")["sales"].sum().sort_values().plot(kind = "barh", title = "Total Sales of Top 2000 Companies globally by Continent")
+```
+
+```{python}
+#| fig-cap: "Total Profits of Top 2000 Companies globally by Continent"
+company.groupby("continent")["profits"].sum().sort_values().plot(kind = "barh", title = "Total Profits of Top 2000 Companies globally by Continent")
+```
+
+```{python}
+#| fig-cap: "Total Assets of Top 2000 Companies globally by Continent"
+company.groupby("continent")["assets"].sum().sort_values().plot(kind = "barh", title = "Total Assets of Top 2000 Companies globally by Continent")
+```
+
+## Which Companies, Contiments have the Highest Returns on Assets and Profit margins?
+
+The return on assets is the ratio of profits to assets and captures the efficiency with which a company utilises its assets to generate profits. The net profit margin also captures how well a company is able to convert its sales into profits. The margin can also proxy the management efforts towards expenses management.
+
+Carphone Warehouse with a return on assets of 1 means that it generated profits equivalent to its assets base. This is phenomenal!! The companies in the top 5 all have a return greater than 30%, which is an exceptional performance.
+
+```{python}
+company["roa"] = company["profits"] / company["assets"]
+company["margin"] = company["profits"] / company["sales"]
+```
+
+```{python}
+company['roa'].sort_values(ascending = False).head()
+```
+
+Next, I compute the median ROA for each continent. Africa leads, though the continent has very few companies in the sample. North America is in second place, which implies that the companies in this continent are very efficient in utilizing assets to generate profits.
+
+```{python}
+company.groupby("continent")['roa'].median().sort_values(ascending = False)
+```
+
+Let us do the same for profit margin. The companies in the top 5 have ratios greater than 1 which implies they generated profits greater than the sales. This is cause for concern especially for Carphone Warehouse which appears to have generated profits from zero sales.
+
+```{python}
+company['margin'].sort_values(ascending = False).head()
+```
+
+Africa leads in median profit margin. Again this could be die to the low number of companies from the continent in this sample. Oceania and North America follow in that order. Europe does poorly.
+
+```{python}
+company.groupby("continent")['margin'].median().sort_values(ascending = False)
+```
+
+# **Conclusion**
+
+In this analysis, we use data from Kagle to illustrate the use of Python and Pandas in data analysis. From the analysis, we find that;
+
+1.  Most large companies in the sample are located in the United States.
+2.  The continent with the highest number of large companies is Asia.
+3.  There is a positive relationship between company size and financial performance. However, this relationship varies across continents.
+4.  Companies from North America and Asia have the highest sales and profits.
+5.  Companies from Europe and Asia have the highest asset base.
+6.  Companies in Africa and North America are more efficient in converting sales and assets into profits.
+
+# **References** {.unnumbered}

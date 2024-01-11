@@ -1,0 +1,179 @@
+---
+output: stevetemplates::html_article
+title: "Extracting Data from 200 Nested Excel Files Using the R Programming Language"
+thanks: "Replication files are available on the author's Github account (http://github.com/Karuitha). **Current version**: `r format(Sys.time(), '%B %d, %Y')`; **Corresponding author**: jkaruitha@karu.ac.ke."
+author:
+- name: "**John Karuitha**"
+  affiliation: "***Karatina University, Kenya***"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Background
+
+In this project, I demonstrate how to extract data from multiple excel files nested in different folders and sub-folders. Ordinarily, this data would require a person to open each folder and sub-folder. Next, open each Ms Excel file inside the folders or sub-folders, and then copy-paste the content of each of the Excel files to a master Excel file. 
+
+Copy-pasting is viable when dealing with a few data files. However, even for a very efficient Ms Excel user, cutting and pasting data from 200 Ms Excel files to create one data set is a tall order. Fortunately, the `R` programming language makes such tasks easy and fast. 
+
+```{r, echo = FALSE}
+knitr::read_chunk("get_data_script.R")
+```
+
+I start by loading the required packages. Note that this step requires an internet connection. 
+
+```{r}
+## Load required packages ----
+if(!require(pacman)){
+        
+        install.packages("pacman")
+}
+
+
+pacman::p_load(tidyverse, readxl, data.table, doParallel,
+               
+               tufte, tint, stevetemplates, rticles)
+```
+
+The code chunk below hastens code execution.
+
+```{r parallel_computing}
+
+```
+
+# Raw Data
+
+The data is as follows: One master folder named `Data` contains 16 sub-folders for the years 2006 to 2021. Each of the 16 sub-folders has 12 sub-folders, one for each month of a given year. Each of the 12 sub-folders contains one Ms Excel workbook with one sheet. Thus, we have `r 16 * 12` Ms Excel files. Note that all the data in Excel are in the same format. A sample excel file, in this case that of August 2006, has data in the following format. 
+
+```{r sample_dataset, message=FALSE, warning=FALSE}
+
+```
+
+
+## Expected Output
+The first task is to create a single data table from the 192 excel files. The second task is to clean the data in column F. Specifically; I extract each row in column F (or column 6) that contains a 5 number digit. Put another way, I drop all rows in column F that do not have a number with exactly five digits. 
+
+Next, I break down the 5 number digit in column F into three components or variables.
+
+- Digit 1: `Cloud` cover.
+- Digits 2 and 3: `Wind direction`.
+- Digit 4 and 5: `Wind speed` in knots. 
+
+For example, a five digit number like 13786 will be as follows. 
+
+```{r}
+tribble(~ cloud, ~ wind_direction, ~ wind_speed,
+        
+        1, 37, 86) %>% 
+        
+        knitr::kable()
+```
+
+Next, I convert wind speed from knots to metres per second by multiplying the variable by 0.514. Finally, I extract the wind speed in metres per second and summarise (average) the variable by month and year.
+
+You can download the code used in this analysis from my [GitHub account](www.github.com/Karuitha), www.github.com/Karuitha. 
+
+
+# Extracting the Data
+
+This section details the steps I follow in reading and extracting the data. 
+
+## Step 1: List all the Ms Excel Files in the Folders. 
+
+The code chunk below will list the names of all excel (.xlsx) files inside the `Data` folder, including sub-folders inside the `Data` folder. 
+
+```{r read_allfiles}
+
+```
+
+- `path = "Data"`: Indicates that our data is in the `Data` folder.
+- `pattern = "*.xlsx"`: This notation instructs R to extract all files that end in .xlsx.
+- `recursive = TRUE`: This instruction tells R to check for excel files in the `Data` folder and the sub-folders inside the `Data` folder. If set to FALSE, R will only check for excel files inside the `Data` folder and miss the files inside the sub-folders.
+- `full.names = TRUE`: This instruction tells R to extract the full file path of each excel file. The entire file path allows R to read files contained in the sub-folders. 
+
+Below is a listing of all the excel files detected. 
+
+```{r list_files}
+
+```
+
+
+## Step 2: Create a Function to Read and Clean Excel Files
+
+As noted earlier, the data in the Ms Excel files have the same format. My approach to creating a function to read and clean data is to take one Excel file and write a piece of code that reads the data and does data cleaning to my satisfaction. I then use this code to construct a function to read and clean data from any other file in the dataset. 
+
+The function below reads in the data and does the cleaning. Notable is the `extract` function that takes a grouped regular expression (`regex`) and extracts the data specified. The function will extract the first, second and third, and fourth and fifth digits and allocate them to their respective variable names. It is also critical to convert all data into characters to avoid problems when combining the files into one dataset. You can convert all columns to characters using the code;
+
+`mutate(across(.cols = everything(), as.character))`
+
+```{r function_data}
+
+```
+
+
+## Step 3: Loop the Function Over the Excel Files
+
+Next, I loop the function over each Ms Excel file. We would have to write a `for` loop in other programming languages like Python. However, in R, we loop mainly using the `apply` or `map` family of functions, although `for` loops can also work in R. 
+
+```{r loop_over_data, message=FALSE, warning=FALSE}
+
+```
+
+## Long Form of the Data
+
+The table below shows the first six rows of the data in the long format.
+
+```{r head_final_data}
+
+```
+
+## Long Form of the Wind Speed data
+
+The last two digits of the five digit number in column F represent the wind speed in knots. We then convert the wind speed to meters per second. In this section, I summarise the wind speed in Zambia by month of each year. 
+
+```{r Write_excel}
+
+```
+
+```{r long_data}
+
+```
+
+```{r final_joe_long_data}
+
+```
+
+## Wide Form of the Wind Speed data
+
+For storage efficiency, we usually store data in a wide format. Here, the columns represent months, while the rows are the years. 
+
+
+```{r averages_data}
+
+```
+
+```{r averages_data_wide}
+
+```
+
+## Exploratory Data Analysis
+
+I summarise the cloud, wind_direction and wind_speed in Zambia. 
+
+```{r summary_graphs}
+
+```
+
+## What Could cause Code to Break?
+
+```{r important_info}
+
+```
+
+## Conclusion
+
+In this analysis, I have demonstrated how to read multiple Ms Excel files from a folder and techniques for cleaning such data. 
+
+Replication files are available on my Github account (https://github.com/Karuitha/data_projects/tree/master/Send). **Corresponding author**jkaruitha@karu.ac.ke.
+

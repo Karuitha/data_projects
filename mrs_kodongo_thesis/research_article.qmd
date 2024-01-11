@@ -1,0 +1,770 @@
+---
+title: "Research Article"
+author: 
+    - name: Dorothy Miruka
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "University of the Witwatersrand, Johannesburg"
+      affiliation-url: www.wits.ac.za
+title-block-banner: true
+echo: false
+message: false
+warning: false
+prefer-html: true
+format: 
+    html:
+        theme: flatly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+---
+
+# **Research Questions**
+
+The research seeks to answer the following questions:
+
+1.  Is there a relationship between working from home and employee motivation?
+2.  Is there a relationship between working from home and job satisfaction?
+3.  Is there a relationship between employee motivation and job satisfaction?
+4.  How do technological skills affect the relationship between employee motivation and job satisfaction when working from home?
+
+# **Data**
+
+We collected the data using an online survey of Wits University staff members. The survey captured data for 41 variables of interest that covered constructs for job satisfaction, employee motivation, technology, and demographic and personal data. The description of the variables is in the appendix.
+
+The sampling frame consisted of all () staff members of the university in 2021. The survey resulted in 201 questionaires for a desired sample size of 354. To make up for the defficiency, we bootstrapped the data to represent 354 observations. The rest of the analysis draws from these 354 observations.
+
+```{r}
+## Load the package manager
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+## Load the packages and install when unavailable
+pacman::p_load(tidyverse, janitor, skimr, GGally, 
+               readxl, rio, tidymodels,
+               Amelia, gt, flextable, BiocManager, survey,
+               NHANES, patchwork, corrplot, kableExtra, 
+               ggcorrplot, performance, corrtable, ltm, 
+               htmltools, jtools, huxtable, officer)
+
+if(!require(firatheme)){
+remotes::install_github("vankesteren/firatheme")}
+
+if(!require(ggbiplot)){
+remotes::install_github("vqv/ggbiplot")}
+
+## Set the default theme for plots
+theme_set(theme_classic() + theme(axis.line = element_blank(),
+                                  axis.text.y = element_blank(),
+                                  axis.ticks.y = element_blank()
+                                  ))
+
+options(digits = 3)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    
+    data %>% 
+        dplyr::select(-n_missing, -complete_rate,
+        -skim_type) %>%
+        dplyr::rename(Mean = numeric.mean, SD = numeric.sd, 
+        Min = numeric.p0, Max = numeric.p100, Q1 = numeric.p25,
+        Median = numeric.p50, Q3 = numeric.p75,
+        Variable = skim_variable) %>%
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+```
+
+```{r}
+## Load the data
+my_data <- rio::import("Data_for_John.xlsx") %>% tibble()
+# head(my_data)
+#names(my_data)
+# class(my_data)
+# names(my_data)
+
+
+## rename the variables
+my_data <- my_data %>% 
+    dplyr::rename(
+           age1825 = `Age group: 18-25`,
+           age2635 = `Age group: 26-35`,
+           age3645 = `Age group: 36-45`,
+           age4655 = `Age group: 46 - 55`,
+           age5665 = `Age group: 56-65`,
+           marital_single = `Marital Status: Single`,
+           marital_married_cohabit = `Marital Status: Married or cohabiting`,
+           marital_with_parents = `Marital Status: Living with parents`,
+           marital_divorced = `Marital Status: Divorced`, 
+           educ_high_school = `Education: High school`,
+           educ_diploma = `Education: Diploma`,
+           educ_graduate = `Education: Graduate`,
+           educ_post_graduate = `Education: Postgraduate`,
+           emp_permanent = `Employment type: Permanent`,
+           emp_temporary = `Employment type: temporary`,
+            motiv_enough_time_to_work = `There was  enough time to get through my job.`,
+            motiv_work_clearly_explained = `My work assignment was always clearly explained to me.`,
+            motiv_comfortable_working_hours = `I had comfortable working hours.`,
+            motiv_satisfied_career_progress = `I am satisfied with my career progress in this institution.`,
+            motiv_equipment_tools_efficient = `The equipment and tools used  for work were efficient.`,
+            motiv_adequate_working_area = `I had adequate working area to work efficiently.`,
+            motiv_interest_what_i_did = `I took interest in what I did.`,
+            motiv_lighting_ventilation_workplace = `There was the provision of lighting and ventilation facilities at the workplace.`,
+            motiv_comfortable_work_environment = `My  working environment was comfortable.`,
+            js_day_seemed_to_never_end = `Each day of my work was pleasant and enjoyable`,
+            js_work_disturbed_family_life = `The requirements for my working activities did not disturb my family life`,
+            js_work_affected_family_respo = `The duration of my working life made it easy to fulfil my family responsibilities.`,
+            js_private_life_positive_effect_work = `My private life affected my professional tasks positively.`,
+            js_institution_impt_to_me = `This institution is of great importance to me.`,
+            js_adequate_opp_to_develop_skills = `I have adequate opportunities to develop my professional skills`,
+            js_could_communicate_all_levels = `I felt I could easily communicate with members from all levels.`,
+            js_work_affected_private_tasks = `The stress of working duties made it difficult to fulfil my private tasks.`,
+            js_postpone_job_tasks_due_to_family_respo = `I had to postpone my professional tasks because I had too many family responsibilities.`,
+            wfh_job_objectives_clear_daily_weekly = `My work objectives were clear each day/week`,
+            wfh_adequate_equipment = `I had all the equipment needed to complete my work.`,
+            wfh_remote_productivity_office_productivity_equal = `I was as productive at home as I am at the office.`,
+            wfh_work_from_home_cannot_be_improved = `I feel like working from home need no improvement.`,
+            wfh_remote_work_support_growth = `I find that working from home supported my career growth.`,
+            wfh_online_physical_meetings_equivalent = `I found online meetings to be as effective as face-to-face meetings.`,
+            wfh_remote_work_tech_reliable = `The technology I used for online work was reliable.`,
+            wfh_good_focus_remote_work = `I found myself focusing well when working from home.`,
+            wfh_not_miss_social_interactions = `I did not miss social interactions while working from home.`,
+            wfh_prefer_remote_work = `I would rather continue working from home after the outbreak.`,
+            tech_communication_employees_easy = `I found communication with other employees easy`,
+            tech_acess_work_related_info_hard = `I found access to work-related information straightforward`,
+            tech_not_miss_impt_info = `I felt like I never missed important information because of technology.`,
+            tech_not_hinder_work = `Communication tools (e.g. technology) did not hinder my work.`,
+            tech_remote_help_available_incase_digital_hitches = `When I encountered difficulties, people on the digital platform would help me overcome the problem.`)  %>%
+
+            mutate(
+
+                marital = case_when(
+
+                    marital_single == 1 ~ "single",
+
+                    marital_married_cohabit == 1 ~ "married",
+
+                    marital_with_parents == 1 ~ "with parents",
+
+                    TRUE ~ "Divorced"
+
+
+                )
+            ) %>%
+
+
+            mutate(
+
+                    employment_category = case_when(
+
+                       emp_permanent == 1 ~ "permanent",
+
+                       TRUE  ~ "temporary"     
+
+                    )
+
+            ) %>%
+
+
+            mutate(age_group = case_when(
+
+                  age1825 == 1 ~ "18-25",
+
+                  age2635 == 1 ~ "26-35",
+
+                  age3645 == 1 ~ "36-45",
+
+                  age4655 == 1 ~ "46-55",
+
+                  TRUE ~ "Over 55"
+
+
+
+            )) %>%
+
+            mutate(gender = case_when(
+
+                    Female == 1 ~ "Female",
+
+                    TRUE ~ "Male"
+
+            )) %>%
+
+
+            mutate(education = case_when(
+
+                   educ_high_school == 1 ~ "High School",
+
+                   educ_diploma == 1 ~ "Diploma",
+
+                   educ_graduate == 1 ~ "Graduate",
+
+                   TRUE ~ "Postgrad"
+
+
+            )) %>%
+
+            dplyr::select(gender, marital, education, age_group, employment_category, where(is.numeric)) 
+            
+            
+
+
+
+#my_data %>% filter(!complete.cases(.))
+#names(my_data)
+#head(my_data)
+#Amelia::missmap(my_data)
+
+```
+
+## **Data Reliability**
+
+As noted in the methodology section, we used a virtual questionaire to collect the data from the administrative staff of University of the Witwatersrand, Johannesburg. In this ection, we examine the reliability of the data using the Cronbach's Alpha. The Cronbach's Alpha is useful for quantifying reliability of the data by measuring the internal consistency of the data.
+
+```{r}
+Amelia::missmap(my_data)
+cronbach.alpha(data = my_data, 
+standardized = FALSE,
+CI = TRUE)
+```
+
+The Cronbach's \$\alpha\$ lies between 0.4 and 0.57 which may indicate poor response. For instance, most of the respondents are female and relatively older. However, the data does lie in the acceptable region.
+
+## **Exploring the Data**
+
+We start this section by exploring the data set through visualizations. Figure 1 contains the profiles of employees in the sample and that responded to the survey. In Panel C, for instance, 84% of the respondents were female and 16% male. This response profile is problematic given that the sampling frame is different as the University has about 50% male employees \[\]. Even more extreme is the profile for permanent versus part time employees at 93% and 7% (see Panel A), respectively, although this closely follows employee job categories at the University. The profiles for other employee categories including age, experience, marital status, and education level do not possess these extreme qualities. In the regression analysis, we control for the gender of the respondents (see section ()).
+
+\newpage
+
+\blandscape
+
+```{r}
+#| fig-cap: "Respondents Profile (% of Total Count)"
+#| fig-height: 8
+#| fig-width: 12
+
+# Plotting the demographics of respondents
+(my_data %>%
+    dplyr::count(employment_category) %>%
+    dplyr::mutate(n = n / sum(n) * 100) %>%
+    dplyr::mutate(n = n %>% round(0)) %>%
+    tibble() %>%
+    dplyr::mutate(employment_category = fct_reorder(employment_category, n, max)) %>%
+    ggplot(aes(x = employment_category, y = n)) + 
+    geom_col(fill = "gray90", color = "black") +
+    geom_text(aes(label = n), position=position_dodge(width=0.9), vjust=-0.25) + labs(title = "A: Job Category", x = "", y = "") +
+
+my_data %>%
+    dplyr::count(age_group) %>%
+    dplyr::mutate(n = n / sum(n) * 100) %>%
+    dplyr::mutate(n = n %>% round(0)) %>%
+    tibble() %>%
+    dplyr::mutate(age_group = fct_reorder(age_group, n, max)) %>%
+    ggplot(aes(x = age_group, y = n)) + 
+    geom_col(fill = "gray90", color = "black") +
+    geom_text(aes(label = n), position=position_dodge(width=0.9), vjust=-0.25) +
+    labs(title = "B: Age Group", x = "", y = "")) /
+
+(my_data %>%
+    dplyr::count(gender) %>%
+    dplyr::mutate(n = n / sum(n) * 100) %>%
+    dplyr::mutate(n = n %>% round(0)) %>%
+    tibble() %>%
+    dplyr::mutate(gender = fct_reorder(gender, n, max)) %>%
+    ggplot(aes(x = gender, y = n)) + 
+    geom_col(fill = "gray90", color = "black") +
+    geom_text(aes(label = n), position=position_dodge(width=0.9), vjust=-0.25) +
+    labs(title = "C: Gender", x = "", y = "") 
+
+
+) /
+
+(my_data %>%
+    dplyr::count(marital) %>%
+    dplyr::mutate(n = n / sum(n) * 100) %>%
+    dplyr::mutate(n = n %>% round(0)) %>%
+    tibble() %>%
+    dplyr::mutate(marital = fct_reorder(marital, n, max)) %>%
+    ggplot(aes(x = marital, y = n)) + 
+    geom_col(fill = "gray90", color = "black") +
+    geom_text(aes(label = n), position=position_dodge(width=0.9), vjust=-0.25) +
+    labs(title = "E: Marital Status", x = "", y = "") +
+
+my_data %>%
+    dplyr::count(education) %>%
+    dplyr::mutate(n = n / sum(n) * 100) %>%
+    dplyr::mutate(n = n %>% round(0)) %>%
+    tibble() %>%
+    dplyr::mutate(education = fct_reorder(education, n, max)) %>%
+    ggplot(aes(x = education, y = n)) + 
+    geom_col(fill = "gray90", color = "black") +
+    geom_text(aes(label = n), position=position_dodge(width=0.9), vjust=-0.25) +
+    labs(title = "F: Education Level", x = "", y = ""))
+```
+
+\elandscape
+
+\newpage
+
+We also examine each of the categories of questions in the questionaire that covered the following areas.
+
+-   Motivation.
+-   Job Satisfaction.
+-   Working from home.
+-   Technology.
+
+### Motivation
+
+Table () below shows the summary statistics of the responses capturing motivation of employees. On a scale of 1 (strongly disagree) to 7 (strongly agree), most respondents (102) strongly disagreed that they had no time to work when working from home (see the median od the variable motiv_no_time_to_work in the table). The other variables have a similar interpretation.
+
+```{r}
+table(my_data$motiv_no_time_to_work)
+
+my_data %>%
+    dplyr::select(starts_with("motiv")) %>%
+    skimr::skim_without_charts() %>%
+    formatting_function(caption = "Summary: Variables Capturing Motivation")
+
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: 'Correlation Between Motivation Indicators'
+#| label: "motiv_correlation"
+#| fig-height: 8
+#| fig-width: 12
+my_data %>%
+    dplyr::select(starts_with("motiv")) %>% 
+    GGally::ggpairs()
+    # cor() %>%
+    # ggcorrplot(lab = TRUE, type = "lower", method="circle")
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+### Job satisfaction
+
+Table () summarises the responses capturing job satisfaction. As an example, when the researcher posed the question "My day never seemed to end", most respondents strongly disagreed, implying a high degree of job satisfaction.
+
+```{r}
+table(my_data$js_day_seemed_to_never_end)
+
+my_data %>%
+    dplyr::select(starts_with("js")) %>%
+    skimr::skim_without_charts() %>%
+    formatting_function(caption = "Summary: Variables Capturing Motivation")
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: 'Correlation Between Job Satisfaction Indicators'
+#| label: "js_correlation"
+#| fig-height: 8
+#| fig-width: 12
+my_data %>%
+    dplyr::select(starts_with("js")) %>%
+    GGally::ggpairs()
+    # cor() %>%
+    # ggcorrplot(lab = TRUE, type = "lower", method="circle")
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+### Working from Home
+
+Again, Table () below summarises the responses for employees regarding remote work. Most respondents, for instance,strongly agreed that daily and weekly job objectives were clearly stated.
+
+```{r}
+table(my_data$wfh_job_objectives_clear_daily_weekly)
+
+my_data %>%
+    dplyr::select(starts_with("wfh")) %>%
+    skimr::skim_without_charts() %>%
+    formatting_function(caption = "Summary: Variables Capturing Work from Home")
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: "Correlation Between Working from Home Indicators"
+#| label: "wfh_correlation"
+#| fig-height: 8
+#| fig-width: 12
+my_data %>%
+    dplyr::select(starts_with("wfh")) %>%
+    GGally::ggpairs()
+    # cor() %>%
+    # ggcorrplot(lab = TRUE, type = "lower", method="circle")
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+### Technology
+
+In this section, I visualize the variables that capture the use of technology by employees while working from home. As an example, most employees disagreed that they had problems communicating with colleagues virtually.
+
+```{r}
+table(my_data$tech_communication_employees_problematic)
+my_data %>%
+    dplyr::select(starts_with("tech")) %>%
+    skimr::skim_without_charts() %>%
+    formatting_function(caption = "Summary: Variables Capturing Technology")
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: 'Correlation Between Working from Home Indicators'
+#| label: "tech_correlation"
+#| fig-height: 8
+#| fig-width: 12
+my_data %>%
+    dplyr::select(starts_with("tech")) %>%
+    GGally::ggpairs()
+    # cor() %>%
+    # ggcorrplot(lab = TRUE, type = "lower", method="circle")
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+## **Data Analysis and Discussion of Results**
+
+In this section, we will examine the research questions in greater detail.
+
+### *Principal Components Analysis*
+
+To start with, we create aggregate metrics to capture the four variables;
+
+-   Motivation.
+-   Job Satisfaction.
+-   Working from Home.
+-   Technology.
+
+To construct these variables from the responses in the questionaires, we apply Principal Components Analysis (PCA). We label these variables `motiv` for motivation, `js` for job satisfaction, `wfh` for working from home, and `tech` for technology. In each PCA analysis, we extract the first principal component. This first principal component proxies the corresponding metric in answering the research questions.
+
+The output below shows the contributions of each of the components for motivation. The first principal component constitutes 39% of total variance.
+
+```{r}
+motiv_pca <- my_data %>% 
+    dplyr::select(starts_with(c("motiv"))) %>% 
+    prcomp(center = TRUE,scale. = TRUE)
+
+summary(motiv_pca)
+
+motiv <- motiv_pca$x[,1]
+```
+
+For job satisfaction, the first principal component constitutes 40% of total variance.
+
+```{r}
+js_pca <- my_data %>% 
+    dplyr::select(starts_with(c("js"))) %>% 
+    prcomp(center = TRUE,scale. = TRUE)
+
+summary(js_pca)
+
+js <- js_pca$x[,1]
+```
+
+For the wfh variable the first principal component contributes 29% of the total variability.
+
+```{r}
+wfh_pca <- my_data %>% 
+    dplyr::select(starts_with(c("wfh"))) %>% 
+    prcomp(center = TRUE,scale. = TRUE)
+
+summary(wfh_pca)
+
+wfh <- wfh_pca$x[,1]
+```
+
+Lastly, first principal component for technology contributes 52% of the total variability.
+
+```{r}
+tech_pca <- my_data %>% 
+    dplyr::select(starts_with("tech")) %>%
+    prcomp(center = TRUE,scale. = TRUE)
+
+summary(tech_pca)
+
+tech <- tech_pca$x[,1]
+```
+
+```{r}
+final_data <- tibble(motiv, js, wfh, tech) %>%
+                bind_cols(
+
+                    my_data %>% dplyr::select("gender" , "age_group" , "marital" , "education", "employment_category")) %>%
+                dplyr::mutate(across(.cols = where(is.character), factor))
+
+#head(final_data)
+```
+
+The graphs below shows the contributions of each principal component to the total variability.
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: 'Contribution of the Principal Components'
+#| label: "pca"
+#| fig-height: 8
+#| fig-width: 12
+
+par(mfrow = c(2, 2))
+
+plot(motiv_pca, type = "l", main = "Principal Component Analysis, Motivation")
+
+plot(js_pca, type = "l", main = "Principal Component Analysis, Satisfaction")
+
+
+plot(wfh_pca, type = "l", main = "Principal Component Analysis, Remote Work")
+
+plot(tech_pca, type = "l", main = "Principal Component Analysis, Technology")
+
+par(mfrow = c(1, 1))
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+#### Visualizing the First Principal Components
+
+In this section, we examine the correlation between the proxies for motivation, job satisfaction, technology, and working from home. Again, these proxies are the first principal components of the measures for motivation, job satisfaction, working from home and technology computed in the previous section.
+
+Figure () shows a significant correlation between the variables. For instance, there is very high positive correlation between the motivation and job satisfaction on the one hand and technology and job satisfaction on the other. However, there appears to be a non-linear relationship between the variables making the correlations less useful.
+
+### *Remote work and employee motivation?*
+
+Figure () below shows the relationship between employee motivation and working from home. The relationship is negative at the initial levels but turns positive at higher levels. In the regression analysis in section () below, we examine the significance of the relationship between employee motivation and working from home in the presence of other related variables.
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+final_data %>%
+    dplyr::select(where(is.numeric)) %>%
+    GGally::ggpairs(title = "Correlation Matrix for the First PCA of the Variables", 
+
+    lower = list(continuous = "cor", combo = "box_no_facet", discrete = "count", na =
+    "na"),
+  upper = NULL,
+  diag = list(continuous = "densityDiag", discrete = "barDiag", na = "naDiag")
+    
+
+
+    
+    
+    )
+
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+```{r}
+final_data %>%
+    ggplot(mapping = aes(x = wfh, y = motiv, color = motiv)) + 
+    geom_point(shape = 1, size = 5, stroke = 2) + 
+    scale_color_gradient(low = "gray80", high = "black") + 
+    labs(x = "Working from Home", y = "Motivation", title = "Work from Home and Employee Motivation") 
+```
+
+### *Remote work and and job satisfaction?*
+
+Figure () below shows the relationship between job satisfaction and working from home. The relationship is negative at the initial levels but flattens at higher levels. This observation goes against the theory. In the regression analysis in section () below, we examine the significance of this relationship in the presence of other related variables.
+
+```{r}
+final_data %>%
+    ggplot(mapping = aes(x = wfh, y = js, color = motiv)) + 
+    geom_point(shape = 1, size = 5, stroke = 2) + 
+    scale_color_gradient(low = "gray80", high = "black") + 
+    labs(x = "Working from Home", y = "Job Satisfaction", title = "Work from Home and Job Satisfaction") 
+```
+
+### *Employee motivation and job satisfaction?*
+
+As expected, Figure () below shows the positive relationship between employee motivation and job satisfaction. In line with the theory, higher employee motivation corresponds to higher job satisfaction. Again , we examine the significance of this relationship in the regression analysis section below.
+
+```{r}
+final_data %>%
+    ggplot(mapping = aes(x = motiv, y = js, color = motiv)) + 
+    geom_point(shape = 1, size = 5, stroke = 2) + 
+    scale_color_gradient(low = "gray80", high = "black") + 
+    labs(x = "Motivation", y = "Job Satisfaction", title = "Motivation and Job Satisfaction") 
+```
+
+### *Technological skills, employee motivation and job satisfaction in remote work*
+
+Overall, there is a positive relationship between the employee motivation and job satisfaction (see Figure () below). The figure also indicates that employees with better technology skills have higher motivation. However, job satisfaction does not appear to have a significant relationship with the technology. The implication here is that the positive relatonship between the employee motivation and job satisfaction arises from other factors beyond profficiency in technology. We discuss some of these other factors in the regression analysis in the next section.
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+#| fig-cap: "Respondents Profile (% of Total Count)"
+#| fig-height: 8
+#| fig-width: 12
+
+# How do technological skills affect  
+# the relationship between employee motivation 
+# and job satisfaction when working from home?
+
+(final_data %>%
+    ggplot(mapping = aes(x = motiv, y = js, color = tech)) + 
+    geom_point(shape = 1, size = 3) + 
+    scale_color_gradient(low = "gray80", high = "black") + 
+    labs(x = "Motivation", y = "Job Satisfaction",
+    title = "Motivation vs Job Satisfaction")  +
+
+final_data %>%
+    ggplot(mapping = aes(x = motiv, y = tech)) + 
+    geom_point(shape = 1, size = 3) +
+    labs(x = "Motivation", y = "Technology",
+    title = "Motivation vs Technology") +
+
+final_data %>%
+    ggplot(mapping = aes(x = js, y = tech)) + 
+    geom_point(shape = 1, size = 3) +
+    labs(x = "Job Satisfaction", y = "Technology",
+    title = "Job Satisfaction vs Technology"))
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+We run a regression analysis of the following form;
+
+$motivation = \beta_{0} + \beta_{1}job_satisfaction + \beta_{n}controls + error_term$
+
+Where motivation and job_satisfaction are variables that captures employee motivation and job satisfaction, respectively. The controls include gender, age group, marital status, education level, employment category, experience, and whether or not the employee worked from home. We also include an interaction of technology and job satisfaction. The interaction is the outcome of interest in this section. The summary of the regression analysis is in the table below.
+
+The regression confirms the outcome of Figure () above. While the relationship between job satisfaction and motivation is positive and significant, the relationship between motivation and the interaction of job satisfaction and technology is not. What are the additional variables that affect the levels of motivation among employees?
+
+The regression table shows that the level of motivation among employees is a function of other variables. These variables include working from home (wfh), age group, marital status, education level, experience. Notably, both technology and job satisfaction are not a significant driver of the level of motivation among employees. However, the flexibility to work from home does positively affect the level of motivation.
+
+Divorced employees had a greater motivation than married or single employees in the sample. Employees with certificate level education had less motivation compared to employees with higher levels of education. Part-time employees have a greater motivation motivation than parmanent employees which is a suprising outcome from the analysis.
+
+Compared to employees with 1-5 years of experience, employees with experience between 6 and 20 years have a greater motivation. On the other hand, employees with experience of 21-25 years have significantly less motivation. Critically, working from home has a significant relationship with employee motivation. Hence, management could explore mechanisms to allow employees to choose remote work where possible.
+
+Note that we do not include age in the regression as it is highly correlated with experience. The regression disagnostics plot in Figure () indicates a mild level of multicollinearity. However, the model is significant with the independent variables explaining 77% of the variation in the dependent variable with a significant F-statistic.
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r}
+# 𝑀𝑜𝑡𝑖𝑣 = 𝛽0 + 𝛽1 𝑊𝐹𝐻 + 𝛽2 𝑇𝑒𝑐𝑆𝑘𝑙 + 𝛽3 𝑊𝐹𝐻 × 𝑇𝑒𝑐𝑆𝑘𝑖𝑙 + 𝛽4 𝐶𝑜𝑛𝑡𝑟𝑜𝑙𝑠 + 𝜀𝑀𝑜𝑡𝑖𝑣
+
+my_reg <- lm(motiv ~ wfh + tech + wfh:tech + age_group + gender + marital + education + employment_category, data = final_data)
+
+summary(my_reg)
+
+
+## 𝐽𝑜𝑏𝑆𝑎𝑡 = 𝛽0 + 𝛽1 𝑊𝐹𝐻 + 𝛽2 𝑀𝑜𝑡𝑖𝑣 + 𝛽3 𝑀𝑜𝑡𝑖𝑣 × 𝑊𝐹𝐻 + 𝛽4 𝑀𝑜𝑡𝑖𝑣 × 𝑊𝐹𝐻 × 𝑇𝑒𝑐𝑆𝑘𝑙 + 𝛽5 𝐶𝑜𝑛𝑡𝑟𝑜𝑙𝑠 𝜀𝐽𝑜𝑏𝑆𝑎𝑡
+
+my_reg2 <- lm(js ~ wfh + motiv + motiv:wfh + tech + age_group + gender + marital + education + employment_category, data = final_data)
+
+summary(my_reg2)
+
+
+## The composite relationship
+## 𝑀𝑜𝑡𝑖𝑣 = 𝛽0 + 𝛽1 𝑊𝐹𝐻 + 𝛽3 𝑊𝐹𝐻 × 𝑇𝑒𝑐𝑆𝑘𝑖𝑙 + 𝜀𝑀𝑜𝑡𝑖𝑣
+my_reg3 <- lm(motiv ~ wfh + wfh:tech, data = final_data)
+
+summary(my_reg3)
+
+final_data <- final_data %>% mutate(explained = predict(my_reg3))
+
+## 𝐽𝑜𝑏𝑆𝑎𝑡 = 𝛽0 + 𝛽1 𝑊𝐹𝐻 + 𝛽2 𝜓 + 𝛽3 𝐶𝑜𝑛𝑡𝑟𝑜𝑙𝑠 𝜀𝐽𝑜𝑏𝑆𝑎𝑡
+my_reg4 <- lm(js ~ wfh + explained + age_group + tech + gender + marital + education + employment_category,
+data = final_data)
+summary(my_reg4)
+```
+
+```{r}
+#| results: asis
+
+#export_summs(my_reg,my_reg2, my_reg3, my_reg4, scale = TRUE)
+stargazer::stargazer(my_reg,my_reg2, my_reg3, my_reg4,
+                      title = "Regression output",
+                     type = "latex",
+                      font.size = "footnotesize",
+                      out = "mskodongo.html")
+```
+
+```{r}
+#| echo: false
+htmltools::includeHTML("mskodongo.html")
+```
+
+\newpage
+
+```{r}
+#| fig-cap: "Regression Diagnosis"
+#| fig-height: 8
+#| fig-width: 12
+check_model(my_reg)
+```
+
+```{=tex}
+\elandscape
+\newpage
+```
+# References
+
+# Appendix

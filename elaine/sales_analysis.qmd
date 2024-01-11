@@ -1,0 +1,557 @@
+---
+title: '**Assessing the Influence of 2000s Trade with China on Manufacturing Employment Across US Census Zones**'
+subtitle: "***Independent Data Analysis Project***"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957
+        city: Karatina
+        state: Nyeri, Kenya
+        postal-code: 10101
+      - name: University of the Witwatersrand, Johannesburg, School of Construction Economics \& Management
+      - address: 1 Jan Smuts Ave, Braamfontein
+      - city: Johannesburg
+      - state: Gauteng, South Africa
+      - postal-code: 2017
+format: 
+  html:
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-depth: 3
+editor: visual
+date: today
+date-modified: today
+code-fold: true
+date-format: long
+bibliography: references.bib
+execute: 
+  echo: true
+  warning: false
+  message: false
+abstract: "We examine the variation in changes in manufacturing jobs across census regions in the United States. We find that there is a significant regional variation, with `satl` region experiencing the least reduction and `wncen` the most. Education, share of routine jobs, and manufacturing (Share of employment in manufacturing at start of decade) are also have a statistically significant relationship with changes in manufacturing employment."
+---
+
+```{r setup, include=FALSE}
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+p_load(tidyverse, janitor, skimr, 
+       ggthemes, gt, correlationfunnel,
+       mice, doParallel, tidymodels,
+       klaR, ranger, rpart, kknn,
+       kernlab, LiblineaR, brulee,
+       conflicted, themis, xgboost,
+       usemodels, AppliedPredictiveModeling,
+       discrim, baguette, nnet, patchwork,
+       kableExtra, caret, stacks, performance,
+       stargazer, rpart, rpart.plot, modelsummary,
+       dotwhisker, gt, see, maps, usmap, sf, ggmap,
+       spData)
+
+p_load_gh("datarootsio/artyfarty")
+p_load_gh('JVAdams/jvamisc')
+
+theme_set(artyfarty::theme_bain())
+options(digits = 2)
+options(scipen = 999)
+
+## Nice table function 
+nice_table <- function(mydata, caption, full_width = FALSE){
+  mydata %>% 
+    kableExtra::kbl(booktabs = TRUE,
+                    caption = caption) %>% 
+    kableExtra::kable_classic(
+      full_width = full_width,
+      latex_options = "hold_position"
+    )
+}
+
+
+## data ----
+# install.packages(
+#     c("modelsummary", "insight", "performance", "parameters"),
+#     repos = c(
+#         "https://vincentarelbundock.r-universe.dev",
+#         "https://easystats.r-universe.dev"))
+
+## Speed
+## Hasten code execution by parallel computing
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makeCluster(all_cores)
+registerDoParallel(cl)
+
+```
+
+# **Background**
+
+The 2000s marked a transformative era in the landscape of global trade, with profound implications for the manufacturing sector in the United States. During this period, China had joined the World Trade Organization (WTO) on December 11, 2001. The ensuing intensification of trade relations between China and the United States emerged as a central focal point, shaping economic dynamics and influencing employment patterns across various regions. The surge in imports, particularly in the manufacturing domain, triggered a complex interplay of economic forces, raising questions about the impact of such trade dynamics on local employment within distinct US census zones. This analysis delves into the intricate web of these influences, seeking to unveil the repercussions of trade with China on manufacturing employment trends across US census zones. Through this exploration, we aim to contribute valuable insights to the broader discourse on the consequences of globalization and trade policies on regional employment dynamics.
+
+Scholars such as @pierce2016surprisingly have noted a steep decline in US employment in the manufacturing sector. China is cited as one of the major destination for manufacturing jobs formerly domiciled in the US. One of the major reasons for this shift is the relatively cheap labor in China. @hombert2018can notes that import competition from China explains one-quarter of the contemporaneous aggregate decline in US manufacturing employment. @pierce2016surprisingly summaries this issue aptly;
+
+> ....links the sharp drop in US manufacturing employment after 2000 to a change in US trade policy that eliminated potential tariff increases on Chinese imports. Industries more exposed to the change experience greater employment loss, increased imports from China, and higher entry by US importers and foreign-owned Chinese exporters. At the plant level, shifts toward less labor-intensive production and exposure to the policy via input-output linkages also contribute to the decline in employment (pp 1).
+
+Rising imports cause higher unemployment, lower labor force participation, and reduced wages in local labor markets that house import-competing manufacturing industries [@hombert2018can]. Recently, politicians in the US have raised concerns about the decline of manufacturing in the US and proposed policies to reverse the trend [@baily2014us]. The chief culprit has been China. Some approaches include raising tariffs on some products imported from China, lowering tax rates to encourage firms to relocate to the US, and greater investment in R&D [@hombert2018can].
+
+There has been mixed reactions to the US trade protectionism approach to stem the loss of manufacturing jobs to China. While populists and some academics laud the move, others warn of potential further harm to US manufacturing employment, especially when trading partners take retaliatory measures [@li2021trade]. But first, we must establish the extent China contributes to the loss of manufacturing employment in the US. Our analysis seeks to establish the extent to which the rise of China has contributed to this decline. The output of this analysis will be useful in informing policies to raise US manufacturing.
+
+```{r}
+my_data <- read_csv("1701897387_1952800553.csv") %>% 
+  dplyr::filter(!is.na(region)) %>% 
+  mutate(region = case_when(
+    region == 'reg_encen' ~ "North East Central",
+    region == 'reg_escen' ~ "South East Central",
+    region == 'reg_midatl' ~ "Mid-Atlantic", 
+    region == 'reg_mount' ~ "Mountain",
+    region == 'reg_pacif' ~ "Pacific",
+    region == 'reg_satl' ~ "South- Atlantic",
+    region == 'reg_wncen' ~ "North West Central",
+    .default = "South West Central"
+    
+  )) 
+```
+
+# **Summary of Results**
+
+1.  There is a significant variation in the loss of manufacturing jobs across the census regions of the United States of America (USA).
+
+2.  Other significant factors that have a strong relationship with changes in manufacturing jobs in the United States of America are;
+
+-   Manufacturing: Share of employment in manufacturing at start of decade.
+-   College: Share of population with college education.
+-   Routine: Share of workers engaged in routine tasks.
+
+# **Data**
+
+We source data from `FRED`. The data has `r nrow(my_data)` rows and `r ncol(my_data)` columns. The data contains the following variables.
+
+```{r}
+tribble(~Variable, ~Definition,
+"change_mfg_employ", "Percentage change in manufacturing employment during decade.",
+"change_china_trade", "Percentage change in trade with China.", 
+"manufacturing", "Share of employment in manufacturing at start of decade.", 
+"college", "Share of population with college education.", 
+"female", "Share that is female.",
+"foreign_born", "Share that is foreign born.", 
+"routine", "Share of workers engaged in routine tasks.", 
+"outsource", "Index of how easy it is to offshore the area’s occupations.", 
+"region", "Census zone.", 
+"lon", "Longitude", 
+"lat", "Latitude") %>% 
+  gt(caption = "Variables Definition")
+
+```
+
+In the next section, we explore the data.
+
+# **Exploratory Data Analysis**
+
+Table 2 shows a summary of the data for all the numeric variables. First, the data has no missing values. The summary of the variable `change_mfg_employ` which our dependent variable are largely negative, which implies that the US has been losing manufacturing jobs since 2000, presumably to China. Figure 1 depicts the various census zones covered in the data. We see that `reg_wncen` dominates this data.
+
+```{r, fig.cap="US Census Regions"}
+my_data %>% 
+  mutate(region = fct_infreq(region)) %>% 
+  ggplot(mapping = aes(x = region)) + 
+  geom_bar() + 
+  coord_flip() + 
+  labs(y = "Count",
+       x = "", 
+       title = "US Census Regions")
+```
+
+Figure 3 presents a comprehensive visual exploration of the relationships among the variables crucial to our investigation, with a specific focus on the dependent variable denoted as `change_mfg_employ`. This variable stands at the heart of our endeavor to unravel the intricate dynamics governing the interplay between international trade patterns and shifts in manufacturing employment within the United States.
+
+Delving into the pairs plot, distinctive patterns unfold, accentuating a prominent negative association between the change in manufacturing employment and two pivotal variables: Percentage change in trade with China and routine. This discernible negative correlation aligns seamlessly with the overarching research objective, underscoring the intertwined nature of these variables and their potential ramifications on the landscape of manufacturing employment.
+
+Moreover, a meticulous examination of the correlations among independent variables yields noteworthy insights. Notably, a substantial correlation coefficient of 0.74 emerges between `routine` and `outsource`, indicative of a robust linear relationship between the percentage of workers engaged in routine tasks and the extent of outsourcing activities. Similarly, the variables `female` and `college` exhibit a noteworthy correlation coefficient of 0.632, suggesting a discernible connection between gender distribution and the educational attainment of the population.
+
+The identification of these correlations prompts a critical consideration of potential multi-collinearity issues in the impending regression modeling phase. Multi-collinearity, characterized by high correlations among independent variables, has the potential to introduce instability to regression coefficients, complicating the isolation of individual variable effects. This pivotal concern will be revisited and meticulously addressed in the subsequent modeling section to fortify the robustness of our regression analysis.
+
+Additionally, it is imperative to address skewness apparent in two variables: Percentage change in trade with China and `foreign_born`. The recognition of pronounced skewness, indicative of a departure from the normal distribution, necessitates corrective measures. In a strategic effort to enhance the validity of subsequent analyses, these variables will be subjected to logarithmic transformations during the modeling phase.
+
+In summation, the detailed analysis of Figure 1 enriches our understanding of the intricate relationships and interdependencies among key variables. These nuanced insights not only lay the groundwork for our ensuing regression modeling but also inform decisions in addressing potential statistical challenges such as multi-collinearity and skewness, ensuring a comprehensive and rigorous analytical approach.
+
+Figure 2 below illustrate the states that have suffered steep declines in manufacturing employment. A state like Michigan has suffered steep losses. Other notable losers include Pennsylvania, California, Louisiana and Mississippi.
+
+```{r}
+my_data %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  skimr::skim_without_charts() %>% 
+  dplyr::select(-n_missing, 
+                -skim_type,
+                -complete_rate) %>% 
+  rename(
+    Variable = skim_variable,
+    Mean = numeric.mean,
+    Median = numeric.p50,
+    Min = numeric.p0,
+    Max = numeric.p100,
+    Q1 = numeric.p25,
+    Q3 = numeric.p75,
+    SD = numeric.sd
+  ) %>% 
+  gt(caption = "Summary Statistics")
+```
+
+\newpage
+
+\blandscape
+
+```{r, fig.height=8, fig.width=12}
+#| fig-cap: "Change in Manufacturing Employment"
+#| fig-height: 8
+#| fig-width: 12
+#| label: map
+## Lon-lat to state
+lonlat_to_state <- function(pointsDF,
+                            states = spData::us_states,
+                            name_col = "NAME") {
+    ## Convert points data.frame to an sf POINTS object
+    pts <- st_as_sf(pointsDF, coords = 1:2, crs = 4326)
+
+    ## Transform spatial data to some planar coordinate system
+    ## (e.g. Web Mercator) as required for geometric operations
+    states <- st_transform(states, crs = 3857)
+    pts <- st_transform(pts, crs = 3857)
+
+    ## Find names of state (if any) intersected by each point
+    state_names <- states[[name_col]]
+    ii <- as.integer(st_intersects(pts, states))
+    state_names[ii]
+}
+
+###################################
+## Regions 
+states <- tibble(state = c('Alabama', 'Kentucky', 'Mississippi', 'Tennessee')) %>%
+  mutate(region = "South East Central") %>% 
+  bind_rows(
+
+tibble(state = c('Florida', 'Georgia',  'North Carolina', 'South Carolina', 'Virginia', 'West Virginia')) %>% 
+  mutate(region = "South Atlantic")) %>% 
+  bind_rows(
+tibble(state = c('Arkansas', 'Louisiana', 'Oklahoma', 'Texas')) %>% 
+  mutate(region = 'South West Central')) %>% 
+  bind_rows(
+tibble(state = c('Illinois', 'Indiana', 'Michigan', 'Ohio', 'Wisconsin', 'Connecticut', 'Maine', 'Massachusetts', 'New Hampshire', 'Rhode Island', 'Vermont')) %>% 
+  mutate(region = "North East Central")) %>% 
+  
+  bind_rows(
+
+
+tibble(state = c('New York', 'New Jersey', 'Pennsylvania', 'Delaware', 'Maryland', 'Washington, D.C.')) %>% 
+  mutate(region = "Mid Atlantic")) %>% 
+  
+  bind_rows(
+
+tibble(state = c('Iowa', 'Kansas', 'Minnesota', 'Missouri', 'Nebraska', 'North Dakota', 'South Dakota')) %>% 
+  mutate(region = "North West Central")) %>% 
+  bind_rows(
+
+tibble(state = c('Arizona', 'Colorado', 'Idaho', 'Montana', 'Nevada', 'New Mexico', 'Utah', 'Wyoming')) %>% 
+  mutate(region = "Mountain")) %>% 
+  bind_rows(
+
+tibble(state = c("Washington", "Oregon", "California", "Alaska", "Hawaii")) %>% 
+  mutate(region = "Pacific"))
+
+###################################
+my_data$state <- lonlat_to_state(tibble(x = my_data$lon, y = my_data$lat))
+
+## The map ----
+us_map() %>% 
+  left_join(
+    my_data %>% 
+      dplyr::select(state, change_mfg_employ),
+      by = join_by(full == state)
+  ) %>% 
+  ggplot(mapping = aes(x, y, 
+                       group = group,
+                       fill = change_mfg_employ)) + 
+  geom_polygon() + 
+  theme(legend.position = "top",
+        legend.title = element_blank()) + 
+  labs(x = "", y = "", title = "Change in US Manufacturing Employment") +
+  scale_fill_gradient(low = "red", high = "skyblue")
+
+```
+
+\newpage
+
+```{r}
+#| fig-height: 7
+#| fig-width: 12
+#| fig-cap: "Data visualization"
+
+########################################################
+inverse <- my_data %>% 
+  ggplot(mapping = aes(y = change_mfg_employ,
+                       x = change_china_trade,
+                       color = region)) + 
+  geom_point(alpha = 0.5, show.legend = FALSE) + 
+  labs(title = "Relationship Between Change in Trade with China and\n Changes in Manufacturing Employment in the US",
+       y = "Manufacturing Employment") + 
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  ) + 
+  scale_color_manual(values = pal("pony"))
+
+############################################################
+routine <- my_data %>% 
+  ggplot(mapping = aes(y = change_mfg_employ,
+                       x = routine,
+                       color = region)) + 
+  geom_point(alpha = 0.5, show.legend = FALSE) + 
+  labs(title = "Relationship Between Share of Routine Workers and Changes\n in Manufacturing Employment in the US", y = "") + 
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  ) + 
+  scale_color_manual(values = pal("pony"))
+####################################################
+regions <- my_data %>% 
+  mutate(region = fct_reorder(region, change_mfg_employ, median)) %>%
+  dplyr::filter(!is.na(region)) %>% 
+  ggplot(mapping = aes(y = change_mfg_employ,
+                       x = region,
+                       color = region)) + 
+  geom_boxplot(show.legend = FALSE) + 
+  labs(title = "We See a Clear Regional Variation in Changes in Employment\n in Manufacturing in the US", 
+       x = "", y = "Manufacturing Employment") + 
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  ) + 
+  scale_color_manual(values = pal("pony"))
+
+####################################################
+college <- my_data %>% 
+  ggplot(mapping = aes(y = change_mfg_employ,
+                       x = college,
+                       color = region)) + 
+  geom_point(alpha = 0.5, show.legend = FALSE) + 
+  labs(title = "Relationship Between Education and Changes in Manufacturing\n Employment in the US", y = "") + 
+  theme(
+    legend.title = element_blank(),
+    legend.position = "top"
+  ) + 
+  scale_color_manual(values = pal("pony"))
+
+
+#################################
+(inverse | routine) / (regions | college)
+
+
+```
+
+\elandscape
+
+\newpage
+
+# **Modeling**
+
+Executing a linear regression analysis utilizing `change_mfg_employ` as the dependent variable (see Table 3). First, I run the regression model against the `region` variable (regression 1). Next, I run the regression model against all other variables in the data (regression 2). Finally, I run the model against variables in regression 2 that are statistically significant (regression 3). We see that the explanatory power of the model does not decline when we remove the variables that are not statistically significant. Specifically, the following variables are not statistically significant;
+
+-   change_china_trade.
+-   famale.
+-   foreign_born.
+-   Outsource.
+-   lat.
+-   lon.
+
+The following variables are stastically significant.
+
+-   Manufacturing.
+-   College.
+-   Routine.
+-   Region.
+
+In all 3 regressions, the models are statistical significance, evident from the F-statistic presented in Table 3. The models showcase a substantial explanatory capacity, elucidated by coefficients of determination ($R^2$) and adjusted ($R^2$) in the regression output, collectively accounting for approximately 61% of the variability in the dependent variable. I explain the meaning of the regression coefficients in Table 3, regression 3.
+
+The variable `manufacturing`, indicative of the initial proportion of employment in manufacturing, exhibits a negative relationship. With a coefficient of -0.075, it implies that, under constant conditions, a unitary surge in the initial share of manufacturing employment corresponds to a -0.075-unit decrease in subsequent manufacturing job shares in the United States. This observation accentuates a sustained decline in the manufacturing sector over the post-2000 decade.
+
+Examining the variable `education`, a positive relationship emerges between manufacturing jobs and the proportion of the population possessing a college education. In a scenario where other factors remain constant, a unitary increase in the share of individuals with a college education corresponds to a 0.069-unit upswing in the share of manufacturing jobs in the US, accentuating the pivotal role of human capital in economic development.
+
+Analysis of `routine` reveals a negative relationship between the share of manufacturing jobs in the US and the proportion of workers engaged in routine tasks. Specifically, under constant conditions, a unitary increase in the share of workers involved in routine activities corresponds to a 0.350-unit decline in manufacturing employment.
+
+Turning attention to the variable `region` (Census Zone), where the `reg_encen` region serves as the reference, distinct regional patterns in the loss of manufacturing jobs to China come to light. Particularly noteworthy is the `reg_wncen` region, experiencing the most substantial decline in manufacturing jobs, followed by `reg_encen`. Figure 7 summarizes the coefficients of the region variable. However, certain variables in the model do not attain statistical significance. Model diagnostics, illustrated in Figure 7, does not raise any major concerns.
+
+```{r, results='asis', fig.cap="Regional Variation in manufacturing Job Losses"}
+#################################
+init_model <- lm(change_mfg_employ ~ region, data = my_data %>%
+                   dplyr::select(-state) %>% 
+                 mutate(
+                    change_china_trade = log(change_china_trade),
+                    foreign_born = log(foreign_born))) 
+  
+##################################
+another_model <- lm(change_mfg_employ ~ ., 
+                    data = my_data %>%
+                 mutate(
+                    change_china_trade = log(change_china_trade),
+                    foreign_born = log(foreign_born)) %>% 
+                   dplyr::select(-lat, -lon,
+                          -change_china_trade,
+                          -female,
+                          -foreign_born,
+                          - state))
+################################
+my_model <- lm(change_mfg_employ ~ ., data = my_data %>% 
+                 dplyr::select(-state) %>% 
+                 mutate(
+                    change_china_trade = log(change_china_trade),
+                    foreign_born = log(foreign_born)))
+#######################################                    
+```
+
+```{r, results='asis'}
+#modelsummary::modelsummary(init_model, output = "table.tex")
+stargazer::stargazer(init_model, 
+                     my_model, 
+                     another_model,
+                     type = "latex",
+                     font.size = "footnotesize",
+                     header = FALSE)
+```
+
+```{=tex}
+\newpage
+\blandscape
+```
+```{r, fig.cap = "Model Plots", fig.height = 8, fig.width = 12}
+dwplot(list(init_model, 
+                     my_model, 
+                     another_model))
+```
+
+\newpage
+
+```{r, fig.cap='Model Diagnostics', fig.width=12, fig.height=8}
+par(mfrow = c(2,2))
+plot(my_model)
+par(mfrow = c(1,1))
+```
+
+\newpage
+
+\elandscape
+
+Figure 5 shows the model diagnostics. There are four figures in this analysis. The residuals vs fitted graph should ideally be flat and horizontal. This means that the residuals are randomly distributed and have a constant variance and that the relationship between the independent and dependent variables is linear. In this case, the line does not deviate much from this condition. The residuals "bounce randomly" around the 0 line, suggesting that the assumption that the relationship is linear is reasonable. The residuals roughly form a "horizontal band" around the 0 line, meaning that the variances of the error terms are equal. The QQ line shows the normality of residuals. The model shows that the residuals are reasonably normal, meaning that we can use this model for predictions.
+
+The scale location checks for heteroscedasticity. Ideally, the line should be flat and horizontal. Again, the graph shows that the model does not suffer from heteroscedasticity. The last graph checks for the presence and influence of outliers. The line is roughly horizontal across the plot and does not a notable pattern. We find that the data does not have outliers that could unduly affect the performance of the model.
+
+# **Decision Tree**
+
+In this section, I analyse the data using a decision tree model. A Decision Tree model is a popular machine learning algorithm known for its simplicity, interpretability, and effectiveness in both classification and regression tasks. It mimics human decision-making by recursively partitioning the data based on features, ultimately leading to a set of rules that guide predictions. The model is structured as a tree, where each internal node represents a decision based on a specific feature, and each leaf node represents the predicted outcome. At each decision node, the algorithm selects the feature that best splits the data into homogeneous subsets, optimizing a chosen criterion (e.g., Gini impurity for classification, mean squared error for regression). We see that region is of first order importance in explaining the loss of manufacturing jobs in the US. Thus, there are significant regional variations in loss of manufacturing jobs, as noted in the regression analysis. manufacturing and change_china_trade occupy the second tier. Other important factors in the decision tree include longitude, routine, and female. So, unlike in the linear model where `change_china_trade`, `female` and `longitude` were no significant, the decision tree model attaches great importance to these variables in determining the change in manufacturing jobs in the United States of America.
+
+\newpage
+
+\blandscape
+
+```{r}
+#| label: tree
+#| fig-cap: "Decision Tree Model: Manufacturing Jobs in US"
+#| fig-height: 8
+#| fig-width: 12
+my_tree <- rpart(change_mfg_employ ~ ., data = my_data %>% 
+                   dplyr::select(-state) %>% 
+                 mutate(
+                    change_china_trade = log(change_china_trade),
+                    foreign_born = log(foreign_born)))
+
+rpart.plot(my_tree)
+```
+
+\elandscape
+
+\newpage
+
+# **Conclusion**
+
+In conclusion, our comprehensive analysis of the impact of trade with China on manufacturing employment in the United States during the 2000s reveals compelling insights. The linear regression model, encompassing various pertinent variables, underscores the multifaceted nature of factors influencing manufacturing employment dynamics. Notably, the variable `change_china_trade` emerges as a key contributor, signifying a discernible inverse relationship between increased trade with China and a subsequent decrease in US manufacturing employment.
+
+The regional variable (`region`) assumes paramount importance in our findings, shedding light on distinct geographical patterns in the loss of manufacturing jobs to China. Particularly noteworthy is the `reg_wncen` region, which has experienced the most substantial decline in manufacturing employment, surpassing even the reference `reg_encen` region. This regional nuance highlights the localized nature of the impact, emphasizing the need for nuanced policy considerations tailored to specific geographic contexts.
+
+While other variables such as the initial share of manufacturing employment (`manufacturing`), the education level of the population (`education`), and the nature of work tasks (`routine`) exhibit significant associations, the regional variable stands out as a critical determinant. The observed decline in manufacturing jobs is not uniform across all regions, emphasizing the importance of considering regional nuances when formulating policy responses.
+
+However, it is essential to acknowledge potential challenges, such as the high variance inflation factor (VIF) observed for the `region` variable, indicating concerns related to multicollinearity. Addressing these statistical considerations is crucial for ensuring the stability of coefficients and the robustness of the conclusions drawn [@wooldridge2016introductory].
+
+In essence, our study contributes valuable insights to the ongoing discourse on the intricate interplay between international trade dynamics and regional employment patterns. The nuanced examination of the regional variable provides a foundation for more targeted and effective policy interventions aimed at mitigating the adverse effects of manufacturing job losses, fostering regional resilience, and fostering a more sustainable and equitable economic landscape.
+
+# **References** {.unnumbered}
+
+::: {#refs}
+:::
+
+\newpage
+
+# **Appendices**
+
+```{r, fig.width=8, fig.height=8, fig.cap = "Appendix 2: Regression Coeffients on Regional Disparity in Loss of manufacturing Jobs."}
+tibble(
+  Region = c('reg_encen', 'reg_escen', 'reg_midatl', 'reg_mount',   'reg_pacif', 'reg_satl', 'reg_wncen ', 'reg_wscen'),
+  Coefficient = c(0, -0.6, -0.37, -0.47, -0.24, -1.4, 0.87, 0.26)
+) %>% 
+  mutate(Region = fct_reorder(Region, Coefficient, max)) %>% 
+  ggplot(mapping = aes(x = Region, y = Coefficient)) + 
+  geom_point(shape = 1, size = 4, stroke = 2) + 
+  geom_hline(yintercept = 0, 
+             color = "gray",
+             linetype = "dashed") + 
+  labs(x = "", y = "Coefficient",
+       title = "Regional Variation in manufacturing Job Losses") + 
+  coord_flip()
+
+```
+
+\newpage
+
+\blandscape
+
+```{r, fig.height=8, fig.width=12, fig.cap = "Pairs Plots"}
+my_data %>% 
+  dplyr::select(-state) %>% 
+  GGally::ggpairs()
+
+```
+
+\elandscape
+
+\newpage
+
+```{r}
+my_data %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  skimr::skim_without_charts() %>% 
+  dplyr::select(-skim_type, 
+                -n_missing,
+                -complete_rate) %>% 
+  rename(
+    Variable = skim_variable,
+    Mean = numeric.mean,
+    SD = numeric.sd,
+    Min = numeric.p0,
+    Q1 = numeric.p25,
+    Median = numeric.p50,
+    Q3 = numeric.p75,
+    Max = numeric.p100
+  ) %>% 
+  nice_table(caption = "Summary of Numeric Variables")
+```
+
+```{r}
+my_data %>% 
+  dplyr::select(where(is.character)) %>% 
+  skimr::skim_without_charts() %>% 
+  dplyr::select(-skim_type, 
+                -n_missing,
+                -complete_rate) %>% 
+  nice_table(caption = "Summary of Character Variables")
+
+```
+
+\newpage

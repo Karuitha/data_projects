@@ -1,0 +1,192 @@
+---
+title: "Analysis of 2021 KCSE Performance"
+author: "John Karuitha"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=FALSE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+
+opts_knit$set(width=75)
+options(digits = 4)
+
+options(knitr.kable.NA = "-")
+```
+
+## Backgound
+
+This is an analysis of the 2020 Kenya Certificate of Secondary Education (KCSE) examinations results. The KCSE examination is taken by all form four students in Kenya after 12 years of primary and secondary education. The examination forms the basis for admission to universities and other institutions of higher learning. In other countries form four is the equivalent of grade 12 ^[The link address for the data is https://nation.africa/kenya/news/education/2020-kcse-list-of-top-100-schools-3397314]
+
+I start by reading in the data which I got from the [Nation Newspapers website](https://nation.africa/kenya/news/education/2020-kcse-list-of-top-100-schools-3397314). Note that I cannot verify the veracity or completeness of the data. Rather, I use the data as is.
+
+```{r}
+kcse <- read_csv("data-RE5RC.csv") %>% 
+    
+    janitor::clean_names()
+```
+
+Note that the data consists of `r nrow(kcse)` schools and `r ncol(kcse)` variables: school, mean grade, and county. 
+
+## Top Schools Nationally
+
+The Table below shows the top 20 schools in Kenya. 
+
+```{r}
+kcse %>% 
+    
+    head(20) %>% 
+    
+    knitr::kable(caption = "Top 20 Schools, 2020 KCSE", booktabs = TRUE) %>% 
+    
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = TRUE)
+```
+
+
+## Counties with the Most Schools in the Top 100
+
+The figure below shows the counties with the most schools in the top 100. Here, I just capture the top 6 counties. Appendix 1 shows the full listing of schools in the top 100 by county. 
+
+```{r}
+kcse %>% 
+    
+    count(county) %>% 
+    
+    arrange(desc(n)) %>% 
+    
+    head() %>% 
+    
+    ggplot(aes(x = fct_reorder(county, n, max), y = n, fill = county)) + 
+    
+    geom_col(show.legend = FALSE) + 
+    
+    geom_text(aes(label = n)) +
+    
+    coord_flip() + 
+    
+    ggthemes::theme_clean() + 
+    
+    labs(x = "County", y = "Number", title = "Number of Schools in Top 100 by County")
+```
+
+## Counties not represented in the Top 100
+
+In this section, I source data from [Wikipedia](https://en.wikipedia.org/wiki/Counties_of_Kenya) on the counties in Kenya. The objective is to find the counties not represented in the top 100. ^[The data on the 47 counties in Kenya is available at https://en.wikipedia.org/wiki/Counties_of_Kenya]. The counties are underlisted. 
+
+```{r}
+library(rvest)
+url <- "https://en.wikipedia.org/wiki/Counties_of_Kenya"
+
+county_data <- read_html(url) %>% 
+    
+    html_nodes("table") %>% 
+    
+    html_table() %>% 
+    
+    .[[3]] %>% 
+    
+    janitor::clean_names() %>% 
+    
+    mutate(county = str_replace_all(county, "\\-", " "), 
+           
+           county = str_replace_all(county, "\\(County\\)", ""), 
+           
+           county = if_else(county == "Taita–Taveta", "Taita Taveta", county), 
+           
+           county = if_else(county == "Mombasa ", "Mombasa", county), 
+           
+           county = if_else(county == "Nairobi ", "Nairobi", county)) %>% 
+    
+    filter(!is.na(code)) 
+
+############################################
+## Counties with no schools in the top 100
+
+setdiff(county_data$county, kcse$county)
+
+## Combined data with county metadata
+updated_data <- county_data %>% 
+    
+    right_join(kcse, by = "county") %>% 
+    
+    select(school, mean_grade, everything())
+```
+
+## Top Schools in Laikipia County
+
+I was born and brought up in Laikipia County and got secondary school education at Nanyuki High School. Hence, I have a personal interest to know how the county and especially my former school was faring. Laikipia county had `r kcse %>% filter(county == "Laikipia") %>% nrow` schools in the top 100 going by the data. 
+
+```{r}
+## Laikipia schools ranked
+kcse %>% 
+    
+    filter(county == "Laikipia") %>% 
+    
+    knitr::kable(caption = "Top Schools in Laikipia County, 2020 KCSE", booktabs = TRUE) %>% 
+    
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = TRUE)
+```
+
+## Top Schools in Nyeri County
+
+The table below shows the top schools in Nyeri County. 
+
+```{r}
+## Nyeri county schools
+kcse %>% 
+    
+    filter(county == "Nyeri") %>% 
+    
+    knitr::kable(caption = "Top Schools in Nyeri County, 2020 KCSE", booktabs = TRUE) %>% 
+    
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = TRUE)
+```
+
+## Appendices
+### Appendix 1: Counties with the Most Schools in the Top 100
+```{r}
+## Counties with most schools
+kcse %>% 
+    
+    count(county) %>% 
+    
+    arrange(desc(n)) %>% 
+    
+    knitr::kable(caption = "Counties with the Most Schools in the Top 100, 2020 KCSE", booktabs = TRUE) %>% 
+    
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = TRUE)
+```
+
+
+### Appendix 2: Summary Statistics by County
+
+```{r}
+kcse %>% 
+    
+    group_by(county) %>% 
+    
+    summarise(Min = min(mean_grade), SD = sd(mean_grade), 
+              
+              Mean = mean(mean_grade), Median = median(mean_grade), 
+              
+              Max = max(mean_grade)) %>% 
+    
+    knitr::kable(caption = "Counties KCSE Summaries", booktabs = TRUE) %>% 
+    
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = TRUE)
+```

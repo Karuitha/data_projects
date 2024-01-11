@@ -1,0 +1,229 @@
+---
+title: "**Which Beauty Products do Customers Often Buy Together?**"
+subtitle: "*Mining Association Rules for a Beauty Products Shop*"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, Kenya"
+      affiliation-url: www.wits.ac.za
+description: "Independent Data Analysis Project"
+date: today
+title-block-banner: "makeup.png"
+title-block-banner-color: "black"
+echo: true
+message: false
+warning: false
+format: 
+    html:
+        theme: 
+            light: flatly
+            dark: darkly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+bibliography: ref.bib
+---
+
+```{r}
+#| include: false
+## Load the required packages 
+###################################################
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, KableExtra, 
+               rpart, rpart.plot,  arules, arulesViz, gt)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+```
+
+# **Background**
+
+In this mini-project, I explore association rules using data from a beauty products shop.
+
+> Association rule learning is a rule-based machine learning method for discovering interesting relations between variables in large databases. It is intended to identify strong rules discovered in databases using some measures of interestingness.In any given transaction with a variety of items, association rules are meant to discover the rules that determine how or why certain items are connected [@kotsiantis2006association].
+
+The questions that I explore in this analysis are;
+
+-   Which beauty products have the highest demand? (See section 3)
+-   Which combinations of beauty products are often purchased together? (See section 4)
+-   How best can the owner of this beauty shop utilize this analysis? (See section 6)
+
+::: callout-tip
+## Read More of my Work
+
+Please visit [my rpubs site](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link <https://www.rpubs.com/Karuitha> into your browser.
+
+My data visualizations projects are available in my [Tableau Public profile page](https://public.tableau.com/app/profile/john.karuitha) or copy and paste the link <https://public.tableau.com/app/profile/john.karuitha>.
+
+My Shiny web apps are available on this [site](https://karuitha.shinyapps.io/). You can copy-paste this web address instead <https://karuitha.shinyapps.io/>.
+:::
+
+::: callout-note
+## Tools Utilized & Skills Applied
+
+R [@myR], arules, arulesViz, Quarto, Data Science, Association Rules Mining.
+:::
+
+Note, however, many rules generated using this association rules mining maybe trivial. It would require domain expertise sift through the output to spot actionable rules.
+
+# **Data**
+
+The file Cosmetics.csv contains 1000 records of transactions of cosmetics sales in a beauty shop (1: purchased; 0: no purchased). Each transaction is tied to an invoice so that the data shows the basket of items that each consumer bought on a given date.
+
+```{r}
+## read in the data 
+cosmetics <- read_csv("Cosmetics.csv") %>% 
+    clean_names() %>% 
+    mutate(invoice_number = paste0("c", 1:nrow(.))) %>% 
+    pivot_longer(cols = -invoice_number, 
+                 names_to = "item", 
+                 values_to = "bought") %>% 
+    filter(bought == 1) %>% 
+    mutate(invoice_number = factor(invoice_number)) %>% 
+    group_by(invoice_number) %>% 
+    filter(!duplicated(item)) %>% 
+    ungroup()
+
+head(cosmetics, 10) %>% formatting_function(caption = "A Peek into the Data")
+```
+
+# **Most Popular Items**
+
+After reading in the data and converting the data into a transactions object, I build an item frequency plot. The plot shows the most popular items in all transactions contained in the data. The 2 most popular items are `foundation` and `lip gross`.
+
+```{r}
+#| echo: true
+## Split the data by invoice number
+my_bundles <- split(cosmetics$item, cosmetics$invoice_number)
+my_bundles <- sapply(my_bundles, unique)
+```
+
+```{r}
+trans <- as(my_bundles, "transactions")
+summary(trans)
+```
+
+```{r, fig.cap = "Most Frequently Bought Items"}
+itemFrequency(trans)
+itemFrequencyPlot(trans, topN = 10)
+```
+
+# **Items often Bought Together**
+
+Next, I build an association rules model, setting the support value to 0.01 and the confidence value to 0.1. Based on the association rule results, I show the first eight rules after sorting the rules by their lift values.
+
+::: callout-important
+I define the terms support, confidence and lift later in section 6.
+:::
+
+```{r}
+my_rules <- apriori(data = trans, 
+                    parameter = list(support = 0.01, 
+                                   confidence = 0.8,
+                                   minlen=2))
+summary(my_rules)
+```
+
+I convert the rules into a dataframe for ease of printing.
+
+```{r}
+as(my_rules, "data.frame") %>% 
+    arrange(desc(lift)) %>% 
+    head(8) %>% 
+    gt(caption = "Top Rules by Lift")
+#inspect(sort(my_rules, by = "lift"))
+```
+
+# **Interpreting the Results**
+
+I use the first rule from the table in section 4 (above) to illustrate the meaning of these rules. The first rule is as follows.
+
+(bronzer,eyeliner,lip_liner,mascara,nail_polish) =\> {brushes}
+
+This rule means that consumers who buy the basket of goods on the left (bronzer,eyeliner,lip_liner,mascara,nail_polish) often buy brushes. But How often do they buy brushes? To answer this question we explore the values for support, confidence and lift for this rule.
+
+**Support:** First the combination of bronzer, eyeliner, lip_liner, mascara, and nail_polish constitute 3% of all sales.
+
+**Confidence:** When a customer buys bronzer, eyeliner, lip_liner, mascara, nail_polish, there is a 96% chance of buying brushes.
+
+**Lift:** Having bronzer, eyeliner, lip_liner, mascara, nail_polish in a shopping basket raises the probability that a customer will buy brushes sixfold (6.2).
+
+# **Implications of the Analysis**
+
+In this section, I give the precise meaning of "support", "confidence", and "lift".I then discuss the implications of the results above in the setting of association rules and business.
+
+*Support*:
+
+Support is the percentage of groups that contain all of the items listed in the association rule. In the first rule above, the support is 0.03, meaning that 3% of the transactions contained the items listed on the right (bronzer,eyeliner,lip_liner,mascara,nail_polish =\> brushes).
+
+Implication of support: The support shows the volume of transactions that a product or groups of products as a percent of total transactions. When combined with other confidence and lift, we can focus on selling products that generate highest sales. In other words, support allows us to filter for meaningful rules. It would not be very useful to have a confidence of 99% but that constitutes only0.0001% of sales.
+
+*Confidence*:
+
+Confidence is the proportion of times that a customer buys item X given that she/he buys item Y. In our first rule, given that the customer buys bronzer,eyeliner,lip_liner,mascara,nail_polish =\> brushes then that customer bought brushes 96% of the time.
+
+The implication of confidence: We can target customers buying bronzer,eyeliner,lip_liner,mascara,nail_polish ith bushes as they have a 96% chance of buying. Alternatively, in a store, these products could be placed close to each other.
+
+*Lift*:
+
+The lift value captures rule importance. Usually, its the confidence of a rule divided by the support of a product. It is the rise in probability of the purchase of product Y once we know that product X is in the basket. Again, the implication is that it helps managers decide on product placements in stores.
+
+# **Conclusion**
+
+In this mini-project, I have explored association rules using data from a beauty product shop. The analysis has implications for the conduct of business. However, many rules generated using this technique maybe trivial. It would require domain expertise to spot actionable rules.
+
+# **Technology and Packages Utilised**
+
+In this analysis, I have utilised Zorin OS, R, Quarto and the following R packages.
+
+```{r}
+sessioninfo::session_info()
+```
+
+# **References**

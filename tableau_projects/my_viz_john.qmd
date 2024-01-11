@@ -1,0 +1,57 @@
+---
+title: "Designing a Visualization for Your Manager"
+subtitle: "Final Project for the Course: Essential design Principles in Tableau"
+author: John Karuitha
+date: today
+format: 
+        pdf:
+                linkcolor: "blue"
+---
+
+# **Questions and Responses**
+
+## Link to my Visualisation
+
+The link to my Tableau visualization is;
+
+<https://public.tableau.com/app/profile/john.karuitha/viz/RegionalProfitRatiosbyProductSubcategories/Dashboard1>
+
+## **Question A**
+
+How does your visualization leverage at least one “pop-out effect” or “pre-attentive attribute?” Which one(s) was (were) chosen and why?
+
+
+:::{.callout-note}
+>I have used a pop up effect or pre-attentive attribute of colour (red) to highlight loss making products and grey for profit making regions. I choose red for losing products as these are the items the manager needs to focus on.
+:::
+
+## **Question B**
+
+c. How does your visualization utilize at least one Gestalt principle? Which principle(s) is (are) being reflected, and how?
+
+:::{.callout-note}
+>Yes. I have utilised the Gestalt principle of proximity. Profit making regions are lumped together as are loss making regions making it easy to tell them apart.
+:::
+
+## **Question C**
+c. How does your design reflect an understanding of cognitive load and clutter?
+
+:::{.callout-note}
+I have removed all unnecesary details that could make the user of the visualisation to use extra mental effort to consume the visualization for no added value. For instance, I have removed all gridlines and axis. Instead of an axis containing values, I have put the values at the tip of the bars. I have also left a substantial amount of white space.
+:::
+
+## **Question D**
+
+Is your visualization static or interactive? Why did you choose that format?
+
+:::{.callout-note}
+My visualisation is interactive. It allows the manager to expore the prodcuts performance by region. The interactivity allows the manager to even see the variability from one region to the next. For example, the visual shows tha manager that the Central region is especially problematic. 
+:::
+
+## **Question E**
+e. What need does this visualization address that words or numbers alone cannot fill?
+
+:::{.callout-note}
+At a glance and using very little mental effort, the manager is able to see the top loss making products. Moreover, the manager can choose different regions to see the poorly performing products there as well.Scanning a table of values would take more mental effort especially for a manager who is not numerically inclined.
+:::
+

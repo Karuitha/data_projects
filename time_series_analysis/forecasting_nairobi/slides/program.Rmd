@@ -1,0 +1,59 @@
+# Day 1
+
+9.00 1 Intro. 
+9.15 2 tsibble
+9.45 Lab session 1
+10.30 Coffee
+11.00 3 tsgraphics
+11.30 Lab session 2
+12.00 4 tsfeatures
+12.15 Lab session 3
+12.30 Lunch
+13.30 5 Introduction to forecasting
+14.00 Lab session 4
+14.15 6 forecasting toolbox 1
+14.45 Lab session 5
+15:00 Coffee
+15.30 Lab session 5
+15.45 
+16.15 6 forecasting toolbox 1
+16.15 5.3 Rob
+16.25 5.4 Lab session 10
+16.40 Wrap up, questions, etc
+17.00 Finish
+
+# Day 2
+
+9.00 6.1 Rob
+9.15 6.2 Bahman
+9.30 6.3 Lab session 11
+9.45 6.4 Rob
+9.55 6.5 Lab session 12
+10.00 6.6 Bahman
+10.15 6.7 Lab session 13
+10.30 Coffee
+11.00 7.1 Rob 
+11.10 7.2 Bahman
+11.20 7.3 Lab session 14
+11.35 7.4 Bahman
+11.40 7.5 Rob
+11.50 7.6 Lab session 15
+12.05 7.7 Rob
+12.15 8.1 Bahman
+12.30 Lunch
+13.30 8.2 Lab session 16
+13.45 8.3 Bahman
+13.50 8.4 Lab session 17
+14.05 8.5 Rob
+14.15 9.1 Rob
+14.30 9.2 Lab session 18
+14.45 9.3 Bahman
+15.00 Coffee
+15.30 9.4 Lab session 19
+15.45 9.5 Rob
+16.00 10.1 Bahman
+16.10 10.2 Rob
+16.20 10.3 Rob
+16.30 10.4 Lab session 20
+16.45 Wrap up, questions, evaluation
+17.00 Finish

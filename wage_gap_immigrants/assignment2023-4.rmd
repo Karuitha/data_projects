@@ -1,0 +1,574 @@
+---
+title: "Empirical Project in Introductory Econometrics Course"
+author: "Edwin Leuven"
+date: "2023-01-31"
+always_allow_html: true
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1]{fontenc}
+- \usepackage{amsmath}
+- \usepackage{subcaption}
+output:
+  pdf_document: default
+  html_document: default
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){install.packages("pacman")}
+
+pacman::p_load(foreign, tidyverse, janitor, Amelia, kableExtra, 
+               mice, haven, ggthemes, viridis, patchwork, skimr,
+               ggstatsplot, GGally, remotes)
+
+if(!require(artyfarty)){
+  remotes::install_github("datarootsio/artyfarty")
+}
+
+theme_set(artyfarty::theme_scientific())
+```
+
+## Introduction
+
+The aim of the project is to study the differences in real wages in 2019 US$ (rw) between immigrants and non-immigrants, and draw some conclusions as to what explains these differences. The issue of migrant wages features prominently in the United States, a country that receives a significant proportion of migrants from around the world. A major issue is that migrants contribute significantly to wage inequality in the United States. While some researchers argue that migrants do exacerbate wage inequality, other researchers opine that the observation only holds for unskilled migrants [@lin2019immigration]. 
+
+In light of these concerns, the objectives of this analysis are as follows;
+
+a. To quantify the wage gap between immigrants and non-immigrants in the United States.
+
+b. To investigate whether and how the wage gap varies by time since immigrants entered the US.
+
+c. To identify possible drivers of the migrant wage gap using regression analysis.
+
+## Data
+
+The data comes from the 2019 US current population survey (CPS). The data is available on this site, <https://ceprdata.s3.amazonaws.com/data/cps/data/cepr_org_2019.zip>
+
+The data file comes in `Stata` format. I imported the data into R using the read_dta() function of the "haven" package.
+
+```{r eval=TRUE, echo=TRUE}
+my_df <- read_dta("cepr_org_2019.dta") %>% 
+  ## Remove columns that have no data 
+  janitor::remove_empty() %>% 
+  ## Remove columns that have constant values
+  janitor::remove_constant() %>% 
+  
+  tibble() %>% 
+  
+  ## -1 indicates missing value
+  mutate(
+    
+    across(
+      
+      .cols = everything(),
+      
+      .fns = ~ case_when(
+        
+        . == -1 ~ NA,
+        
+        
+        TRUE ~ .
+      )
+      
+      
+    )
+    
+  ) %>% 
+  
+  drop_na(rw) %>% 
+  
+  mutate(citizen = factor(citizen, labels = c("Non-Citizen", "Citizen"))) %>%
+  
+  mutate(female = factor(female, labels = c("Male", "Female")))  %>% 
+  
+  mutate(wbhaom = factor(wbhaom, levels = 1:6, labels = c("White", "Black", "Hispanic", "Asian", "Native American", "Mixed"))) %>% 
+  mutate(docc03 = factor(docc03)) %>%
+  
+  mutate(forborn = factor(forborn, labels = c("US", "Foreign")))
+
+```
+
+The data has `r nrow(df)` observations for `r ncol(df)` variables. I start by eliminating variables that have no data which leaves 133 variables. The data has substantial missing values. The target variable, real wages (rw) has 137,111 data points missing, which is `r paste(137111/291390*100, "%")`. I drop all the observations that have a missing value for the target variable, real wages (rw), which leaves us with  154279 observations [@amo2020migrant]. 
+
+```{r}
+nrow(my_df)
+```
+
+I visualise the missing data below. There is still 23% of the data missing. 
+
+```{r}
+Amelia::missmap(my_df)
+```
+
+
+The “Data” section give an overview of the analysis dataset you constructed, and describe the differences between immigrants and non-immigrants.
+
+In the appendix below you will find a list of variables and description. Categorical variables are imported as factor variables with descriptive labels, and the file should be self explanatory.
+
+The dataset contains many demographic and employment related variables that may explain wages. You should carefully go over the variable list to see what information is available and tabulate variables to see how they are coded.
+
+## **Empirical Approach**
+
+I first do exploratory analysis to quantify the wage gap between migrant and non-migrant workers in the United States. specifically, I construct plots and calculate summary statistics.
+
+Next, I run regressions to examine the factors that have a relationship with real wages between migran and non-migrant workers. In this analysis, I use nationality and the length that migrants have been in the United States as controls, over and above personal and household variables that may affect income. From theory and past empirical analysis, I find that the following factors have a significant relationship with wage differentials between migrants and non-immigrants. 
+
+
+I then run the following regression model. 
+
+$rw = \beta_{0} + \beta_{1} citizen + \beta_{2} female + \beta_{3} wbhaom + \beta_{4} age + \beta_{5} educ + \beta_{6} cert + \beta_{7} hourslw + \beta_{8} faminc + \beta_{9} docc03 + \beta_{10}arrived$
+
+## **Results**
+
+### ***Quantifying the Wage Gap Between Migrants and Non_Immigrants***
+
+I first start by running summary statistics regarding the earnings of migrants versus non-immigrants. 
+
+```{r}
+my_df %>% 
+  select(rw, forborn) %>% 
+  group_by(forborn) %>% 
+  skimr::skim_without_charts() %>% 
+  select(-skim_variable, -n_missing, -complete_rate, -numeric.p0) %>% 
+  rename(Mean = numeric.mean, SD = numeric.sd, Q1 = numeric.p25, 
+         Median = numeric.p50, Q3 = numeric.p75, Max = numeric.p100) %>% 
+  kbl(booktabs = TRUE, caption = "Summary of Wages for US Citizens and Migrants") %>% 
+  kable_classic(full_width = TRUE, latex_options = "hold_position")
+```
+
+Table 1 shows a notable disparity in wages between migrants and citizens. We can visualise this disparity. The Figure below shows that we fail to reject the null hypothesis that there is no wage disparity and accept the alternative hypothesis that there is indeed a significant wage disparity between migrants and US born residents at 1% significance level. 
+
+```{r}
+#| fig-width: 8
+#| fig-height: 6
+#| fig-cap: "Wage Differential Between Migrants and Non-Immigrants"
+my_df %>% ggstatsplot::ggbetweenstats(x = forborn, y = rw,
+                                      ylab = "Real Wages",
+                                      title = "Do US Born Residents Earn Significantly More than Migrants?",
+                                      subtitle = "Wages Disparity Between US Citizens and Migrants",
+                                      conf.level = 0.99)
+```
+
+### **Which factors Have a Notable relationship with the Wage Gap Between Migrants and Non-Immigrants?**
+
+In this section, I use data visualization to explore factors that may have a significant relationship with wages for migrants and non-immigrants. 
+
+I start by doing a pairs plot for all the variables that I hypothesize have a relationship with the wages gap.
+
+The data shows that there is a notable difference in the incomes of citizens and immigrants. Citizens have a higher mean and median income compared to immigrants. 
+
+The income of immigrants varies by the time of arrival. New arrivals receive substantially less income compared to other people. However, the income improves markedly after the second year. After the 5th year, there is a gradual decline in income. 
+
+The significant drivers of wage differential between migrants and non-migrants are;
+
+
+- Foreign Born (forborn).
+
+- The level of education (educ). 
+
+- Gender (female).
+
+- Occupation, which may have high correlation with the level of education (docc03).
+
+- Age, which may proxy experience (age). 
+
+- Race (wbhaom).
+
+- Certification (wbhaom).
+
+- Hours worked (hourslw).
+
+- Family income (faminc).
+
+- Time of arrival in the United States (arrived).
+
+
+\newpage
+
+\blandscape
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| fig-cap: "Pairs Plots"
+
+my_df %>% 
+  select(rw, forborn, female, wbhaom, age, educ, cert, hourslw, faminc, arrived) %>% 
+  GGally::ggpairs()
+  
+```
+
+\newpage
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+
+(my_df %>%
+  select(arrived, rw) %>%
+  ggplot(mapping = aes(y = rw, x = factor(arrived))) + 
+  geom_jitter(shape = ".", alpha = 0.5, shape = 1) + 
+   scale_color_tableau() +
+  geom_violin() + 
+  labs(y = "Income", x = "Arrival", 
+       title = "Income by Time of Immigrant Arrival",
+       caption = "Data Source: 2019 US current population survey (CPS)") + 
+
+###########################
+my_df %>%
+  ggplot(mapping = aes(y = rw, x = hourslw, color = forborn)) + 
+  geom_point(alpha = 0.5) + 
+  geom_smooth(se = FALSE) + 
+  scale_color_tableau() + 
+  labs(y = "Income", x = "Hours Worked", 
+       title = "Income and Hours Worked by Citizens and Migrants",
+       caption = "Data Source: 2019 US current population survey (CPS)")) / 
+
+##########################
+(my_df %>% 
+  ggplot(aes(x=citizen, y=rw, fill=forborn)) +
+    geom_boxplot(width=0.1, color="grey", alpha=0.2) +
+    geom_violin(width=1.4) +
+    scale_fill_tableau() +
+    theme_fivethirtyeight() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) + 
+  
+  scale_y_log10() + 
+  labs(y = "Income", x = "Citizen", 
+  title = "Income for US Citizens and Migrants",
+       caption = "Data Source: 2019 US current population survey (CPS)") + 
+
+##########################
+my_df %>% 
+  ggplot(aes(x = forborn, y = rw, fill = female)) +
+    geom_boxplot(color="grey", alpha=0.8) +
+    scale_fill_tableau() +
+    theme_fivethirtyeight() +
+    theme(
+      plot.title = element_text(size=11)
+    ) + 
+  
+  scale_y_log10() + 
+  scale_y_log10() + 
+  labs(x = "Citizen", y = "Income",
+  title = "Income for US Citizens and Migrants by Gender",
+       caption = "Data Source: 2019 US current population survey (CPS)"))
+
+```
+
+
+\newpage
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+###########################
+###########################
+(my_df %>% 
+  ggplot(aes(x = forborn, y = rw, fill = female)) +
+    geom_boxplot(color="grey", alpha=0.8) +
+    scale_fill_tableau() +
+    theme_fivethirtyeight() +
+    theme(
+      plot.title = element_text(size=11)
+    ) + scale_y_log10() + 
+  
+  labs(x = "Citizen", y = "Income",
+  title = "Income for US Citizens and Migrants by Gender",
+       caption = "Data Source: 2019 US current population survey (CPS)") + 
+  
+  
+##########################
+my_df %>% 
+  ggplot(aes(x = wbhaom, y = rw, fill = wbhaom)) +
+    geom_boxplot(color="grey", alpha=0.8, show.legend = FALSE) +
+    theme_fivethirtyeight() +
+    scale_fill_tableau() +
+    theme(
+      plot.title = element_text(size=11)
+    ) + scale_y_log10() + 
+  labs(x = "Race", y = "Income", 
+       title = "Income by Race for Citizens vs Immigrants", 
+       
+       caption = "Data Source: 2019 US current population survey (CPS)"
+       
+       
+       ) + 
+  facet_wrap(~citizen)) /
+
+
+##############################
+(my_df %>% 
+  ggplot(aes(x = docc03, y = rw, fill = docc03)) +
+    geom_boxplot(color="grey", alpha=0.8, show.legend = FALSE) +
+    theme_fivethirtyeight() +
+    scale_fill_tableau() +
+    theme(
+      plot.title = element_text(size=11)
+    ) + scale_y_log10() + 
+  labs(x = "Occupation", y = "Income", 
+       title = "Income by Occupation: Citizens vs Immigrants", 
+       caption = "Data Source: 2019 US current population survey (CPS)"
+       ) + 
+  facet_wrap(~ citizen) + 
+
+#######################################
+my_df %>% 
+  ggplot(mapping = aes(x = age, y = rw, color = forborn)) + 
+  geom_point() + 
+  geom_smooth() + 
+  scale_color_tableau() +
+  labs(x = "Age", y = "Income", 
+       title = "Income for Citizens vs Immigrants by Age Group",
+       caption = "Data Source: 2019 US current population survey (CPS)"))
+
+```
+
+
+\elandscape
+
+\newpage
+
+### **Regression Analysis**
+
+This section presents the findings from my *regression models* which look at
+
+a. The immigrant wage gap and possible explanations
+
+b. Whether and how the wage gap varies by time since immigrants entered the US.
+
+
+In this analysis, I regress the income (rw) of individuals and several variables. The summary of regression results is in the table below.  The analysis shows the following variables to be the significant drivers of wages.
+
+- **Age**: This variable has a positive relationship with income. Meaning that older employees with greater experience tend to have more pay, ceteris paribus. 
+
+- **Education**: More educated employees have better pay compared to less educated employees, all else remaining the same. 
+
+- **Certification**: Employees with a professional certification eran more on average, all else remaing the same. 
+
+- **Race**: White people tend to have better pay compared to employees from other races hodling other factors constant.
+
+- **Hours worked (hourslw)**: The more hours an employee puts in , the higher the average pay holding other factors constant. 
+
+- **Rural**: Employees in rural locations tend to get less pay. 
+
+- **Occupation**: Some occupations are more lucrative than others. Given that immigrants are likely to occupy unskilled occupations, it is likely that they have lower average salaries. 
+
+- **Year of arrival** in the united states: Very new arrivals in the US have notably lower pay compared to those that arrived earlier. The income rises after the first year and then declines gradually. 
+
+
+```{r}
+my_df %>% 
+  group_by(arrived) %>% 
+  mutate(Mean_Earnings = mean(rw, na.rm = TRUE),
+         Median_Earnings = median(rw, na.rm = TRUE)
+         ) %>% 
+  select(Mean_Earnings, Median_Earnings) %>% 
+  filter(!is.na(arrived)) %>% 
+  pivot_longer(-arrived, names_to = "measures", values_to = "amount") %>% 
+  ggplot(mapping = aes(x = arrived, y = amount, color = measures)) + 
+  geom_line() + 
+  labs(x = "Year Since Arrival", y = "Mean or Median Income", 
+       title = "Income for Citizens by Time of Arrival",
+       caption = "Data Source: 2019 US current population survey (CPS)") + 
+  scale_color_tableau()
+```
+
+We start by running a simple model of real wages against the `forborn`, a variable that captures whether or not the person was born outside the United States. 
+
+```{r}
+lm(rw ~ forborn, data = my_df) %>% summary()
+```
+
+This simple model shows that foreign born US residents earn significantly less than the people born in the United States. However, the explanatory power of the model is too low. I add more variables in the next model. 
+
+```{r}
+lm(rw ~ forborn + female + wbhaom + age + educ + cert + hourslw + factor(arrived) + rural + docc03, data = my_df) %>% summary()
+```
+
+
+## Summary and conclusion
+
+In this analysis, I examined the drivers of the differential in earnings between US born and migrant workers in the United States. The data shows that migrants have the lowest earnings in their first year of arrival. Earnings increase steeply in the first five years, followed by a gradual decline. The drivers of income differentials include gender, age, race, education, certification, hours worked, job location (rural vs urban), and occupation. The data has a severe case of missing data making analysis challenging. There is potential for omitted variable bias. 
+
+## References 
+
+
+
+
+
+## Appendix - Variable list [Delete this section in your hand-in]
+
+```{r eval= F}
+year               Year
+month              Month
+minsamp            Month in sample
+hhid               Household ID
+hhid2              Household ID Part 2
+hrsample           Household sample ID
+hrsersuf           Household serial suffix
+hhnum              Household counter
+hrlonglk           Longitudinal link
+lineno             Person number
+fnlwgt             Final weight
+orgwgt             Earnings weight
+lonwgt             Longitudinal weight
+famwgt             Family weight
+age                Age
+female             Female
+wbho               Race
+wbhao              Race/ethnicity, inc. Asian
+wbhom              Race, inc. mixed
+wbhaom             Race, inc. Asian and Mixed
+racehpia           Hawaiian/Pacific Islanders
+racehpi            Hawaiian/Pacific Islanders Only
+racea              Detailed Asian Origin
+forborn            Foreign born
+citizen            US citizen
+prcitshp           Citizenship status
+arrived            Year entered US
+prinusyr           Year entered US
+penatvty           Country birth
+pemntvty           Country birth, mother
+pefntvty           Country birth, father
+vet                Veteran
+married            Married
+marstat            Marital status
+ownchild           Number of children
+ch02               Child 0-2
+ch05               Child 0-5
+ch35               Child 3-5
+ch613              Child 6-13
+ch1417             Child 14-17
+famrel84           Family relation
+famrel94           Family relation
+famrel             Family relation
+relahh             
+hoh79              
+refper             Reference person
+faminc             Family income band
+lfstat             Labor-force status
+empl               Employed
+unem               Unemployed
+nilf               Not in labor force
+selfemp            Unincorporated self-employed - 1st job
+selfinc            Incorporated self-employed - 1st job
+pubsect            Public sector - 1st job
+pubfed             Federal employee - 1st job
+pubst              State employee - 1st job
+publoc             Local employee
+cow1               Class of Worker, 1st job
+cow2               Class of Worker, 2nd job
+unemdur            Unemployment duration (weeks)
+jobloser           Job loser
+jobleaver          Job leaver
+entrant            Entrant
+unmem              Union member
+uncov              Union coverage
+union              Union
+cert               Professional Certification
+certgov            Certification was government issued
+schenrl            Enrolled in HS or College last week
+schhs              Enrolled in HS
+schcol             Enrolled in College
+schft              Full-time Student
+schpt              Part-time Student
+multjob            Has more than one job
+multjobn           Number of jobs
+pdemp1             Usually has paid employees
+pdemp2             Usually has paid employees
+nmemp1             Number of paid employees
+nmemp2             Number of paid employees
+state              State
+metro              Metropolitan area
+centcity           Central city
+suburb             Suburbs
+rural              Rural
+cmsacode05         CSA Code
+cmsacode14         CSA Code
+fipscounty         FIPS County Code
+principalcty       Individual Principal City
+smsastat05         Metro CBSA FIPS Code
+smsastat14         Metro CBSA FIPS Code
+cbsasz             CBSA Size
+nyc                New York City, metro area
+la                 Los Angeles, metro area
+educ               Education level
+educ92             Education level, post-1991
+ind_nber           2-digit industry
+ind_2d             2-digit industry
+ind70              3-digit industry SIC
+ind80              3-digit industry SIC 1987
+ind03              3-digit industry NAICS 2002
+ind09              3-digit industry
+ind12              3-digit industry
+ind14              3-digit industry NAICS 2012
+ind_m03            Major Industry Recode
+agric              Agriculture
+manuf              Manufacturing
+servs              Services
+docc70             2-digit occupation
+docc80             2-digit occupation
+docc03             2-digit occupation
+occ70              3-digit occupation
+occ80              3-digit occupation
+occ03              3-digit occupation
+occ11              3-digit occupation
+occ12              3-digit occupation
+occ_m03            Major Occupation Recode
+manag83            Manager
+manag03            Manager
+hourslwa           Hours last week, all jobs
+hourslw            Hours last week, all jobs
+hourslwm           Hours last week, main job
+reason79           Why <35 hours last week
+reason94           Why <35 hours last week
+absent79           Why absent last week
+absent94           Why absent last week
+abpaid             Paid for time off last week
+uhours             Usual hours, main job
+uhourse            Usual hours, main job
+why3579            Why usually <35 hours
+why3594            Why usually <35 hours
+ptecon             PT, economic reasons
+unempt             Unemployed, PT
+prhrusl            Usual hours, Basic CPS
+hrsvary            Hours vary, main job
+pehrusl1           Usual hours, main (BLS)
+pehrusl2           Usual hours, 2nd (BLS)
+pehruslt           Usual hours, all (BLS)
+peernhro           Usual hours, ORG (BLS)
+imphrs             Hours, main job (imputed)
+hrsimptd           Hours imputed
+uhoursi            Hours, w/ imputation
+blsimpt            BLS allocated weekly hours
+blsimph            BLS allocated hourly earnings
+blsimpw            BLS allocated weekly earnings
+paidhre            Paid by hour
+weekpay            Weekly pay
+uearnwke           Weekly pay
+uearnwk            Weekly pay
+earnwke            Weekly pay
+peernuot           DO YOU USUALLY RECEIVE OVERTIME PAY,
+otcrec             Usually receive overtime, tips, commissions
+otcamt             Weekly earnings overtime, tips, commissions
+wage1              Hourly wage (if hourly worker)
+wage2              Hourly wage (if nonhourly worker)
+wage3              Hourly wage
+wage4              Hourly wage
+rw                 Real wage, 2019$
+rw_ot              Real wage, 2019$
+tc                 Weekly earnings topcoded
+proxy              Self or proxy response
+wholine            Line number of respondent
+reltoref           Relationship to reference person
+```
+

@@ -1,0 +1,489 @@
+---
+title: "**How Can the Hospital Manage Admission Delays for Emergency Patients?**"
+subtitle: "***Analysis of Admission Delays for Emergency Ward Patients***"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+    toc_float: yes
+    code_folding: hide
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+    number_sections: true
+bibliography: ref.bib
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+if (!require(pacman)) {
+  install.packages("pacman")
+}
+
+
+pacman::p_load(
+  tidyverse, janitor, skimr,
+  kableExtra, readxl, conflicted,
+  GGally, corrplot, ggthemes,
+  randomForest, vip, stargazer,
+  naivebayes, e1071, caret,
+  kernlab, tidymodels
+)
+
+options(digits = 3)
+theme_set(ggthemes::theme_clean())
+```
+
+\newpage
+
+# **Summary**
+
+In this analysis, I have used emergency department data from a fictitious hospital to generate insights to reduce waiting times. Following my analysis, I come up with the following insights.
+
+- The critical factor in wait times are the number of patients.
+
+- The number of patients vary by number of day or day of week.
+
+My recommendations are as follows;
+
+- Vary the number of staff depending on days of week that have more emergency cases.
+
+- Vary staff by hour of day, with more staff during hours with more emergency cases like 1100 hrs, and less during times when there are fewer cases like around midnight. 
+
+- Given that the hospital has fixed number of beds, there should be arrangements to create portable, temporary emergency wards and beds to cater for the upsurge in emergency cases during particular days of week and hours of day.
+
+\newpage
+
+# **Background**
+
+In hospital emergency wards, the longer the patient waits in a queue before being attended, the greater the risk of mortality. In this analysis, I use data regarding the patient wait times in an emergency department in an anonymous hospital to derive insights that can help the hospital management reduce the wait times. Specifically, the analysis aims uncovering factors associated with admission delays so as to advise the management of actionable strategies to reduce the delays. 
+
+To achieve this goal, I run the following models for the analysis. 
+
+- Simple Linear Regression Model.
+
+- Support Vector Machines (SVM) Model.
+
+- Naive Bayes Model.
+
+- Random Forest Model.
+
+But first, I load and explore the data, run the models, and, finally, make recommendations. The analysis then concludes. 
+
+# **Data**
+
+## ***Overview of the Data***
+
+In this section, I load and explore the data.
+
+```{r}
+## Load the data ----
+waiting <- readxl::read_xlsx("Hw_data.xlsx") |>
+  janitor::clean_names()
+
+## Overview of the data
+glimpse(waiting)
+```
+
+The data consists of `r nrow(waiting)` observations of `r ncol(waiting)` variables. Table 1 below describes the variables. 
+
+```{r}
+# Describing the variables in the raw data ----
+tribble(
+  ~Variable, ~Description,
+  "date_and_time",
+  "Time and date of patient arrival.",
+  "number_of_ed_beds",
+  "Number of beds in the emergency department.",
+  "number_of_ip_beds",
+  "Number of inpatient beds.",
+  "number_of_ed_pts",
+  "Number of emergency department patients.",
+  "number_of_ed_pts_waiting_ip_bed",
+  "Number of emergency department patients waiting for bed",
+  "number_of_critical_care_pts_display",
+  "Number of critical care patients display",
+  "door_to_bed_time_for_last_ed_patient",
+  "Door to bed time for last patient in emergency department.",
+  "longest_admit_time_waiting_in_ed",
+  "Longest admission time for patient waiting in emergency department."
+) |>
+  kbl(booktabs = TRUE, caption = "Variables Description") |>
+  kable_classic(
+    full_width = TRUE,
+    latex_options = "hold_position"
+  )
+```
+
+
+The target variable (dependent variable) is the longest admit time waiting in emergency department (longest_admit_time_waiting_in_ed).
+
+## ***Missing and Duplicate values***
+
+The data has no missing values. 
+
+```{r}
+## Check missing values
+waiting |>
+  sapply(is.na) |>
+  colSums() |>
+  tibble(variables = names(waiting), missing = _) |>
+  kbl(booktabs = TRUE, caption = "Missing values") |>
+  kable_classic(
+    full_width = FALSE,
+    latex_options = "hold_position"
+  )
+```
+
+Likewise, the data has no duplicate rows. 
+
+```{r}
+## Check duplicate observations
+waiting |>
+  janitor::get_dupes()
+```
+Given that this is a relatively clean dataset, I embark on data exploration. 
+
+## ***Exploratory Data Analysis***
+
+I start by summarising the data. 
+
+```{r}
+## Summary statistics for the data
+waiting |>
+  select(-date_and_time) |> skimr::skim_without_charts() |>
+  select(-complete_rate, -n_missing) |>
+  set_names(c(
+    "no", "variable", "Mean", "SD", "Min",
+    "Q1", "Median", "Q3", "Max"
+  )) |>
+  select(-no) |> kbl(booktabs = TRUE, caption = "Data Summary") |>
+  kable_classic(
+    full_width = FALSE, latex_options = "hold_position"
+  )
+```
+
+I do a pairs plot for the variables to uncover the significant relationships between the variables. 
+
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Pairs Plot for Raw Data"}
+## Pairs plotof the raw data 
+waiting |>
+  select(
+    -date_and_time, -number_of_ed_beds,
+    -number_of_ip_beds
+  ) |>
+  GGally::ggpairs(title = "Variables Pairs Plots")
+```
+
+
+\elandscape
+\newpage
+
+
+Note that the number of both inpatient and emergency department beds are constant and hence the NA value for the correlations of these variables and other variables in the dataset. Hence, I omit both variables in the correlation analysis.
+
+Overall, there are significant correlations between waiting times and the number of patients (number_of_ed_pts), and the patients waiting in inpatient beds (number_of_ed_pts_waiting_ip_bed). The variables can be useful in explaining waiting times in emergency rooms except for the number of beds. 
+
+I remove the two constant columns from the data; number_of_ed_beds, number_of_ip_beds. 
+  
+```{r}
+## Remove the columns with constant values
+## These are; number_of_ed_beds, number_of_ip_beds. 
+waiting <- waiting |>
+  remove_constant()
+```
+
+## ***Feature Engineering***
+
+Given that the flow of patients may vary by day of the week and time of day, I split the date_and_time variable into two variables, weekday (Sunday (1) to Saturday (7)) and hour of the day (in 24 hour format 00 to 23). Note that the data was collected in May 2016 hence the month and year may not be useful in the analysis.
+
+Given that I also run Naive Bayes and Support Vector Machines (SVM) models, I create a new categorical variable from the wait times. Specifically, I segment the target variable (longest_admit_time_waiting_in_ed) into 9 categories. Examples of these categories are patients that wait for 0-3.34 minutes, 3.34 to 6.67 minutes, and so on. I have used my own judgement to select these segments.
+
+```{r}
+## Creating new variables, day of week, hour of day, and wait_cat
+## wait_cat bins the waiting times into 9 categories
+waiting <- waiting |>
+  mutate(
+    week_day = wday(date_and_time, label = FALSE),
+    hour_day = hour(date_and_time)
+  ) |>
+  select(-date_and_time) |>
+  mutate(
+    hour_day = factor(hour_day),
+    week_day = factor(week_day)
+  ) |>
+  mutate(wait_cat = cut(longest_admit_time_waiting_in_ed,
+    breaks = 9
+  ))
+```
+
+
+# **Analysis**
+
+## Distribution of Wait Times
+
+Figure 1 below shows the distribution of weight times. We see that the variable is skewed with much of the wait time less than 10 minutes. However, there are outliers of upto 30 minutes which could mean life and death for patients. Next, we see the distribution of patients based on the waits times for the categorical variable `wait_cat` (Figure 2). 
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Distribution of Patient Wait Times", fig.width=12, fig.height=6}
+## Distribution of patient wait times
+waiting |> ggplot(aes(x = longest_admit_time_waiting_in_ed)) +
+  geom_histogram(color = "black", fill = "gray80") +
+  geom_density(aes(y = ..count..)) +
+  labs(x = "Wait Time", y = "Count",
+    title = "Distribution of Wait Time")
+```
+
+
+
+\newpage
+
+```{r, fig.cap="Waiting Times in Emergency Departments", fig.width=12, fig.height=6}
+## Waiting time by categories
+waiting |> count(wait_cat) |>
+  ggplot(mapping = aes(x = wait_cat, y = n)) + geom_col() +
+  labs(x = "length of Wait", y = "Count",
+  title = "Waiting Times in Emergency Departments") + coord_flip()
+```
+
+
+\elandscape
+\newpage
+
+Again the skewness in the histogram repeats, with most waits between zeo and 4 minutes. However, there are outliers of upto thirty minutes which are a cause for concern. 
+
+## **Day of Week and Hour of Day with Most emergencies**
+
+Table 4 below shows the distribution of cases by week day. The table shows that most cases occur on Sundays, Mondays, and Tuesdays with 120 admissions each.
+
+```{r}
+## Patients by day of the week
+waiting |>
+  count(week_day) |>
+  kbl(booktabs = TRUE, caption = "Patients by Day of Week") |>
+  kable_classic(
+    full_width = FALSE,
+    latex_options = "hold_position"
+  )
+```
+
+For hour of day, there are a uniform number of admissions for this data (Table 5). 
+
+```{r}
+## Patients by hour of day
+waiting |>
+  count(hour_day) |>
+  kbl(booktabs = TRUE, caption = "Patients by Hour of Day") |>
+  kable_classic(
+    full_width = FALSE,
+    latex_options = "hold_position"
+  )
+```
+
+## **Models**
+
+In this section, I run the models in the following order. 
+
+1. Linear Regression Model.
+
+2. Support Vector Machines Model. 
+
+3. Naive Bayes Model.
+
+4. Random forest Model. 
+
+
+### ***Linear Regression Model.***
+
+The regression analysis [@]Muller2016 shows the factors that are important in determining waiting times for patients. 
+
+```{r, results='asis'}
+## Run the regression model
+lm_model <- lm(longest_admit_time_waiting_in_ed ~ . - wait_cat, data = waiting)
+
+```
+
+```{r, results='asis'}
+## Generate regression model output for either HTML or PDF output
+
+if (knitr::is_html_output()) {
+
+  stargazer::stargazer(lm_model,
+  type = "html",
+  title = "Regression Output"
+)
+} else {
+
+  stargazer::stargazer(lm_model,
+  type = "latex",
+  title = "Regression Output",
+  font.size = "tiny"
+)
+}
+```
+
+The critical factors include;
+
+- Number_of_ed_patients_waiting_in_ip_beds.
+
+- Weekday.
+
+- Hour of day.
+
+Specifically, the number of patients waiting in inpatient beds has a direct relationship with waiting times. Besides, some days of the week are likely to experience longer waiting times than others. For instance, compared to Sunday (day 1), Thursday(day 5) has longer waiting times. Likewise, some hours of the day see longer waiting times. As case in point, 1100 hrs has a higher waiting times compared to midnight.  
+
+Recommendation: Increase the number of staff during peak days like Thursday so as to clear the number of patients waiting in inpatient beds. 
+
+### ***Support Vector Machines Model.***
+
+```{r, fig.cap = "Variable Importance: Naive Bayes Model"}
+## Create a dataset for Naive Bayes and SVM Models
+
+final_data <- waiting |>
+  select(-longest_admit_time_waiting_in_ed) |>
+  data.frame()
+
+```
+
+We run the SVM model and generate variable importance plots [@DataCampSVMR]. As in the Naive Bayes case, for patients that wait between 20 and 23.3 minutes, the number of patients is critical, followed by the door to bed time for the last emergency department patient. 
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Variable Importance: Random Forest Model", fig.width=12, fig.height=5}
+# Create cross validation folds
+train_control <- trainControl(
+  method = "repeatedcv", number = 10, repeats = 3)
+# Fit the model
+svm_model <- train(wait_cat ~ ., data = final_data,
+  method = "svmLinear", trControl = train_control,
+  preProcess = c("center", "scale"), tuneGrid = expand.grid(C = seq(0, 2,
+    length = 20
+  )))
+# View the model
+plot(varImp(svm_model))
+```
+
+\elandscape
+\newpage
+
+### ***Naive Bayes Model.***
+
+To run Naive Bayes model, I have divided the outcome variable into categories to create a categorical variable (wait_cat). The variable has nine categories. For instance, how many times did admissions delay for between zero and three minutes, and so on. This is the `wait_cat` variable (see section 3.4 on feature engineering). 
+
+I now run the Naive Bayes model and generate the variable importance plots [@EdurekaNaiveBayesR]. Figure 5 shows the variable imprortance by category. For instance, the top left plot shows the factors that are imprtant for patients that wait for between 20 and 23.3 minutes. In that case, the number of patients is critical, followed by the door to bed time for the last emergency department patient. For the other categories, we use the same interpretation.
+
+Recommendation: The implication is that in days and hours where there is projected to be more patients, we should have additional staff and portable emergency wards and beds. 
+
+\newpage
+\blandscape
+
+```{r, fig.cap = "Variable Importance: Naive Bayes", fig.width=12, fig.height=5}
+## Create a hyperparameter tuning grid 
+Grid <- data.frame(usekernel = FALSE, laplace = 0, adjust = 1)
+## Run the Naive Bayes model
+mdl <- train(wait_cat ~ .,data = final_data,
+  method = "naive_bayes", trControl = trainControl(method = "none"),
+  tuneGrid = Grid
+)
+## Plot the variable importance 
+plot(varImp(mdl))
+```
+
+\elandscape
+\newpage
+
+### ***Random Forest Model.***
+
+I run the random forest model [@Muller2016]. 
+
+```{r}
+## Set random seed for reproducibility
+set.seed(123)
+
+## Run the random forest model
+rf_model <- randomForest(longest_admit_time_waiting_in_ed ~ .
+- wait_cat, data = waiting)
+
+summary(rf_model)
+```
+
+For inference and actionable insights, I get the variable importance. Figure 4 below shows that hour of the day is of primary importance in explaining waiting times for patients. The number of patients and the number of patients waiting in inpatient beds are also important. 
+
+\newpage
+\blandscape
+
+
+```{r, fig.cap = "Variable Importance: Random Forest Model"} 
+## Variable importance plots for the random forest model
+
+vip(rf_model) +
+  labs(title = "Variable Importance: Random Forest Model")
+```
+
+
+\elandscape
+\newpage
+
+
+Recommendation: Vary the number of staff by the hour of day where there are more emergency cases. 
+
+# **Model Evaluation**
+
+
+
+
+# **Key Takeaways**
+
+The four models tell us the critical factors associated with hospital delays. The regression model,for instance, points to the number_of_ed_patients_waiting_in_ip_beds, Weekday, and hour of day. Likewise,the SVM model also points to number of ed patients and hour of day as important drivers of long delays (for instance a delay of over 25 minutes). The observation is the same for naive bayes and random forest models. The models inform the need to manage staff, more so when there are many patients during particular hours of the day and days of the week. For forecasting purposes, it would be useful to split the data into a training set and test set and select the best model among the four.
+
+# **Conclusion**
+
+In this analysis, I have used emergency department data from a fictitious hospital to generate insights to reduce waiting times. Following my analysis, I come up with the following insights.
+
+- The critical factor in wait times are the number of patients.
+
+- The number of patients vary by number of day or day of week.
+
+My recommendations are as follows;
+
+- Vary the number of staff depending on days of week that have more emergency cases.
+
+- Vary staff by hour of day, with more staff during hours with more emergency cases like 1100 hrs, and less during times when there are fewer cases like around midnight. 
+
+- Given that the hospital has fixed number of beds, there should be arrangements to create portable, temporary emergency wards and beds to cater for the upsurge in emergency cases duting particular days of week and hours of day.
+
+# Packages Used in the Analysis
+
+I have utilised the following packages in R for the analysis. 
+
+```{r}
+sessionInfo()
+```
+
+# References{.unnumbered}
+
+
+
+
+
+
+
+
+
+
+

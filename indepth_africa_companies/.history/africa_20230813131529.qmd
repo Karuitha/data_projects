@@ -1,0 +1,286 @@
+---
+subtitle: "***Analyzing Top Companies Africa with Libreoffice calc, Python and Pandas***"
+title: "**A Deeper Analysis of Africa's Corporate Landscape Using Libreoffice and Python**"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957-00100
+        city: Karatina
+        state: Kenya
+        postal-code: 10101
+      - name: Graduate School of Business Administration, University of the Witwatersrand
+        address: 2nd St Davids Pl & St Andrew Rd, Parktown
+        city: Johannesburg
+        state: South Africa
+        postal-code: 2193
+title-block-banner: "Untitled.jpeg"
+title-block-banner-color: "black"
+self-contained: true
+date: today
+date-modified: today
+date-format: long
+format: 
+  html:
+    theme: pulse
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    smooth-scroll: true
+    code-fold: false
+execute: 
+  message: false
+  warning: false
+  echo: fenced
+bibliography: references.bib
+csl: apa.csl
+---
+
+# **Background**
+
+Recently. I published a data analysis project titled **Navigating Africa’s Business Landscape Using Python** in my [Rpubs site](https://rpubs.com/Karuitha/africa_business). The analysis provoked quite a bit of interest that motivated me to go a little deeper into analyzing the corporate landscape in Africa. In this mopre comprehensive analysis project, I use data from the [Africa Business](https://african.business/2023/05/long-reads/africas-top-250-companies-in-2023-doing-business-in-tough-times) to explore the 250 largest formal corporations in the continent ^[The data is available on this link <https://african.business/2023/05/long-reads/africas-top-250-companies-in-2023-doing-business-in-tough-times>]. The data consists of 250 largest companies in Africa together with revenue, net income, and market valuation for the years 2022 and 2023.
+
+# **Objectives**
+
+The primary objective of the analysis is to explore trends in the corporate environment in Africa. 
+
+Specifically, we examine the following matters. 
+
+1. Which are the top ranking companies in Africa in 2022 and 2023?
+2. Which companies have the best financial performance in 2022 and 2023?
+3. Which countries have the highest concentration of companies in the top 250 largest corporations in Africa?
+4. Which industries have the highest concentration of companies in the top 250 largest corporations in Africa?
+5. What is the correlation between market value of a company on the one hand and revenues and profits on the other?
+
+# **Key Findings**
+
+1. 75% of the top 20 companies are domiciled in South Africa.
+2. 38% of the top 250 companies are domiciled in South Africa.
+3. The largest company in Africa is Naspers with USD 49,619,000,000, USD 80,865,000,000, USD 7,940,000,000, and USD 12,000,000 in market value (2023), market value (2022), revenue, and profits respectively.
+4. Outside South Africa, Morocco, Nigeria, and Egypt are the biggest players in Africa's corporate landscape.
+5. Outside South Africa, MTN Nigeria and Dangote cement are the largest companies in South Africa.
+6. Safaricom of Kenya is the 24th largest company in Africa, and the sixth largest company in Africa outside South Africa.
+7. The top 250 companies operate in telecommunications, non-energy materials, and finance sectors.
+8. Revenues have a higher correlation with company value compared to profits.
+
+# **Data**
+
+I scrape the data using Libreoffice calc. [Libreoffice calc](https://www.libreoffice.org/discover/calc/) is the equivalent of Ms Excel except that it is free to use. Next, I load the required python packages and read in the data ^[Libreoffice is available to download,install and use on the site <https://www.libreoffice.org/>]. 
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+```
+
+```{python}
+## Read in the data
+africa = pd.read_excel("africa250.xlsx")
+
+africa.sort_values(by = "ranking2023", inplace = True)
+
+## Reset the index
+africa.reset_index(inplace=True)
+
+## Update the country BOTSWANA to Botswana as there are mixed cases.
+africa["stock_exchange"].replace(["BOTSWANA"], ["Botswana"], inplace = True)
+
+africa.head(10)
+```
+
+# **Data Exploration**
+
+## **Variables, Observations, and Data Types**
+
+Lets us check the variables and observations present in the data. There are 250 observations of 9 variables. 
+
+```{python}
+africa.info()
+```
+
+The variables in the data are the following. 
+
+```{python}
+africa.columns.values
+```
+
+- Ranking2023: The company ranking by market value in 2023.
+- Ranking2022: The company ranking by market value in 2022.
+- Name: The company name.
+- Sector: The company sector of business operations.
+- Stock exchange: The stock exchange where company stocks are listed.
+- Market_value_22: The company market value in 2022.
+- Market_value_23: The company market value in 2023.
+- Revenue_latest: Latest reported company annual revenues.
+- Net_income_latest: Latest reported company net income. 
+
+We find that has captured the variables ranking2022 and market_value_2022 as text rather than numeric values. To correct this anomaly, we convert these variables to the appropriate data format. 
+
+```{python}
+africa["ranking2022"] = pd.to_numeric(africa["ranking2022"], errors = "coerce")
+africa["market_value_22"] = pd.to_numeric(africa["market_value_22"], errors = "coerce")
+
+africa.info()
+```
+
+
+## **Missing Values**
+
+We examine the missing values in the variables. For the rankings, all the missing values relate to new entrants in the data. For instance, a company may have entered the list of 250 companies in 2023. Hence, ranking for 2022 is a missing value. Likewise, a company may hae been ranked in 2022 but dropped out of the ranking of 250 companies in 2023.
+
+```{python}
+[col for col in africa.columns if africa[col].isnull().any()]
+```
+
+We see the columns that have missing values. Our interest is in revenues and net income. 
+
+```{python}
+africa.isna().sum()
+```
+
+```{python}
+plt.style.use("fivethirtyeight")
+africa.isna().sum().sort_values(ascending=False).plot(kind = "barh",
+title = "Missing values", color = "blue")
+plt.ylabel("Variable")
+plt.show()
+```
+
+## **Data Exploration**
+
+We explore the data using the seaborn pairs plots. The first analysis visualises pertinent variables by country. 
+
+```{python}
+sns.pairplot(africa[["stock_exchange", "sector", "market_value_22", "market_value23",
+"revenue_latest", "net_income_latest"]], hue = "stock_exchange", palette = "colorblind", corner = True, dropna = True)
+```
+
+We note, as expected, a substatial correlation between revenues and profits with market values. The correlation varies across countries.
+
+Let us the same analysis for market sectors. Again we see the variation across sectors. 
+
+```{python}
+sns.pairplot(africa[["stock_exchange", "sector", "market_value_22", "market_value23",
+"revenue_latest", "net_income_latest"]], hue = "sector", palette = "colorblind", corner = True, dropna = True)
+```
+
+
+# **Answering Pertinent Questions**
+
+## Which are the top 20 ranked companies in Africa?
+
+In this section, I concentrate on the top 20 companies in Africa. The top company for 2 years running is `Naspers` of South Africa, a company dealing in consumer non-cyclicals. First Rand Bank and Standard Bank Group from South Africa come a distant second. 
+
+```{python}
+africa[["name","sector","stock_exchange",
+"market_value_22","market_value23",
+"revenue_latest", "net_income_latest"]].head(20)
+```
+
+Notable is that 15 of the companies in the top 20 are from South Africa. That is a ratio of 75%. 
+
+```{python}
+africa[["name","sector","stock_exchange",
+"market_value_22","market_value23",
+"revenue_latest", "net_income_latest"]].head(20)["stock_exchange"].value_counts().plot(kind = "pie", title = "Domicile of Top 20 Companies in Africa", autopct = "%1.0f%%")
+```
+
+
+Which industriee have the most companies in the top 20? The chart below shows shows that companies in the non-energy materials and finance dominate the top 20 with 40% and 25% shares, respectively.
+
+```{python}
+africa[["name","sector","stock_exchange",
+"market_value_22","market_value23",
+"revenue_latest", "net_income_latest"]].head(20)["sector"].value_counts().plot(kind = "pie", title = "Top 20 Companies in Africa by Sector", autopct = "%1.0f%%")
+```
+
+
+## Which are the top 20 ranked companies in Africa (Outside South Africa)?
+Given the dominance of South Africa in the sample, I create a subset of data that excludes companies from South Africa  and rerun the analysis.The aim is to list the top 20 companies in Africa not domiciled in South Africa. 
+
+Outside South Africa, the top companies in Africa are MTN Nigeria followed by Dangote Cement. Safaricom of Kenya is sixth in the list and 24th in the top 250 companies in Africa.
+
+```{python}
+africa[africa["stock_exchange"] != "South Africa"][["name", "stock_exchange"]].head(20)
+```
+
+We see that Morocco, Nigeria, and Egypt top the list. 
+
+```{python}
+africa[africa["stock_exchange"] != "South Africa"][["name", "stock_exchange"]].head(20)["stock_exchange"].value_counts()
+```
+
+
+```{python}
+africa[africa["stock_exchange"] != "South Africa"][["name", "stock_exchange"]].head(20)["stock_exchange"].value_counts().plot(kind = "pie", title = "Domicile of Top 20 Companies in Africa (Outside South Africa)", autopct = "%1.0f%%")
+```
+
+Outside South Africa, telecommunications, non-energy materials, and finance are the dominant sectors for the top 20 companies. 
+
+```{python}
+africa[africa["stock_exchange"] != "South Africa"][["name", "sector"]].head(20)["sector"].value_counts()
+```
+
+
+```{python}
+africa[africa["stock_exchange"] != "South Africa"][["name", "sector"]].head(20)["sector"].value_counts().plot(kind = "pie", title = "Domicile of Top 20 Companies in Africa (Outside South Africa)", autopct = "%1.0f%%")
+```
+
+## Which countries have the highest concentration of companies in the top 250 largest corporations in Africa?
+
+In the previous section, we concentrated on the top 20 largest companies. Here, we examine the entire sample data. Which country has the largest number of companies in the top 250?
+
+We see that South Africa still leads with 38%, followed by Egypt(13%), Morocco (12%), Nigeria and kenya (9% and 4% respectively).
+
+```{python}
+africa["stock_exchange"].value_counts().plot(kind = "pie", title = "Domicile of Top Companies in Africa", autopct = "%1.0f%%")
+```
+
+## Which industries have the highest concentration of companies in the top 250 largest corporations in Africa?
+
+Which industries dominate Africa's corporate landscape? The figure below that in Africa, the financial sector leads by a wide margin, followed by consumer non-cyclicals, non-energy materials and telecommunications. Perhaps most companies engaged in cosntruction,health, and health care are from outside the continent. There is room fo further analysis. 
+
+```{python}
+africa["sector"].value_counts().plot(kind = "pie", title = "Top Companies in Africa by Sector", autopct = "%1.0f%%")
+```
+
+## What is the correlation between market value of a company on the one hand and revenues and profits on the other?
+
+Among the 250 largest companies in Africa, revenues have a stronger correlation with the market value of a company than profits. Although profits do consist of numerous non-cash expenditures, this observation is surprising, especially given that profits have a very mild correlation with the market value of a company. 
+
+```{python}
+plt.scatter(africa["market_value23"],
+africa["revenue_latest"], color = "blue",
+label = "Revenues")
+
+plt.scatter(africa["market_value23"],
+africa["net_income_latest"], color = "red", label = "Profits")
+
+plt.legend()
+plt.xlabel("Market value")
+plt.ylabel("Revenues/Profits")
+plt.title("Correlation of Revenues/Profits with Market Value")
+plt.xticks([0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000],
+labels = ["0K", "10K", "20K", "30K", "40K", "50K", "60K", "70K", "80K"])
+plt.show()
+```
+
+# **Conclusion**
+In this analysis, I examine the top 250 companies in Africa using data from the business report. The chief findings are as follows:
+
+1. 75% of the top 20 companies are domiciled in South Africa.
+2. 38% of the top 250 companies are domiciled in South Africa.
+3. The largest company in Africa is Naspers with USD 49,619,000,000, USD 80,865,000,000, USD 7,940,000,000, and USD 12,000,000 in market value (2023), market value (2022), revenue, and profits respectively.
+4. Outside South Africa, Morocco, Nigeria, and Egypt are the biggest players in Africa's corporate landscape.
+5. Outside South Africa, MTN Nigeria and Dangote cement are the largest companies in South Africa.
+6. Safaricom of Kenya is the 24th largest company in Africa, and the sixth largest company in Africa outside South Africa.
+7. The top 250 companies operate in telecommunications, non-energy materials, and finance sectors.
+8. Revenues have a higher correlation with company value compared to profits.
+
+More analysis is warranted to identify drivers of business performance on the continent.
+
+# **References** {.unnumbered}

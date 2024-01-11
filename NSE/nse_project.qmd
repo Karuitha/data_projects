@@ -1,0 +1,98 @@
+---
+title: "Nairobi Securities Exchange Stocks Analysis, 2013-2020"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, Kenya"
+      affiliation-url: www.karu.ac.ke
+description: "Independent Data Analysis Project"
+date: today
+title-block-banner: "stocks.jpeg"
+title-block-banner-color: "black"
+echo: true
+message: false
+warning: false
+format: 
+    html:
+        theme: 
+            dark: darkly
+            light: flatly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+bibliography: ref.bib
+---
+
+# Background
+
+```{r}
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+pacman::p_load(tidyverse)
+
+#if(!require(artyfarty)){
+  
+#}
+
+theme_set(ggthemes::theme_fivethirtyeight() + 
+theme(
+  
+  legend.title = element_blank())
+)
+```
+
+
+# Data 
+
+```{r}
+my_files <- list.files(path = "data/", 
+                       pattern = "stocks_\\d{4}\\.csv$", 
+                       full.names = TRUE, 
+                       recursive = TRUE)
+
+
+
+full_data <- map_dfr(my_files, read_csv) |>
+  janitor::clean_names() |>
+  mutate(date = lubridate::dmy(date))
+  
+head(full_data)
+```
+
+
+```{r}
+full_data %>%
+  filter(code %in% c("KCB", "ABSA", "EQTY", "SCBK", "KUKZ", "KAPC")) |>
+  ggplot(mapping = aes(x = date, y = day_price, color = code)) + 
+  geom_line() + 
+  scale_color_brewer() + 
+  labs(title = "NSE Price Trend for Selected Stocks")
+```
+

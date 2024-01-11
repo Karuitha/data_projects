@@ -1,0 +1,91 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-01-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(fpp3)
+library(tidyverse)
+admission_daily_key <- read_csv(
+  file = "data/ae_uk.csv") |> mutate(arrival_time= dmy_hm(arrival_time)) |> 
+  dplyr::distinct() |> as_tsibble(index = arrival_time, key = c(gender,type_injury), regular=FALSE) |> 
+  group_by(gender, type_injury) |> 
+  index_by(date = lubridate::as_date(arrival_time)) %>% 
+  summarise(arrival=n(), .groups = "drop") %>% fill_gaps(arrival=0)
+```
+
+# Lab 3: time series features
+
+
+For the daily admissions time series with keys (with gender, injury), extract the strength of trend and seasonality
+
+  *Do you see any useful insight?*
+  
+```{r label, options}
+admission_daily_key |>
+  features(arrival, feat_stl)
+```
+
+Admission dataset has only 4 time series, let's look at another dataset with more serries:
+
+Use ``GGally::ggpairs()`` to look at the relationships between the STL-based features. You might wish to change `seasonal_peak_year` and `seasonal_trough_year` to factors.
+
+```{r label, options}
+ library(GGally)
+tourism |>
+  features(Trips, feat_stl) |>
+  select(-Region, -State, -Purpose) |>
+  mutate(
+    seasonal_peak_year = factor(seasonal_peak_year),
+    seasonal_trough_year = factor(seasonal_trough_year),
+  ) |>
+  ggpairs()
+```
+ 
+ 
+Which is the peak quarter for holidays in each state?
+
+```{r label, options}
+tourism |>
+  group_by(State) |>
+  summarise(Trips = sum(Trips)) |>
+  features(Trips, feat_stl) |>
+  select(State, seasonal_peak_year)
+```
+ 
+
+Use a feature-based approach to look for outlying series in `PBS`. What is unusual about the series you identify as outliers?
+
+```{r label, options}
+library(broom)
+
+## Compute features
+PBS_feat <- PBS |>
+  features(Cost, feature_set(pkgs = "feasts")) |>
+  na.omit()
+
+## Compute principal components
+PBS_prcomp <- PBS_feat |>
+  select(-Concession, -Type, -ATC1, -ATC2) |>
+  prcomp(scale = TRUE) |>
+  augment(PBS_feat)
+
+## Plot the first two components
+PBS_prcomp |>
+  ggplot(aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point()
+
+## Pull out most unusual series from first principal component
+outliers <- PBS_prcomp |>
+  filter(.fittedPC1 > 7)
+outliers
+
+## Visualise the unusual series
+PBS |>
+  semi_join(outliers, by = c("Concession", "Type", "ATC1", "ATC2")) |>
+  autoplot(Cost) +
+  facet_grid(vars(Concession, Type, ATC1, ATC2)) +
+  labs(title = "Outlying time series in PC space")
+```

@@ -1,0 +1,790 @@
+---
+title: '**Reducing the Number of High Fatality Accidents in the UK**'
+author: "John King'athia Karuitha"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    theme: readable
+    highlight: haddock
+    toc: yes
+    toc_float: yes
+    code_folding: hide
+    number_sections: yes
+subtitle: "_Can Data Analysis Inform Interventions to Reduce High Fatality Road Accidents?_"
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+
+if(!require(pacman)){
+  
+  install.packages("pacman")
+
+}
+
+
+pacman::p_load(tidyverse, ggthemes, kableExtra, lubridate,
+               
+               patchwork, corrplot, psych, maps, mapproj, 
+               
+               Amelia, hexbin, glue, ggokabeito, scatterPlotMatrix,
+               
+               ggokabeito, rmarkdown)
+
+## Set visualizations theme
+theme_set(theme_clean())
+options(knitr.kable.NA="-")
+```
+
+# **Background**
+
+The [World Health Organization (WHO)](https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries) estimates that approximately 1.3 million people globally die in road accidents every year. Road accidents occur in every country. However, about 93% of the accidents happen in low- and middle-income countries, with 60% of the total vehicles in the world. The monetary loss occasioned by these road accidents amounts to about 3% of the GDP of each country. Importantly, road accidents are the leading cause of death for children and young adults between 5-29 years [^1]. The social and economic costs associated with road accidents make it paramount to craft strategies to reduce the number of road accidents and, critically, the fatalities. Coincidentally, at the time of writing this article, the United Nations is leading the world in commemorating victims of [road accidents on Sunday, November 21, 2021](https://www.un.org/en/observances/road-traffic-victims-day), dubbed the `World Day of Remembrance for Road Traffic Victims` [^2].
+
+[^1]: See the WHO summary on road accidents fatalities on <https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries>
+
+[^2]: See <https://www.un.org/en/observances/road-traffic-victims-day> for further information about World remembrance day, which happens annually on the third Sunday of November.
+
+In this article, I use data from the department of transport in the UK to garner insights into road accidents and associated fatalities. As a (fictional) employee of the road safety team in the department, my task is to use data to develop insights that would help reduce the number and fatalities of major incidents. Major accidents have at least three casualties. The department seeks to uncover the characteristics of these major incidents to brainstorm interventions that could lower the number of deaths. To this end, the department has asked me to examine the data and answer the following questions.
+
+1.  What time of day and day of the week do most major incidents happen?
+2.  Are there any patterns in the time of day/ day of the week when major incidents occur?
+3.  What characteristics stand out in major incidents compared with other accidents?
+4.  On what areas would I recommend the planning team focus their brainstorming efforts to reduce major incidents?
+
+NB: Please click on `code` to unhide the `R` code underlying the results presented.
+
+# **Data**
+
+The reporting department has been collecting data on every reported accident. They've included this along with a lookup file for 2020's accidents. I start by reading in both data sets into `R`. [^3]
+
+[^3]: *Published by the department for transport. , <https://data.gov.uk/dataset/road-accidents-safety-data>.* *Contains public sector information licensed under the Open Government Licence v3.0.*
+
+```{r}
+## Read in the accidents data from the data folder.
+accidents <- read_csv("data/accident-data.csv", na = "-1") %>% 
+  
+  ## Convert date and time to date/time format
+  mutate(date = dmy(date),
+         
+         time = hms(time)) %>% 
+  
+  mutate(day_of_week = factor(day_of_week,
+                              
+                              labels = c("Sun", "Mon", "Tue", 
+                                         
+                                         "Wed", "Thur", "Fri", "Sat")))
+
+## Structure of the accidents data.
+#str(accidents)
+
+## Read in the accidents data from the data folder.
+lookup <- read_csv("data/road-safety-lookups.csv")
+
+## Structure of the lookup data
+#str(lookup)
+```
+
+The `accidents` table has `r ncol(accidents)` variables and `r nrow(accidents)` observations. The `lookup` table has `r ncol(lookup)` variables, and `r nrow(lookup)` observations contains the metadata for the main data set, `accidents`. 
+
+I begin by examining the data, with reference to missing values and possible duplicates. Table 1 below variables with missing data points and the corresponding number of missing observations. 
+
+```{r}
+sapply(accidents, is.na) %>% 
+  
+  colSums() %>% 
+  
+  tibble(variable_name = names(accidents), missing = .) %>% 
+  
+  arrange(desc(missing)) %>% 
+  
+  filter(missing > 0) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Table 1: Missing Values") %>% 
+  
+  kable_classic(full_width = FALSE, 
+                
+                latex_options = "hold_position")
+```
+
+The data set is reasonably complete except for a glaring gaps in the junction control variable.
+
+```{r}
+accidents %>% 
+        
+        filter(duplicated(.))
+```
+
+Again, the data has no duplicate rows that may indicate an accident captured more than once. 
+
+# **Data Exploration**
+
+We summarise the variables in Appendix 1. For these summary statistics, I have eliminated some variables that would yield no meaningful information when summarised, for instance, longitude and latitude. Table 2 below shows the correlation matrix. Of interest are variables with higher correlations with `number of casualties`, the target variable, while bearing in mind that correlation may not capture non-linear relationships. The two variables that show a high correlation with `number of casualties` are `number of vehicles` involved in an accident (0.197) and `speed limit` (0.153).  
+
+```{r}
+accidents %>% 
+  
+        ## Seselect redunndant variables
+        select(-accident_index, -accident_reference, 
+         
+         -accident_year, -day_of_week,
+         
+         -date, -time,
+         
+         -longitude, -latitude, -junction_control) %>% 
+  
+  relocate(number_of_casualties) %>% 
+  
+        ## Remove NA rows 
+        na.omit() %>% 
+  
+        ## Do correlation and a nice table. 
+        cor() %>% 
+  
+        data.frame() %>% 
+  
+        ## Make a nice table
+        kbl(., booktabs = TRUE, caption = "Table 2: Correlation Matrix") %>% 
+  
+        kable_classic(full_width = TRUE, 
+                      
+                      latex_options = "hold_position", 
+                      
+                      font_size = 10)
+```
+
+
+# **The Analysis**
+
+In this section, we examine each of the questions in the analysis. I start by mapping out the areas where major fatal accidents happen- the hotspots. In this case, I use the density (2D) plot and the hexagonal heat map of 2D bin counts (geom_hex)^[See https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjpv8Kkp8f0AhXHDGMBHXKKCPsQFnoECAIQAQ&url=https%3A%2F%2Fggplot2.tidyverse.org%2Freference%2Fgeom_hex.html&usg=AOvVaw1k9D7ncWuUhdgbBeCkxFWQ for details on hexagonal heat maps.]. The visualisation in Figure 1 shows that accidents happen all over the UK. However, there are hotspots where major accidents (with at least three casualties) are concentrated, leading us to our first insight. Figure 1 shows these accidents hotspots. 
+
+```{r, fig.cap="Figure 1: Major Accidents Hotspots in the UK"}
+accidents %>% 
+  
+        ## Filter out major accidents
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Plot locations of major accidents
+        ggplot(mapping = aes(x = longitude, y = latitude)) + 
+  
+         ## Add a hex geom
+        geom_hex(alpha = 0.5) +
+  
+        ## Add a gem dendity 2D
+        geom_density_2d() +
+  
+        ## Add labels and titles
+        labs(x = "Longitude", y = "Latitude",
+       
+       title = "FATAL ACCIDENT HOT SPOTS",
+       
+       subtitle = "Locations of Fatal Accidents in the UK",
+       
+       caption = "John Karuitha, 2021 Using R and ggplot2") + 
+  
+  theme(legend.title = element_blank()) + 
+  
+  scale_fill_gradient(low = "lightgray", high = "red")
+```
+
+**Insight 1**: Major accidents happen all over the UK. However, the graph shows two primary regions with an unusually high concentration of accidents and fatalities. One of these regions is in the south-east (presumably around London) while the other region spans Central UK. The accident hot spot in the central UK  has three key sub-areas where accidents concentrate. There are additional pockets of accident hotspots, one towards the North East and another to the North(Scotland).
+
+We also examine the distribution of the accident fatalities, given that this is the target variable. Figure 2 is a histogram of the distribution of accident fatalities.
+
+```{r, fig.cap = "Figure 2: Distribution of Accident Casualties in the UK"}
+accidents %>% 
+  
+        ## Filter out the major accidents
+        filter(number_of_casualties <= 10) %>% 
+  
+        ## Do a histogram of casualties
+        ggplot(mapping = aes(x = as.integer(number_of_casualties))) + 
+  
+  geom_histogram(binwidth = 1, col = "black") + 
+        
+        scale_fill_okabe_ito(name = "Cylinders", alpha = .9) +
+        
+        scale_color_okabe_ito(name = "Cylinders") + 
+        
+        labs(x = "Number of Casualies", 
+             
+             y = "Count", title = "Distribution of Accident Casualties")
+```
+
+**Insight 2**: The graph clearly shows that most accidents in the UK are minor, with at most two casualties. However, these minor accidents account for 94% of deaths. Only about 6% of deaths arise from major accidents. Table 3 below shows the number and proportions of major and minor accidents deaths. 
+
+```{r}
+accidents %>%
+  
+  mutate(major = case_when(
+    
+    number_of_casualties <= 3 ~ "Minor",
+    
+    TRUE ~ "Major"
+  )) %>%
+  
+  group_by(major) %>%
+  
+  summarise(casualties = sum(number_of_casualties)) %>%
+  
+  mutate(prop = glue("{round(casualties / sum(casualties) * 100, 2)}%")) %>%
+  
+  kbl(., booktabs = TRUE, 
+      
+  caption = "Table 3: Proportion of Deaths from Major and Minor Accidents") %>% 
+        
+        kable_classic(full_width = FALSE, 
+                                                                                     latex_options = "hold_position")
+```
+
+Next, I examine the weekdays and times that major accidents happen most frequently.
+
+## What time of day and day of the week do most major incidents happen?
+
+Suppose there is a pattern in the weekdays or hours where major accidents happen. In that case, this could prove a significant entry point for interventions to minimise accident casualties. This section examines the prevalence of accidents and casualties by day of the week and time of day. 
+
+### What day of the week do most fatal accidents happen?
+
+This section only examines the major accidents with at least three casualties. Figure 3 below shows the number of accidents and associated deaths for each day of the week. Weekends have markedly higher numbers of accidents and casualties. However, weekdays do have substantial numbers of accidents and fatalities as well. It is also notable but not surprising that the number of accidents correlates with the number of accidents. To this end, I do scatter plots of the number of accidents/casualties against the weekday. 
+
+```{r, fig.width = 12, fig.cap = "Figure 3: Number of Major Accidents by Week Day"}
+(
+### GRAPH 1: Number of Accidents.
+accidents %>% 
+  
+  ## Only major accidents with casualties >= 3.
+  filter(number_of_casualties >= 3) %>% 
+  
+  ## We want to see which day of week has more casualties.
+  group_by(day_of_week) %>% 
+  
+  ## Summary of total deaths by day of the week.
+  summarise(accidents = n()) %>% 
+  
+  ## plot casualties versus week day, colored by week day.
+  ggplot(mapping = aes(x = day_of_week, y = accidents, 
+                       
+                       col = factor(day_of_week))) + 
+  
+  ## Scatter plot.
+  geom_point(shape = 1, size = 4, stroke = 4, show.legend = FALSE) + 
+  
+  ## Axis labels, title and caption
+  labs(x = "Day of Week", y = "Number of Accidents", 
+       
+       title = "Number of Major Accidents by Week Day",
+       
+       subtitle = "Weekends Have the Highest Number of Major Accidents",
+       
+       caption = "Developed by John Karuitha, 2021 Using R and ggplot2") +
+
+#############################################################################
+### GRAPH 2: Number of Casualties.
+
+accidents %>% 
+  
+  ## Only major accidents with casualties >= 3.
+  filter(number_of_casualties >= 3) %>% 
+  
+  ## We want to see which day of week has more casualties.
+  group_by(day_of_week) %>% 
+  
+  ## Summary of total deaths by day of the week.
+  summarise(casualties = sum(number_of_casualties)) %>% 
+  
+  ## plot casualties versus week day, colored by week day.
+  ggplot(mapping = aes(x = day_of_week, y = casualties, 
+                       
+                       col = factor(day_of_week))) + 
+  
+  ## Scatter plot.
+  geom_point(shape = 1, size = 4, stroke = 4, show.legend = FALSE) + 
+  
+  ## Axis labels, title and caption
+  labs(x = "Day of Week", y = "Casualties", 
+       
+       title = "Casualties of Major Accidents by Week Day",
+       
+       subtitle = "Weekends Have the Highest Casualties from Major Accidents",
+       
+       caption = "Developed by John Karuitha, 2021 Using R and ggplot2")) 
+```
+
+**Insight 3**: Weekends have the highest number of major accidents resulting in the most casualties. Typically, accidents and deaths are lowest on Mondays. Accidents and fatalities rise gradually during the week and then spike on Friday, peaking on Saturday. The numbers then reduce on Sunday (to levels only lower than Friday and Saturday) and slump back to their minimum on Monday. Still, weekdays have a significant number of fatal road accidents and fatalities, as the Table 4 shows.
+
+```{r}
+accidents %>% 
+  
+  ## Only major accidents with casualties >= 3.
+  filter(number_of_casualties >= 3) %>% 
+  
+  ## We want to see which day of week has more casualties.
+  group_by(day_of_week) %>% 
+  
+  ## Summary of total deaths by day of the week.
+  summarise(all_accidents = n(),
+            
+            percent_accidents = all_accidents/nrow(accidents) * 100,
+            
+            fatalities = sum(number_of_casualties),
+            
+            percent_fatalities = fatalities/sum(accidents %>% 
+                                                  
+                                                  select(number_of_casualties)) * 100) %>% 
+  
+  ## Make a nice table
+  kbl(., booktabs = TRUE, 
+      
+      caption = "Table 4: Major Accidents and Fatalities by Week Day") %>% 
+  
+  kable_classic(latex_option = "hold_position", full_width = FALSE) %>% 
+  
+  add_footnote(c("The weekday count starts on Sunday", "Note: We only include major accidents with more than 3 fatalities"), notation = "alphabet")
+
+```
+
+### What time of day do most fatal accidents happen?
+
+This section examines the number of major accident casualties by the time of day. I visualize this data using an area plot. Figure () below shows the number of deaths from accidents for each hour, which leads us to another insight.
+
+**Insight 4**: There are two peak times of the day when most accidents happen. The first period starts at around 0500 hours, peaking at 0800 hours followed by a sudden drop. In the second and most deadly phase, the number of casualties starts rising at 1000 hours, reaching the maximum at 1700 hours, after which there is a sharp decline.
+
+However, lumping data together may mask heterogeneity in accidents casualties patterns between the days of the week. In the next section, I break the data into the constituent days of the week.
+
+```{r, fig.width = 12, fig.cap="Figure 4: Number of Accident Casualties by Hour"}
+accidents %>% 
+  
+        ## Get only the major accidents        
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Get the hour of day from the time column
+        group_by(hour = hour(time)) %>% 
+  
+        ## Get total casualties by hour of day
+        summarise(death_by_hour = sum(number_of_casualties)) %>% 
+  
+        ## Plot deaths against hour
+        ggplot(mapping = aes(x = hour, y = death_by_hour)) + 
+  
+  geom_area(col = "purple", fill = "lightgray") + 
+  
+  labs(x = "Hour", y = "Casualties", 
+       
+       title = "Number of Accident Casualties by Hour")
+```
+
+## Are there any patterns in the time of day/ day of the week when major incidents occur?
+
+This section examines unique patterns in the time of the day or day of the week when major accidents occur. Again, if there are regularities, then the ministry could have interventions at these days/ times to reduce incidences of fatal accidents. 
+
+### Breaking down accident casualties by the time of day and day of the week.
+
+As noted earlier, lumping together figures could mask heterogeneity in the patterns of accidents by hour of day or day of the week. In this section, I disaggregate this data revealing patterns to each day of the week.
+
+**Insight 5**: Figure 5 below shows a breakdown of the casualties by the hour for each day of the week. Working days (which I define as Monday to Friday) have a similar trend that follows **Insight 1**.
+
+However, Saturdays and Sundays have a markedly different pattern.
+
+```{r, fig.width = 12, fig.cap = "Figure 5: Number of Accident Casualties by Day and Hour"}
+accidents %>% 
+  
+        ## Get only the major accidents
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Group by time of day and day of week
+        group_by(hour = hour(time), day_of_week) %>% 
+  
+        ## Get number of deaths by hour
+        summarise(death_by_hour = sum(number_of_casualties)) %>% 
+  
+        ## Plot deaths against hour
+        ggplot(mapping = aes(x = hour, y = death_by_hour, col = factor(hour))) + 
+  
+  geom_point(show.legend = FALSE) + 
+  
+  facet_wrap(~day_of_week, ncol = 3) + 
+  
+  scale_color_viridis_d() + 
+  
+  labs(x = "Hour", y = "Casualties", 
+       
+       title = "Number of Accident Casualties by Day and Hour")
+```
+
+**Insight 6**: Unlike other days of the week, accidents on Sundays have one peak period that begins around midday and peaks at 1500 hours, followed by a rapid drop.
+
+**Insight 7**: Like Sunday, Saturday has one peak in the number of accident casualties. However, the peak accident period is prolonged, lasting from around 11.00 hours to 1800 hours, after which there is a gradual decline.
+
+### Where do accidents happen at weekends vs weekdays?
+
+#### Major Accident Casualties versus Speed Limits
+
+Speed is one major cause of road traffic accidents [@ashraf2019catastrophic; @rolison2018factors]. This section examines the speed limits that correspond with high casualties for major accidents. Figure 6 shows a plot of major accident casualties (y-axis) versus speed limits (x-axis), faceted by day of the week.
+
+```{r, fig.width = 12, fig.cap = "Figure 6: Speed Limits versus Proportion of major Accident Casualties"}
+
+accidents %>% 
+  
+        ## Get the major accidents
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Group data by speed limit and day of week
+        group_by(speed_limit, day_of_week) %>% 
+  
+        ## Summarise the total casualties
+        summarise(casualties = sum(number_of_casualties)) %>% 
+  
+        ## Get the sum of casualties
+        mutate(perc_casualties = casualties / sum(casualties) * 100) %>% 
+        
+        ## Plot speed limit versus proportion of casualties
+        ggplot(mapping = aes(x = speed_limit, y = perc_casualties)) + 
+  
+        geom_line() + facet_wrap(~ day_of_week) +
+  
+        labs(x = "Speed Limit", y = "Percent Casualties", 
+       
+       title = "Speed Limits versus Proportion of major Accident Casualties")
+  
+```
+
+**Insight 8**: At 21% and 20%, respectively, Fridays and Saturdays account for the highest proportion of major accident casualties at the speed limit of 20 mph. Friday also has a second peak at a speed limit of 50 mph. This observation means that the accidents could result from failure to observe road limit signs. Sunday has most accidents where speed limits are between 30 and 60 mph. Other days of the week have notable peaks at around 40 mph [@jacobs1983road].
+
+I also examine the patterns of major accidents in road stretches with speed limits. In this case, I plot the number of casualties versus days of week faceted by speed limits. 
+
+**Insight 9**: Overall, the road stretches with a speed limit of 30 mph have the highest incident of accidents and accident casualties across all days of the week. Figure () below shows this trend.
+
+```{r, fig.cap = "Figure 7: Accident Casualties by Weekday and Speed Limit"}
+accidents %>% 
+        
+        ## Create a column of major and minor accidents
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        ## Group by day of week and speed limit
+        group_by(day_of_week, speed_limit) %>% 
+        
+        ## Summarise total casualties
+        summarise(total = sum(number_of_casualties)) %>% 
+        
+        ## Plot day of week versus casualties
+        ggplot(mapping = aes(x = day_of_week, y = total, 
+                             
+                             col = day_of_week, fill = day_of_week)) + 
+        
+        geom_col(show.legend = FALSE) +
+        
+        facet_wrap(~ speed_limit) + 
+        
+        scale_fill_viridis_d() + 
+        
+        labs(y = "Number of Casualties", 
+             
+             title = "Accident Casualties by Weekday and Speed Limit")
+```
+
+#### Major Accident Casualties and Weather Conditions
+Another probable driver of accidents is the weather. I tabulate weather conditions against the number of major accident casualties. The results are in Table 5. 
+
+**Insight 9**: Table 5 below shows that about 77% of major accident casualties happen when the weather is fine (that is, fine with no high winds). In comparison, 14% occurs when raining with no high winds.
+
+```{r}
+accidents %>% 
+  
+        ## Get only the major accidents
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Group by weather conditions
+        group_by(weather_conditions) %>% 
+  
+        ## Get the total number of casualties
+        summarise(casualties = sum(number_of_casualties)) %>% 
+  
+        ## Compute the proportion of casualties
+        mutate(perc_casualties = casualties / sum(casualties) * 100) %>% 
+  
+        ## Sort by casualties
+        arrange(desc(casualties)) %>% 
+  
+        ## Make a nice table
+        kbl(., booktabs = TRUE, 
+            
+            caption = "Table 5: Weather Cinditions and Accident Casualties") %>% 
+  
+        kable_classic(full_width = TRUE)
+
+```
+
+We next break down this weather data into days of the week.
+
+**Insight 10**: Most accidents on any day of the week happen when the weather is fine with no high winds (Figure 8). The second riskiest weather pattern is raining with no high winds. It would follow that people are most likely to speed when the weather is clear, hence the high number of casualties.
+
+```{r, fig.cap = "Figure 8: Casualties by Day of Week and Weather Conditions"}
+accidents %>% 
+  
+        ## Get the major accidents
+        filter(number_of_casualties >= 3) %>% 
+  
+        ## Group by weather conditions and day of the week
+        group_by(weather_conditions, day_of_week) %>% 
+        
+        ## Summarise total casualties
+        summarise(casualties = sum(number_of_casualties)) %>% 
+  
+        ## Create new variable for proportion of casualties
+        mutate(perc_casualties = casualties / sum(casualties) * 100) %>% 
+        
+        ## Plot casualties versus day of week
+        ggplot(mapping = aes(x = day_of_week, y = casualties, 
+                       
+                       fill = day_of_week)) + 
+        
+        geom_col(show.legend = FALSE) + 
+        
+        facet_wrap(~ weather_conditions) +
+        
+        labs(x = "Day of the Week", y = "Casualties", 
+             
+             title = "Casualties by Day of Week and Weather Conditions")
+```
+
+## What characteristics stand out in major incidents compared with other accidents?
+
+First, most casualties arise from other accidents instead of major accidents, as noted earlier in **Insight 1**. Figure 9 visualizes this observation.
+
+```{r, fig.cap = "Figure 9: Accident Type versus Number of Casualties"}
+accidents %>% 
+        
+        ## Create a new column major
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        ## Group the data by major
+        group_by(major) %>% 
+        
+        ## Get the total casualties
+        summarise(total_casualties = sum(number_of_casualties)) %>% 
+        
+        ## Plot casualties against major
+        ggplot(mapping = aes(x = major, y = total_casualties)) + 
+        
+        geom_col(col = "skyblue", fill = "darkblue") + 
+        
+        labs(x = "Accident Type- Major or Minor", 
+             
+             y = "Number of Casualties", 
+             
+             title = "Accident Type versus Number of Casualties")
+```
+
+**Insight 11**: In comparison to major accidents, minor accidents are more dispersed. Figure 10 shows that major accidents concentrate in three major hotspots, whereas minor accidents concentrate in more places. Note that the figure's colour `red` shows the accident concentration hotspots.
+
+```{r, fig.cap = "Figure 10: Major/Minor Accidents Hotspots"}
+accidents %>% 
+        
+        ## Create a new column for major and minor accidents
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        ## Group by major/ minor accident
+        group_by(major) %>% 
+        
+        ## Map the locations of accidents
+        ggplot(mapping = aes(x = longitude, y = latitude)) + 
+  
+  geom_hex(alpha = 0.5) +
+  
+  geom_density_2d() +
+  
+  labs(x = "Longitude", y = "Latitude",
+       
+       title = "MAJOR/MINOR ACCIDENT HOT SPOTS",
+       
+       subtitle = "Locations of Major/ Minor Accidents in the UK",
+       
+       caption = "John Karuitha, 2021 Using R and ggplot2") + 
+  
+  theme(legend.title = element_blank()) + 
+  
+  scale_fill_gradient(low = "lightgray", high = "red") + 
+        
+        ## Facet accidents by major/minor category
+        facet_wrap(~ major) 
+```
+
+**Insight 12**: Furthermore, major accidents fatalities appear evenly distributed across rural and urban settings. In contrast, over 2/3 of minor accidents happen in urban areas.
+
+```{r}
+## The data
+accidents %>% 
+        
+        ## Create a major/minor columns
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        ## Group by major and urban/rural area
+        group_by(major, urban_or_rural_area) %>% 
+        
+        ## Get total of casualties
+        summarise(total = sum(number_of_casualties)) %>% 
+        
+        ## Make a wide dataset
+        pivot_wider(names_from = "major", values_from = "total") %>% 
+        
+        ## Make a nice table
+        kbl(., booktabs = TRUE, 
+      
+  caption = "Table 6: Casualties in Rural/Urban Settings for Major and Minor Accidents") %>% 
+        
+        kable_classic(full_width = FALSE, 
+                                                                                     latex_options = "hold_position")
+```
+
+Next, I examine the number of casualties by speed limit for major and minor accidents. The bar chart below shows the distribution showing a significant difference between major and minor accidents. Compared to other accidents, a significantly lower proportion of casualties happen at a speed limit of 30 mph. In contrast, more accident casualties occur at the 60 mph speed limit for major accidents than minor accidents.
+
+```{r, fig.cap = "Figure 11: Speed Limits versus Proportion of Accident Casualties"}
+accidents %>% 
+        
+        ## Create a major/minor accidents column
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        ## Group by major and speed limit
+        group_by(major, speed_limit) %>% 
+        
+        ## Summarise total casualties
+        summarise(casualties = sum(number_of_casualties)) %>% 
+        
+        ungroup() %>% 
+        
+        group_by(major) %>% 
+        
+        ## Create a new column for proportion of casualties
+        mutate(prop = casualties/ sum(casualties)) %>% 
+        
+        ## Plot prop against speed limit
+        ggplot(mapping = aes(x = speed_limit, y = prop, fill = speed_limit)) + 
+        
+        geom_col() +
+        
+        scale_fill_viridis_b() +
+        
+        facet_wrap(~ major) + 
+        
+        ## Add labels and titles
+        labs(x = "Speed Limit", y = "Proportion of Casualties", 
+             
+             title = "Speed Limits versus Proportion of Accident Casualties")
+```
+
+## On what areas would I recommend the planning team focus their brainstorming efforts to reduce major incidents?
+
+One of the major takeaways from the analysis is that most road accidents happen when the weather is clear (77%), with another 14% happening when raining but with no high winds. 91% of major accidents occur during these two weather patterns to restate the point. The first recommendation is for the ministry to pay attention when the weather is clear and when raining with no high winds. However, we cannot take the weather pattern in isolation. After considering the weather, the ministry should also jointly focus on the recommendations below.
+
+First, while accidents are spread all over the UK, there is a need to concentrate on areas with a high concentration of significant casualties. Figure 1 shows these two hotspots, one around London and another in the central UK. The hotspot in the central UK has a further three sub-hotspots that the ministry should pay particular attention to. After separating major and minor accidents, the areas that the ministry should concentrate on to reduce fatalities from major accidents stand out better. Figure 10, panel A, shows the two regions. Again we should not take this recommendation in isolation but with the other suggestions.
+
+Another significant regularity in the data is the high incidence of accidents at stretches with 30mph and 60mph speed limits. This recommendation draws from insight 8 and insight 9. For some reason, the speed limit of 30 mph is especially notorious for both major and minor accidents, followed by the 60 mph speed limit. Thus, the ministry should put mechanisms to enforce adherence to these speed limits. 
+
+The day of the week effect is very prominent and a major entry point to minimise major accidents. As noted earlier in insight 3 and 5, major accidents spike on Fridays, peaking on Saturday and declining on Sundays to levels below Friday and Saturday. However, over weekends, there is a significant pattern of accidents across an hour of the day, as we discuss next. 
+
+Time of day is also a significant entry point for interventions to reduce fatalities from major accidents in line with insight 4 and insight 5. The times when major accidents and accident fatalities occur vary by day of the week. For instance, on Saturdays, the worst day in terms of major accidents fatalities, we observe an extended peak between 1100 hours and 1800 hours when the ministry should effect the interventions. We would follow a similar interpretation for other days of the week. 
+
+As noted earlier, it would be a mistake to take any one of these recommendations in isolation. Each recommendation should serve to reinforce the others. Take Saturday, a day notorious for deadly road accidents, as an example. The ministry should focus efforts on the two regions in the UK (Figure ) with an unusually high concentration of major accidents. In these regions, the ministry should focus on the period between 1100 hours and 1800 hours at road stretches with a speed limit of 30 mph and 60 mph, respectively, by installing speed cameras. The ministry should intensify these interventions when the weather is clear, for instance, by having traffic corps on sight. 
+
+
+```{r}
+accidents %>% 
+        
+        mutate(major = case_when(
+                
+                number_of_casualties >= 3 ~ "Major",
+                
+                TRUE ~ "Minor"
+        )) %>% 
+        
+        group_by(major, weather_conditions) %>% 
+        
+        summarise(total = sum(number_of_casualties)) %>% 
+        
+        ungroup() %>% 
+        
+        mutate(prop = total / sum(total)) %>% 
+        
+        ggplot(aes(x = weather_conditions, y = prop, 
+                   
+                   fill = major, col = major)) + 
+        
+        geom_col(position = "dodge") + 
+        
+        scale_fill_viridis_d()
+```
+
+## Conclusion
+
+In this analysis, I examined the road accidents data from the UK. The study of the data provided some valuable insights, the major ones being;
+
+- Accident casualties peak during weekends, Starting from Friday and falling on Sunday.
+- Accidents casualties vary by time of day.
+- Major accidents and accident casualties mainly happen when the weather is fine.
+- Major accidents and accident casualties mainly occur in road stretches with speed limits of 30 mph and 60 mph. 
+
+The recommendations to reduce significant accidents casualties should hence draw from these insights. None of the proposals would work very well in isolation. What is needed is a package of interventions that would help lower the tide of casualties from significant accidents. 
+
+# References
+
+Ashraf, Imran, Soojung Hur, Muhammad Shafiq, and Yongwan Park. 2019. “Catastrophic Factors                 Involved in Road Accidents: Underlying Causes and Descriptive Analysis.”                   PLoS One 14 (10): e0223473.
+Jacobs, GD, and I Sayer. 1983. “Road Accidents in Developing Countries.” Accident Analysis                 & Prevention 15 (5): 337–53.
+Rolison, Jonathan J, Shirley Regev, Salissou Moutari, and Aidan Feeney. 2018. “What Are the                 Factors That Contribute to Road Accidents? An Assessment of Law Enforcement                 Views, Ordinary Drivers’ Opinions, and Road Accident Records.” Accident                    Analysis & Prevention 115: 11–24.
+
+# Appendix
+
+## Appendix 1: Summary Statistics
+
+```{r}
+accidents %>% 
+  
+        ## Select the relevant variables
+        select(-accident_index, -accident_reference, 
+         
+         -accident_year, -day_of_week,
+         
+         -date, -time,
+         
+         -longitude, -latitude) %>% 
+  
+        ## Get summary statistics
+        skimr::skim_without_charts() %>% 
+  
+        ## Remove redundant summary statistics
+        select(-skim_type, -n_missing) %>% 
+  
+        ## Make a nice table
+        kbl(., booktabs = TRUE, caption = "Table 7: Summary Statistics") %>% 
+  
+        kable_classic(full_width = TRUE, 
+                
+                latex_options = "hold_position")
+```

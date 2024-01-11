@@ -1,0 +1,432 @@
+---
+title: "**Estimating Systematic Risk Using the Capital Asset Pricing Model, CAPM**"
+description: "Independent Data Analysis Project"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, School of Business, Karatina, Kenya"
+      affiliation-url: www.karu.ac.ke
+subtitle: "*Application of CAPM to IBM and Microsoft Stocks, 2000-2022*"
+date: "`r lubridate::today()`"
+title-block-banner: "wellness_stock.jpg"
+title-block-banner-color: "black"
+format: 
+    html:
+        theme: sandstone
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toccolor: "blue"
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        linkcolor: "blue"
+        link-citations: true
+editor: visual
+bibliography: citations.bib
+csl: harvard.csl
+---
+
+```{r}
+#| include = FALSE
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+if(!require(pacman)){
+    install.packages("pacman")
+    library(pacman)
+}
+
+pacman::p_load(tidyverse, kableExtra, janitor, 
+               readxl, skimr, tidyquant,
+               stargazer, performance, Amelia, see)
+
+formatting_function <- function(data, booktabs = TRUE, caption = "My Table", full_width = FALSE){
+    
+    data %>% 
+        
+        kbl(booktabs = booktabs, caption = caption) %>% 
+        
+        kable_classic(full_width = full_width, latex_options = "hold_position")
+}
+
+## graphs
+my_function <- function(xlab, ylab, title, legend_position = "bottom"){
+    
+    labs(x = xlab, y = ylab, title = title) +
+    
+    theme_minimal() +
+        
+        theme(legend.position = legend_position)
+        
+        
+}
+
+```
+
+# **Background**
+
+In this analysis, I use stock prices for Microsoft and General Motors (GM) to estimate the systematic risk of the stocks using the [Capital Asset Pricing Model (CAPM)](https://www.investopedia.com/terms/c/capm.asp). CAPM, developed by William Sharpe, Jack Treynor, John Lintner and Jan Mossin [@Perold:2004] quantifies the systematic risk and the expected return on an asset, particularly stocks.
+
+::: callout-tip
+Please visit [my rpubs site](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link \<www.rpubs.com/Karuitha\> into your browser.
+:::
+
+::: callout-important
+Skills & Technologies Applied: R, Quarto, Data Science, and Machine Learning.
+:::
+
+> [Systematic risk](https://www.wallstreetmojo.com/systematic-risk/) is inherent to the entire market or market segment. The risk affects the entire economy. Hence, investors cannot diversify away systematic as they can unsystematic risk. For this reason, systematic risk is also referred to as **un-diversifiable risk**, **market risk** or **volatility risk**." In finance terminology, $\beta$, a symbol that we define in the next section before we encounter it in the section on regression analysis represents systematic risk.
+
+CAPM quantifies the relationship between the required rate of return of an investment and its risk. The model utilizes return on the given asset $r_a$ (in our case the return on GM or Microsoft), the risk free rate $r_f$ usually proxied by the return on the 90 day treasury bills, and the return on the market $r_m$ taken as the return a market index like the Dow Jones Industrial Index, the S&P 500, or other similar indices [@Bodie:2020]. The relationship is as follows;
+
+$r_a - r_f = \alpha + \beta (r_m - r_f)$
+
+A stock with a $\beta$ of 1 is as volatile as the market. However, stocks with $\beta > 1$ are more volatile than the market and hence should command a higher return. Including such a stock in your portfolio will raise the volatility of your portfolio relative to the market portfolio. On the contrary, stocks with a $\beta < 1$ have lower risk relative to the market and correspondingly, a lower rate of return. The stocks with a $beta < 1$ reduce the volatility of the portfolio relative to the market. In other words, such assets have a diversification benefit.
+
+# **Critique of the CAPM**
+
+CAPM is a simple and pragmatic to utilize. However, this simplicity also gives rise to its major weaknesses, the unrealistic assumptions. Specifically, the model rests on the following [assumptions about markets, financial assets, and market actors](https://analystprep.com/cfa-level-1-exam/portfolio-management/capital-asset-pricing-model-capm/) [@Dumas:1996; @Simmet:2020].
+
+-   Investors are risk-averse, utility-maximizing, rational individuals.
+-   Markets are friction-less, devoid of transaction costs and taxes.
+-   Investors plan for the same, single holding period.
+-   Investors have homogeneous expectations or beliefs.
+-   All investments are infinitely divisible.
+-   Investors are price takers.
+
+As a result we have several alternatives to CAPM. One such model is based on the Arbitrage Pricing Theory (APT) [@Roll:1980] that, even when more [theoretically solid](https://www.investopedia.com/articles/markets/080916/capm-vs-arbitrage-pricing-theory-how-they-differ.asp), are harder to apply [@Huberman:1982].
+
+More recent developments are the models by Fama and French that seek to improve on CAPM. For instance, the [Fama and French 3 factor model](https://www.investopedia.com/terms/f/famaandfrenchthreefactormodel.asp) extends CAPM by factoring in the proportion of the value stocks and small cap stocks in a portfolio. The Fama and French model has seen further extensions by adding more factors [@Dirkx:2020; @Mosoeu:2020].
+
+# **Data**
+
+I use data from Yahoo! Finance for the period 2002-2022. The ***Tidyquant*** package in R (courtesy of [Matt Dancho](https://university.business-science.io/courses)) [@R; @Dancho:2022] provides a convenient way to get this data (see the code chunk below). I collect data for the period from January 2, 2000 to October 25, 2022. Further, I only work with adjusted prices (*adjusted*). The adjustments take into account events like stock splits and share buy-backs. The data also includes the 90 day US treasury bills rate that proxies the risk free rate.
+
+```{r}
+## uncomment this code to download the data 
+# tq_get(c("GM", "MSFT", "^GSPC"),
+#                       get  = "stock.prices",
+#                       from = "2000-01-01",
+#                       to   = "2022-10-25") %>%
+#     select(date, symbol, adjusted) %>%
+#     mutate(symbol = case_when(
+# 
+#         symbol == "^GSPC" ~ "SP500",
+# 
+#         TRUE ~ symbol
+#     )) %>%
+# 
+#     write_csv(., "stocks.csv")
+# 
+# #####################################
+# tq_get("DTB3", from = '2000-01-01', to = '2022-10-25', get = "economic.data") %>% 
+#     select(date, symbol, price) %>% 
+#     rename(adjusted = price) %>% 
+#     mutate(symbol = if_else(symbol == "DTB3", "us_tbill", symbol)) %>% 
+#     write_csv(., "tbills.csv")
+
+```
+
+We also get the [90 day treasury bills rate here](https://www.federalreserve.gov/releases/h15/) and combine this with the stock prices data collected above.
+
+```{r}
+stock_prices <- read_csv("stocks.csv") %>% 
+    pivot_wider(names_from = symbol, values_from = adjusted) 
+
+################################################
+tbill_rate <- read_csv("FRB_H15.csv", skip = 5,
+                       na = c("", "NA", "ND")) %>% 
+    clean_names() %>% mutate(time_period = mdy(time_period)) %>% 
+    select(date = time_period, 
+           adjusted = riflgfcm03_n_b) %>% 
+    mutate(symbol = "tbill") %>% 
+    relocate(symbol, .before = adjusted) %>% 
+    filter(date > '2000-01-01')
+
+################################################
+final_data <- stock_prices %>% 
+    left_join(tbill_rate, by = 'date') %>% 
+    select(-symbol) %>% rename(tbill = adjusted)
+```
+
+The result is a data set with `r nrow(final_data)` and `r ncol(final_data)` columns. The table below defines each of the variables.
+
+```{r}
+tribble(~ Variable, ~ Description,
+        "Date", "The date corresponding to the stock price.",
+        "GM", "The stock for GM, General Motors.",
+        "MSFT", "The stock for Microsoft.",
+        "SP500", "The S&P 500 Index.",
+        "tbill", "The US 3 months treasury bills rate.") %>% 
+    formatting_function(caption = "Description of Variables")
+```
+
+# Exploring the Data
+
+## Missing Values
+
+The data set has a few missing values for treasury bills. However, for GM, data is only available in the Yahoo! Finance database from November 18, 2010 and hence the notable gap.
+
+```{r}
+#| fig-cap: "Missing values"
+#| fig-width: 12
+#| fig-height: 8
+Amelia::missmap(final_data)
+```
+
+Hence I interpolate the missing values with the median.
+
+```{r}
+stock_prices <- stock_prices %>% 
+
+    mutate(MSFT = replace_na(MSFT, median(MSFT, na.rm = TRUE)),
+           
+           SP500 = replace_na(SP500, median(SP500, na.rm = TRUE)))
+####################################################
+tbill_rate <- tbill_rate %>% 
+    mutate(adjusted = replace_na(adjusted, median(adjusted, na.rm = TRUE)))
+
+######################################################
+
+final_data <- stock_prices %>% 
+    left_join(tbill_rate, by = 'date') %>% 
+    select(-symbol) %>% rename(tbill = adjusted)
+
+```
+
+We then examine the trend in stock prices for GM and Microsoft in Figure () below.
+
+```{r}
+#| fig-cap: "Trends in GM and Microsoft Stock Prices"
+#| fig-width: 12
+#| fig-height: 8
+final_data %>% 
+    
+    pivot_longer(cols = -date, names_to = "stock", 
+                 values_to = "value") %>% 
+    ggplot(mapping = aes(x = date, y = value, color = stock)) +
+    geom_line() + theme_minimal() + labs(x = "", y = "Adjusted Prices",
+                                         title = "Trends in GM and Microsoft Stock Prices",
+                                         caption = "John karuitha, 2022 \n Data source: Yahoo! Finance \n Note the different y-axis scales") + 
+    theme(legend.position = 'bottom', legend.title = element_blank()) + 
+    facet_wrap(~stock, scales = "free_y")
+```
+
+All the stocks have had a steep increase in prices. The treasury bill rate has been relatively flat compared to the stock with notable occasional spikes.
+
+## Summary Statistics for Stock Prices
+
+Next, I summarise the prices of stocks.
+
+```{r}
+#head(final_data)
+final_data %>%
+    select(-date) %>%
+    skimr::skim_without_charts() %>% 
+    mutate(across(-c(skim_type, skim_variable), .fns = round, 2)) %>% 
+     select(-skim_type) %>% 
+    formatting_function(caption = "Summary Statistics for Full Data")
+```
+
+## Trends in Stock Returns
+
+In this section I compute the returns of the assets and visualize them. I compute the return of each stock as the price of the stock today less the price of the stock in the previous day divided by the price of the stock in the previous day.
+
+$return = \frac{price_{t} - price_{t-1}}{price_{t-1}}$
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| fig-cap: "Trends in GM and Microsoft Stock Returns"
+returns <- final_data %>% 
+    pivot_longer(cols = -date, names_to = "stock", 
+                 values_to = "value") %>% 
+                 mutate(value = value + 0.00000001) %>% 
+    group_by(stock) %>% 
+    summarise(return = diff(log(value))) %>% 
+    drop_na(return) %>% 
+    mutate(day = row_number()) %>% 
+    ungroup() %>% relocate(day)
+
+#####################################
+returns %>% ggplot(mapping = aes(x = day, y = return, color = stock)) +
+    geom_line() + theme_minimal() + labs(x = "", y = "Returns",
+                                         title = "Trends in GM and Microsoft Stock Returns",
+                                         caption = "John karuitha, 2022 \n Data source: Yahoo! Finance \n Note the different x-axis scales") + 
+    theme(legend.position = 'bottom', legend.title = element_blank()) + 
+    facet_wrap(~stock, scale = "free")
+
+```
+
+The stocks and the market exhibit mean reversion although the GM stock appears the most volatile. The returns from the stock of Microsoft are surprisingly stable and closely resembles the pattern of the market portfolio (S&P500). The treasury bill has an erratic pattern with notable swings. We shall revisit the significance of this perceived difference in volatility in the next section section. We also look at the distribution of the variables in the dataset.
+
+```{r}
+#| fig-cap: "Distribution of Stock Returns"
+#| fig-width: 12
+#| fig-height: 8
+returns %>% 
+    drop_na(return) %>% 
+    ggplot(mapping = aes(x = return, fill = stock)) + 
+    geom_histogram(alpha = 0.6) + 
+    theme_minimal() + labs(x = "% Return", y = "", title = "Distribution of Returns") +
+    theme(legend.title = element_blank(),
+          legend.position = "bottom") + xlim(-1, 1.5) + 
+    scale_y_continuous(trans = 'log10', 
+                       labels = scales::comma_format())
+```
+
+## Summary Statistics - Stock Returns
+
+In this section, we summarise the data on stock returns.
+
+```{r}
+returns %>%
+group_by(stock) %>%
+    skimr::skim_without_charts() %>%
+    filter(skim_variable != "day") %>%
+    select(-skim_type, -skim_variable,
+           -complete_rate) %>%
+    kbl(booktabs = TRUE,
+    caption = "Summary Statistics") %>%
+    kable_classic(latex_options = c("hold_position", "striped"))
+```
+
+# **Regression Model**
+
+To fit the regression model we compute the excess returns of the stocks (GM and Microsoft) and the market portfolio (S&P 500) over return on the US 90 day Treasury bills rate. For each stock, we fit the excess return (premium) against the excess return of the market.
+
+## Regression for GM Stock
+
+The $\alpha$ for GM is negative but not statistically significant. However, the $\beta$ is significant but very close to 1 (at 1.0012069).
+
+```{r}
+gm_reg <- final_data %>% 
+    select(GM, SP500, tbill) %>% 
+    drop_na(GM) %>%
+    mutate(tbill = 
+    replace_na(tbill, median(tbill, na.rm = TRUE))) %>% 
+    summarise(gm_return = diff(log(GM)),
+              market_return = diff(log(SP500)),
+              risk_free = diff(log(tbill + 0.01))
+              ) %>% 
+    
+    transmute(gm_premium = gm_return - risk_free,
+              market_premium = market_return - risk_free) %>% 
+    lm(gm_premium ~ market_premium, data = .)
+
+summary(gm_reg)
+```
+
+## Regression for Microsoft Stock
+
+Like in the case of GM, the $\alpha$ for Microsoft is not statistically significant. However, the $\beta$ of 1.002 is significant but close to 1.
+
+```{r}
+msft_reg <- final_data %>% 
+    select(MSFT, SP500, tbill) %>% 
+    drop_na(MSFT) %>%
+    mutate(tbill = 
+    replace_na(tbill, median(tbill, na.rm = TRUE))) %>% 
+    summarise(msft_return = diff(log(MSFT)),
+              market_return = diff(log(SP500)),
+              risk_free = diff(log(tbill + 0.01))
+              ) %>% 
+    
+    transmute(msft_premium = msft_return - risk_free,
+              market_premium = market_return - risk_free) %>% 
+    lm(msft_premium ~ market_premium, data = .)
+
+summary(msft_reg)
+```
+
+## Are the $\beta$ 's for Both Stocks Significantly Different from 1 at the 95% Confidence Level?
+
+To evaluate the riskiness of an asset, we examine 2 values $\alpha$ and $\beta$. In both cases the alpha is not statistically significant. The threshold for $\beta$ is 1. An asset with a $\beta$ of 1 is as volatile as the market portfolio. For $\beta > 1$, the asset is more volatile than the market portfolio and commands higher returns. The opposite is true for $\beta < 1$.
+
+In this section we examine hether the computed $\beta$ differ significantly from 1. The hypotheses are as follows.
+
+H0: The $\beta$ is not equal to 1. H1: The $\beta$ is equal to 1.
+
+We compute the t-statistic as follows.
+
+$t = \frac{\beta - hypothesised_Beta}{standard error}$
+
+From the t-statistic, we then compute the p-value using the `pt` function in R.
+
+### GM
+
+The $\beta$ for the GM stock does not differ significantly from 1.
+
+```{r}
+hypothesised_value = 1
+tgm = (gm_reg$coefficients["market_premium"]  - hypothesised_value) / summary(gm_reg)$sigma
+pt(tgm, df.residual(gm_reg))
+```
+
+### Microsoft
+
+Likewise, the $\beta$ for the GM stock does not differ significantly from 1.
+
+```{r}
+tmsft = (msft_reg$coefficients["market_premium"]  - hypothesised_value) / summary(msft_reg)$sigma
+
+pt(tmsft, df = df.residual(msft_reg))
+```
+
+# Checking Regression Model Assumptions
+
+In this section, e check for violations of the regression model assumptions. Note that the model has one independent variable so that multi-collinearity is not an issue. The model evaluation focuses on linearity, homoscedasticity, outliers, and normality of residuals.
+
+## GM Model
+
+Figure () below shows that the model does not significantly violate these assumptions but for normality of residuals. Even then the model does not display a high degree of departure from this assumption.
+
+\blandscape
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| echo: false
+check_model(gm_reg)
+```
+
+\elandscape
+
+## Microsoft Model
+
+Figure () below shows that the model for Microsoft satisfies all the assumptions. As a robust model, it could be useful for prediction.
+
+\blandscape
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+#| echo: false
+check_model(msft_reg)
+```
+
+\elandscape
+
+# Conclusion
+
+In this analysis, we used the CAPM to estimate the systematic risk for GM and Microsoft stocks. The main findings are that both stocks are as volatile as the market portfolio. The implication is that in the long run, these stocks these stocks may not provide diversification benefits for investors. The results also suggest that while investors may outperform the market in the short run, they may not sustain this performance for extended periods.
+
+# References

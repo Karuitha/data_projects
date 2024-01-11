@@ -1,0 +1,236 @@
+---
+title: "Functional Programming in R Using Purrr"
+description: |
+  This Article is Inspired by a Purrr Webinar by [R-Ladies Baltimore](https://www.youtube.com/watch?v=IewsPpjKElc&t=3248s) available on YouTube; <https://www.youtube.com/watch?v=IewsPpjKElc&t=3248s>
+author:
+  - name: John Karuitha 
+    url: https://linkedin.com/in/Karuitha
+    affiliation: Karatina University
+    affiliation_url: https://www.karu.ac.ke
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output: distill::distill_article
+bibliography: references.bib
+link_citations: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(!require(pacman)){
+  install.packages("pacman")
+}
+
+pacman::p_load(tidyverse, crosstalk)
+```
+
+## Background
+
+The `purrr` [@purrr] package is part of the `tidyverse` [@tidyverse] and contains functions that allow us to;
+
+1. Apply named or anonymous functions to vectors or lists.
+
+2. Save the results in a variety of convenient formats. 
+
+For instance, you could have data in a series of Ms Excel documents and desire to combine them into one data set. Similarly, you could use purrr to generate a series of reports customised to an audience. 
+
+## First Example: Converting Celsius to Fahrenheit
+
+The formula for converting temperature in Celsius to Fahrenheit is as follows.
+
+$Celsius = (Fahrenheit - 32) * \frac{5}{9}$
+
+Now, we can use this formula to define a function that allows us to convert temperatures easily. 
+
+```{r}
+fahrenheit_to_celsius <- function(fahrenheit){
+  
+  (fahrenheit - 32) * 5 / 9
+}
+```
+
+The function `fahrenheit_to_celsius` takes one argument, temperature in degrees fahrenheit. We convert 100 degrees fahrenheit and zero degree fahrenheit to celsius using the function.
+
+```{r}
+## 100 degrees fahrenheit to celsius
+fahrenheit_to_celsius(100)
+```
+
+```{r}
+## 0 degrees fahrenheit to celsius
+fahrenheit_to_celsius(0)
+```
+
+But supposing we had a long vector of temperatures that you want to convert into Celsius. Consider this vector of average temperatures in degree Fahrenheit recorded in 100 different cities. 
+
+```{r}
+temp <- seq(-50, 50, length.out = 100)
+print(temp)
+```
+
+Converting each of the values into Celsius manually is not convenient. This is where the functions in purrr come handy. In this article, I focus on the map functions. 
+
+## Mechanics of `map` Functions
+
+The map functions from purrr typically take a vector, a column in a data frame, or even a whole data frame. Map will then apply the specified function to each element of the vector, a column in a data frame, or the entire data frame. 
+
+```
+## Arguments required by purrr map functions
+## ... refers to affitional arguments
+map(vector, function, ...)
+```
+
+## The `map` Function
+
+The map function in purrr will loop over the 100 elements and convert each into Celsius. The output is a list of the 100 conversions. Below are the first five conversions. 
+
+```{r}
+map(temp, fahrenheit_to_celsius) |> head(5)
+```
+
+The equivalent `for` loop is as follows;
+
+```
+for(i in temp){
+  c = fahrenheit_to_celsius(i)
+  print(c)
+}
+```
+
+While the `map` function is more compact than the `for` loop, it has the disadvantage of returning a list of values. 
+
+## The `map_dbl` Function
+
+Unlike the `map` function that will return a list, `map_dbl` returns a vector. 
+
+```{r}
+map_dbl(temp, fahrenheit_to_celsius)
+```
+
+The function `map_dbl` allows us to create new columns when used together with the `mutate` function from the tidyverse.
+
+```{r}
+temp %>% 
+  
+  tibble() %>% 
+  
+  set_names("fahrenheit") %>% 
+  
+  mutate(celsius = map_dbl(fahrenheit, fahrenheit_to_celsius)) %>% 
+  
+  head()
+```
+
+If we use `map`, we get a messy data frame with the new variable appearing a list. We would have to use `unlist` to make the new variable clean. See below. 
+
+```{r}
+temp %>% 
+  
+  tibble() %>% 
+  
+  set_names("fahrenheit") %>% 
+  
+  mutate(celsius = map(fahrenheit, fahrenheit_to_celsius)) %>% 
+  
+  head()
+```
+
+
+## The `map_chr`, `map_lgl` and `map_int` Functions
+
+Like `map` and `map_dbl`, the `map_chr`, `map_lgl` and `map_int` functions takes the same arguments but returns a vector of characters, logical, or integers, respectively, or `die trying`. 
+
+```{r}
+temp %>% 
+  
+  tibble() %>% 
+  
+  set_names("fahrenheit") %>% 
+  
+  mutate(celsius = map_chr(fahrenheit, fahrenheit_to_celsius)) %>% 
+  
+  head()
+```
+
+
+## The `map_dfr` and `map_dfc` Functions.  
+
+The map_dfr() and map_dfc() return a data frame created by row-binding and column-binding respectively. They require dplyr to be installed. I For instance, you may have 100 excel sheets with some data and wish to read them into R and combine them into a single data frame. I have illustrated how we can use map_dfr() and map_dfc() to do this in separate tutorials available at <https://rpubs.com/Karuitha/>. 
+
+## The `Walk` Function
+
+The function walk() returns the input .x (invisibly). 
+
+The walk functions work similarly to the map functions, but you use them when you’re interested in applying a function that performs an action instead of producing data (e.g., print()) [@wickham2021functional].
+
+The walk functions are useful for performing actions like writing files and printing a list of plots. 
+
+This makes it easy to use in pipe.
+
+## The `map2` Functions: Map over Multiple Inputs Simultaneously.
+
+As per the R documentation;
+
+> These functions are variants of map() that iterate over multiple arguments simultaneously. They are parallel in the sense that each input is processed in parallel with the others, not in the sense of multicore computing. They share the same notion of "parallel" as base::pmax() and base::pmin(). map2() and walk2() are specialised for the two argument case; pmap() and pwalk() allow you to provide any number of arguments in a list. Note that a data frame is a very important special case, in which case pmap() and pwalk() apply the function .f to each row. map_dfr(), pmap_dfr() and map2_dfc(), pmap_dfc() return data frames created by row-binding and column-binding respectively. They require dplyr to be installed [@rstats].
+
+Suppose we have the following data. 
+
+```{r}
+x <- list(1, 1, 1)
+y <- list(10, 20, 30)
+```
+
+We can use `map2` to apply a function to both x and y. 
+
+```{r}
+map2(x, y, ~ .x +  .y)
+```
+
+Alternatively, we can achieve the same result by using;
+
+```{r}
+map2(x, y, `+`)
+```
+
+Like the `map` functions, the `map2` function has several variants, including but not limited to;
+
+- map2_lgl
+- map2_int
+- map2_dbl
+- map2_chr
+
+Please consult R documentation (??map2) for more details. 
+
+## The `pmap` Function
+
+Like `mp2`, `pmap` operates over multiple variables, in this case more than two. 
+
+```{r}
+x <- list(1, 1, 1)
+y <- list(10, 20, 30)
+z <- list(18, 17, 15)
+```
+
+To sum up the three, we use the following piece of code.
+
+```{r}
+pmap(list(x, y, z), sum)
+```
+
+There are several variants of pmap, inclusing but not limited to;
+
+- pmap_lgl
+- pmap_int
+- pmap_dbl
+- pmap_chr
+
+
+
+## Conclusion
+
+In this article, I have highlighted the use of map functions from the purrr package in R. Additional information is available in the R help pages and the resources cited in the references section. 
+
+
+
+
+
+

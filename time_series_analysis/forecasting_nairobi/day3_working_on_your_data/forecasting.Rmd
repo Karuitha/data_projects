@@ -1,0 +1,117 @@
+---
+title: "Time series analysis and forecasting"
+output: 
+  word_document: 
+    toc: yes
+  html_document: 
+    toc: yes
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+a
+```
+
+# Prepare data
+
+## Read data
+
+```{r read-data}
+
+```
+
+## Create a tsibble
+
+```{r tsibble}
+#check and fix duplicates
+
+
+# Create tsibble using as_tsibble
+
+#Check gaps in time and fix it
+
+```
+
+# Visualise
+
+## time plot
+
+```{r time-plot}
+
+```
+
+## seasonal and subseries
+
+
+```{r seasonal-plot}
+
+```
+
+## autocorrelation
+
+```{r autocorrelation-plot}
+
+```
+
+# Specify and train models
+
+## Specify and train models using time series cross validation
+
+
+## Split
+
+```{r split-data}
+
+```
+
+
+## Specify and train models using time series cross validation
+
+
+```{r specify-train}
+
+```
+
+
+## Generate forecasting
+
+
+
+```{r forecast}
+
+
+```
+
+
+# Evaluate forecast accuracy
+
+## Evaluate point forecast accuracy
+
+```{r point-accuracy, options}
+
+```
+
+## Evaluate prediction interval forecast accuracy
+
+
+```{r interval-accuracy, options}
+
+```
+
+
+# Check residuals for the selected model
+
+
+```{r residual, options}
+
+```
+
+
+# Forecast for the future using the selected model and visualise forecast
+
+
+```{r forecast-visualise, options}
+
+```
+

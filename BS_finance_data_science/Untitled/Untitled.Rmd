@@ -1,0 +1,207 @@
+---
+title: Bachelor of Finance with Data Science
+author: Department of Business & Economics
+date: \today
+params:
+  logo: logo.png
+  cover: cover.png
+  iblue: 008000
+  igray: d4dbde
+documentclass: article
+fontsize: 16
+papersize: a4paper
+output: 
+  IReports::businessReport:
+    keep_tex: TRUE
+    latex_engine: xelatex
+    resetStyleFiles: FALSE
+header-includes: 
+  - \newcommand{\logo}{`r gsub("_", "\\_", params$logo)`}
+  - \newcommand{\cover}{`r gsub("_", "\\_", params$cover)`}
+  - \newcommand{\iblue}{`r params$iblue`}
+  - \newcommand{\igray}{`r params$igray`}
+include-before:
+  - \renewcommand{\contentsname}{Contents}
+  - \renewcommand{\pagename}{Page}
+---
+
+
+
+```{r setup, include = FALSE}
+# packages
+if(!require(pacman)){install.packages("pacman")}
+
+pacman::p_load(tidyverse, knitr, xtable, kableExtra, devtools)
+
+if(!require(IReports)){devtools::install_github("INWTlab/ireports")}
+
+# settings
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+\maketitle
+\tableofcontents
+\addcontentsline{toc}{section}{Contents}
+\clearpage
+
+
+\section{INTRODUCTION}
+
+\subsection{Background Information}
+
+Karatina University was established as a public university in Kenya through the charter award on 1st March 2013. Situated 15km North of Karatina town, the University aspires to be one of the leading institutions of higher learning in Kenya and beyond. Karatina University offers a quality education that is in tandem with the needs and aspirations of the global village as captured in our vision, mission and core values. The University locality is rich in agricultural soils and borders significant tourist attractions in Kenya: the snow-capped Mount Kenya and Mount Kenya National Park. The serene environment is ideal for learning. This institution started in 2007 as the Mount Kenya campus of Moi University. It had succeeded a tea training institute. In 2010 it became Karatina University College of Moi University and was chartered to a full-fledged University in 2013. The University has six academic schools: School of Agriculture and Biotechnology, School of Business, School of Education and Social Sciences, School of Natural Resources and Environmental Studies, School of Nursing and School of Pure and Applied Sciences.
+
+
+\section{PHILOSOPHY OF THE UNIVERSITY}
+Karatina University seeks to create a network that creates an environment that integrates disparate disciplines to conserve, create and disseminate knowledge that promotes development in a dynamic and developing society passionate about community outreach, research and innovation.  The University shall strive to develop programmes that will nurture leadership skills and innovation in all its graduates, thus enabling them to interact with the worldwide community and develop solutions to various environmental, economic, entrepreneurial, social and scientific issues. These skills shall be facilitated by encouraging intellectual rigour that respects academic freedom and provides the necessary capacity needed by members of the University.
+
+\subsection{Core Values}
+The core values of the University are:
+
+\begin{center}
+
+Equity
+
+Teamwork
+
+Meritocracy
+
+Academic Freedom
+
+Accountability
+
+Excellence
+
+Probity
+
+\end{center}
+
+\subsection{Vision}
+
+To be a University of global excellence, meeting the dynamic needs and development of society
+
+\subsection{Mission}
+To conserve, create and disseminate knowledge through, training, research, innovation and community outreach
+
+
+\section{Minimum Admission Requirements}
+
+For admission to the `Master of Finance and Investments` program, the following requirements shall apply: 
+
+1. An undergraduate degree in Finance, Economics, Accounting, Mathematics, Statistics or any related quantitative discipline with a minimum score of second class honours, upper division. 
+
+2. Where condition (1) is not met, the applicant shall provide evidence of at least 2 years work experience. 
+
+\subsection{Course Overview}
+
+The Master in Finance & Investments program shall comprise the following courses. 
+
+
+```{r}
+our_courses <- tribble(~ SEM_1, ~ SEM_2, ~ SEM_3, ~ SEM_4,
+        
+        "Microeconomics", "Finance Macro-environment Analysis", 
+        
+        "Research Project", "Research Project",
+        
+        "", "", "", "",
+
+        
+        "Financial Econometrics I", "Financial Econometrics II", "Investments", "",
+        
+         "", "", "", "",
+        
+        "Financial Statements Analysis and Disclosures",
+        
+        "Corporate Finance and Corporate Governance", "Derivatives", "",
+        
+         "", "", "", "",
+        
+        "Mathematical Methods for Finance", 
+        
+        "Financial Economics", "Banking Operations and Financial Institutions Management", "", 
+        
+         "", "", "", "",
+        
+        "Research Methods", "Asset Pricing Theory", "Elective", "") %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Course Structure for the Master of Finance and Investments Program") %>% 
+  
+  kable_classic(latex_options = c("hold_position", "striped"), full_width = TRUE, 
+                
+                font_size = 8)
+
+our_courses
+```
+
+
+
+```{r}
+
+(our_courses <- tribble(~ No, ~ SEMESTER_1, ~ SEMESTER_2, ~ SEMESTER_1, ~ SEMESTER_2,
+        
+        "YEAR_1", "Microeconomics", "Finance Macro-environment Analysis", 
+        
+        "", "Research Project", 
+        
+        "YEAR_1", "Financial Econometrics I", "Financial Econometrics II", "Investments", "", 
+        
+        "YEAR_2", "Financial Statements Analysis and Disclosures",
+        
+        "Corporate Finance and Corporate Governance", "Derivatives", "",
+        
+        "YEAR_2", "Mathematical Methods for Finance", 
+        
+        "Financial Economics", "Banking Operations and Financial Institutions Management", "", 
+        
+        "YEAR_2", "Research Methods", "Asset Pricing Theory", "Elective", "") %>% 
+  
+  pivot_longer(-No, names_to = "Semester", values_to = "Course") %>% 
+  
+  rename(Year = No) %>% 
+  
+  arrange(Semester, Year) %>% 
+  
+  filter(Course != "") %>% 
+  
+  mutate(Contact_Hours = case_when(
+    
+    Course == "Research Project" ~ 45,
+    
+    TRUE ~ 3
+    
+  )) %>% 
+  
+  mutate(Year = str_remove_all(Year, "_"),
+         
+         Semester = str_remove_all(Semester, "_")) %>% 
+         
+         arrange(Year, Semester) %>% 
+  
+  kbl(., booktabs = TRUE, caption = "Course Structure for the Master of Finance and Investments Program") %>% 
+  
+  kable_classic(latex_options = c("hold_position", "striped"), 
+                
+                full_width = FALSE,
+                
+                font_size = 10))
+```
+
+\section{Second Section}
+
+```{r results = "asis"}
+tab <- xtable(head(iris, n = 20), align = "|C|C|C|C|C|C|")
+
+addtorow <- list()
+addtorow$pos <- list()
+addtorow$pos[[1]] <- -1
+addtorow$command <- c("\\rowcolor{igray}")
+
+print(tab,
+      include.rownames = FALSE,
+      tabular.environment = "tabularx",
+      width = "\\textwidth",
+      comment = FALSE,
+      add.to.row = addtorow)
+```
+

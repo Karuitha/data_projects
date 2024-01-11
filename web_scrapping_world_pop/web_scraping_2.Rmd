@@ -1,0 +1,112 @@
+---
+title: "Web Scrapping in `R`: An Example Using Wikipedia's World Population Data"
+subtitle: "Harvesting Web Data Using `rvest`"
+author: "Author: John Karuitha"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: kate
+    code_folding: hide
+    toc: true
+    toc_depth: 4
+    css: my_css.css
+---
+
+```{r setup, include=FALSE, code = readLines("code/setup.r")}
+```
+
+```{r, child= "text/intro.rmd"}   
+```
+
+```{r, objective, child = "text/objective.Rmd"}
+```
+
+```{r scrapping_intuition, child = "text/scrapping_intuition.Rmd"}
+```
+
+## **The Scrapping Process**
+
+To scrap the web, we first need to read in the web address for the page of interest. We do so using the code below. 
+
+```{r}
+library(tidyverse)
+library(rvest)
+## @knitr enter_url
+url_address <- "https://en.wikipedia.org/wiki/World_population"
+```
+
+Next, I get the `table` nodes and generate the list containing all the data tables on the page. 
+
+```{r}
+## @knitr scraper_code
+## Scrape the page for tables with data
+population_tables <- read_html(url_address) %>%
+  html_nodes("table") %>%
+  html_table()
+```
+
+The page has `r length(population_tables)` tables. Here are the first two tables. 
+
+```{r}
+head(population_tables, 2)
+```
+
+And here are the last 2 tables in the page. 
+
+```{r}
+tail(population_tables, 2)
+```
+
+## **Data Cleaning**
+
+I clean the first two tables. This process of cleaning should be done on the particular table of interest. If you need the data in all tables, then you can do the cleaning per table. Note that using `R`  to clean data is faster and more accurate than doing it by hand. For data cleaning, you will discover that knowledge of regular expressions (Regex), comes handy. 
+
+```{r}
+## @knitr get_data
+## Capture the first few tables and clean the data
+first_table <- population_tables %>% .[[1]]
+
+first_table_clean <- first_table %>% set_names(c("no", "country", "pop_2000", 
+                        "pop_2015", "pop_2020")) %>% filter(no != "#") %>% mutate(no = 1:12) %>% filter(no != 12) %>% mutate(
+         pop_2000 = parse_number(pop_2000),
+         pop_2015 = parse_number(pop_2015),
+         pop_2020 = parse_number(pop_2020),
+         country = str_remove_all(country, "\\[.\\]"))
+
+first_table_clean %>% knitr::kable(caption = "World's Most Populous Counties 2000-2020 (Millions)", booktabs = TRUE) %>% kableExtra::kable_styling(full_width = TRUE, bootstrap_options = "striped", font_size = 12)
+```
+
+Here, I check out the second table. 
+
+```{r}
+my_less_clean_pop <- population_tables %>% .[[2]] %>% set_names(c("continent", "density", "population", "populous_country", "populous_city")) %>% mutate(density = str_remove_all(density, "~") %>% parse_number()) %>% mutate(population = str_remove_all(population, "\\[.\\]") %>% parse_number()) %>% mutate(populous_country = str_remove_all(populous_country, "\\[note\\s[0-9]\\]")) %>% rename(country_pop = populous_country) %>% mutate(populous_country = str_extract(country_pop, "[a-zA-Z]+")) %>% mutate(country_pop = parse_number(country_pop)) %>% mutate(city_pop = populous_city) %>% relocate(populous_country, .after = population) %>% select(-populous_city) %>%  separate(city_pop, into = c("city_population", "city"), sep = "\\s*\\–\\s*") %>% mutate(city_population = str_remove_all(city_population, ",")) %>% separate(city_population, into = c("city_population", "metro_population", sep = "///")) %>% separate(city, into = c("city", "metro"), sep = "/") %>% relocate(city, .before = city_population) %>% relocate(metro, .before = metro_population) %>% mutate(city = if_else(is.na(city), metro, city)) %>% mutate(city = str_remove_all(city, "\\[|\\]")) %>% 
+  mutate(city = str_remove_all(city, "[0-9]")) %>% mutate(metro = str_remove_all(metro, "\\[|\\]")) %>% 
+  mutate(metro = str_remove_all(metro, "[0-9]")) %>% select(-10)
+
+my_less_clean_pop
+```
+
+## **Data Visualization**
+
+It is a good practice to visualize data before subjecting it to a battery of statistical tests. At times, data visualization can provide such compelling evidence for or against a hypothesis that further statistical tests would not be necessary. I start by visualizing the first dataset. 
+
+### Dataset 1: Ten Most Populous Countries (2000-2020)
+
+The league of the top 10 most populous countries globally has remained largely unchanged in the last 20 years. There are two notable issues though. 
+
+1. The rise of India as the most populous country in the world, ahead of China. 
+2. The rapid rise of Nigeria to the fifth most populous country, ahead of Brazil. 
+
+
+```{r}
+first_table_clean %>% select(-no) %>% filter(country != "World total") %>% pivot_longer(-country, names_to = "year", values_to = "pop") %>% mutate(year = parse_number(year)) %>% ggplot(aes(x = year, y = pop, col = country)) + geom_line(show.legend = FALSE) + geom_label(data = . %>% filter(year == "2020"), aes(label = country), show.legend = FALSE) + tidyquant::theme_tq() + scale_y_log10() + labs(x = "Year", y = "Population (Log Scale)", title = "Top 10 Most Populous Countries 2000-2020")
+```
+
+### Dataset 1: Ten Most Populous Countries (2000-2020)
+
+
+
+
+## Conclusion
+
+## **References**

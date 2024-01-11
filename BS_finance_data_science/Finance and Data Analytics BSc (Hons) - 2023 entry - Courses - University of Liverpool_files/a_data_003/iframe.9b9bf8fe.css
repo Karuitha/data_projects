@@ -1,0 +1,28 @@
+/*
+DO NOT EDIT OR MERGE THIS FILE
+This is being left for legacy purposes for the public CSS
+Once new features need to be added to the Public CSS we need to move this all over to SASS
+*/
+
+@import "https://fonts.geckoform.com/muli.css";
+
+html {
+    overflow-y: auto !important;
+}
+body {
+    padding-top: 0 !important;
+}
+.enquiryContainer {
+    margin-top: 0px;
+    margin: 0px !important;
+}
+.navbar-enquiry {
+    display: none;
+}
+.repeatable-table-false, .repeatable-compact-false {
+    display: none;
+}
+.form-page img
+{
+    max-width: 100%;
+}

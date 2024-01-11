@@ -1,0 +1,17 @@
+pacman
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+topicmodels
+rvest
+kableExtra
+tidytext
+ggthemes
+RColorBrewer
+wordcloud

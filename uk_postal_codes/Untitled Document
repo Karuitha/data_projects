@@ -1,0 +1,19 @@
+### Instructions
+The task is
+"What we would like to do is to is to create three different csv files containing values from InputFile.csv divided into the three categories ;
+1)	Actual London postcodes that are also included in LondonPostcodes.csv
+2)	Values that adhere to one of the formats for a valid UK postcode but which are NOT in the LondonPostcodes.csv file
+3)	Values that do not adhere to a valid UK postcode format."
+
+
+## valid postal codes
+Valid UK postcode formats are as follows:
+AN NAA
+ANN NAA
+AAN NAA
+AANN NAA
+ANA NAA
+AANA NAA
+Where A is a character in the range A-Z and N is a digit 1-9
+
+^A{1,2}N{1,2}A?\\sNAA$

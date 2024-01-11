@@ -1,0 +1,462 @@
+---
+title: "The forecasters' toolbox-Part 1"
+author: "Bahman Rostami-Tabar"
+date: ""
+toc: true
+colortheme: monashwhite
+output:
+  binb::monash:
+    fig_width: 7
+    fig_height: 3.5
+    includes:
+      in_header: header.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+
+library(tidyverse)
+library(fable)
+library(tsibble)
+library(feasts)
+library(lubridate)
+library(tsibbledata)
+#source("nicefigs.R")
+library(fable)
+library(tsibble)
+library(feasts)
+library(lubridate)
+library(tsibbledata)
+
+options(width=60)
+library(fpp3)
+```
+
+```{r drug-sale, include=FALSE}
+antidiabetic_drug_sale <- PBS %>% filter(ATC2 == "A10") %>%
+  summarise(Cost = sum(Cost)/1e6) %>% filter_index("2000"~.)
+```
+
+# Learning outcome
+## Learning outcome
+
+You should be able to:
+
+1. Explain simple forecasting methods (benchmarks)
+2. Specify and estimate models using R functions in `fable`
+3. Recognise and extract fitted values and residuals
+4. Produce point and prediction interval forecasts
+
+# A tidy forecasting workflow
+## A tidy forecasting workflow
+
+```{r workflow, echo = FALSE}
+line_curve <- function(x, y, xend, yend, ...){
+  geom_curve(
+    aes(x = x, y = y, xend = xend, yend = yend),
+    arrow = arrow(type = "closed", length = unit(0.03, "npc")),
+    ...
+  )
+}
+
+ggplot() +
+  geom_text(
+    aes(x = x, y = y, label = label),
+    data = tribble(
+      ~ x, ~ y, ~ label,
+      1, 0, "Tidy",
+      7/3, 0, "Visualise",
+      3, 0.5, "Specify",
+      11/3, 0, "Estimate",
+      3, -0.5, "Evaluate",
+      5, 0, "Forecast"
+    ),
+    size = 5
+  ) +
+  geom_segment(
+    aes(x = x, y = y, xend = xend, yend = yend),
+    data = tribble(
+      ~ x, ~ y, ~ xend, ~ yend,
+      1.3, 0, 1.9, 0,
+      4.1, 0, 4.6, 0
+    ),
+    arrow = arrow(type = "closed", length = unit(0.03, "npc"))
+  ) +
+  line_curve(7/3, 0.1, 8/3, 0.5, angle = 250, curvature = -0.3) +
+  line_curve(10/3, 0.5, 11/3, 0.1, angle = 250, curvature = -0.3) +
+  line_curve(8/3, -0.5, 7/3, -0.1, angle = 250, curvature = -0.3) +
+  line_curve(11/3, -0.1, 10/3, -0.5, angle = 250, curvature = -0.3) +
+  theme_void() +
+  xlim(0.8, 5.2) +
+  ylim(-0.6, 0.6) +
+  coord_equal(ratio = 1)
+```
+
+<!--
+# Data preperation(tidy) and visualisation
+
+ ## In the absence of real-time data -->
+
+<!-- ```{r split_fig1, echo=FALSE} -->
+<!-- knitr::include_graphics("figs/train_test_gap.jpg") -->
+<!-- ``` -->
+
+# Define the model (specify)
+
+## Some simple forecasting methods
+\fontsize{13}{14}\sf
+
+### `MEAN(y)`: Average method
+
+  * Forecast of all future values is equal to mean of historical data $\{y_1,\dots,y_T\}$.
+  * Forecasts: $\hat{y}_{T+h|T} = \bar{y} = (y_1+\dots+y_T)/T$
+
+```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 3.3}
+fit <- antidiabetic_drug_sale %>%
+  model(MEAN(Cost)) 
+
+fc <- fit %>% forecast(h=12)
+
+antidiabetic_drug_sale %>%
+  ggplot(aes(x = Month, y = Cost)) +
+  geom_line() +
+  geom_line(data=fit %>% augment(), aes(y = .fitted), colour = "blue", linetype = "dashed") +
+  geom_line(aes(y = .mean), data = fc, colour = "blue") +
+   geom_line(aes(y = .mean), data = fc, colour = "blue")+
+     geom_point(aes(y = .mean), data = fc, colour = "blue")+
+  ylab("$ million") + xlab("Year") +
+  ggtitle("Antidiabetic drug sales using simple average")
+```
+
+## Some simple forecasting methods
+\fontsize{13}{14}\sf
+
+### `NAIVE(y)`: Naïve method
+
+  * Forecasts equal to last observed value.
+  * Forecasts: $\hat{y}_{T+h|T} =y_T$.
+  * Consequence of efficient market hypothesis.
+
+```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 3.1}
+fit <- antidiabetic_drug_sale %>%
+  model(NAIVE(Cost)) 
+
+fc <- fit %>% forecast(h=12)
+
+antidiabetic_drug_sale %>%
+  ggplot(aes(x = Month, y = Cost)) +
+  geom_line() +
+  geom_line(data=fit %>% augment(), aes(y = .fitted), colour = "blue", linetype = "dashed") +
+  geom_line(aes(y = .mean), data = fc, colour = "blue") +
+  geom_point(aes(y = .mean), data = fc, colour = "blue") +
+  ylab("$ million") + xlab("Year") +
+  ggtitle("Antidiabetic drug sales using Naive method")
+```
+
+## Some simple forecasting methods
+\fontsize{13}{14}\sf
+
+### `SNAIVE(y ~ lag(m))`: Seasonal naïve method
+
+  * Forecasts equal to last value from same season.
+  * Forecasts: $\hat{y}_{T+h|T} =y_{T+h-m(k+1)}$, where $m=$ seasonal period and $k$ is the integer part of $(h-1)/m$.
+
+```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.8}
+fit <- antidiabetic_drug_sale %>%
+  model(SNAIVE(Cost)) 
+
+fc <- fit %>% forecast(h=12)
+
+antidiabetic_drug_sale %>%
+  ggplot(aes(x = Month, y = Cost)) +
+  geom_line() +
+  geom_line(data=fit %>% augment(), aes(y = .fitted), colour = "blue", linetype = "dashed") +
+  geom_line(aes(y = .mean), data = fc, colour = "blue") +
+  geom_point(aes(y = .mean), data = fc, colour = "blue") +
+  ylab("$ million") + xlab("Year") +
+  ggtitle("Antidiabetic drug sales usign Snaive method")
+```
+
+<!-- ## Some simple forecasting methods -->
+<!-- \fontsize{13}{14}\sf -->
+
+<!-- ### `RW(y ~ drift())`: Drift method -->
+
+<!--  * Forecasts equal to last value plus average change. -->
+<!--  * Forecasts:\vspace*{-.7cm} -->
+
+<!--  \begin{align*} -->
+<!--  \hat{y}_{T+h|T} & =  y_{T} + \frac{h}{T-1}\sum_{t=2}^T (y_t-y_{t-1})\\ -->
+<!--                  & = y_T + h\left(\frac{y_T -y_1}{T-1}\right). -->
+<!--  \end{align*}\vspace*{-0.2cm} -->
+
+<!--    * Equivalent to extrapolating a line drawn between first and last observations. -->
+
+<!-- ## Some simple forecasting methods -->
+
+<!-- ### Drift method -->
+
+<!-- ```{r drift-method-explained, echo = FALSE, warning = FALSE} -->
+<!-- aus_production %>% -->
+<!--   filter(!is.na(Bricks)) %>% -->
+<!--   model(RW(Bricks ~ drift())) %>% -->
+<!--   forecast(h = "5 years") %>% -->
+<!--   autoplot(aus_production, level = NULL) + -->
+<!--   geom_line(data = slice(aus_production, range(cumsum(!is.na(Bricks)))), -->
+<!--             linetype = "dashed", colour = "blue") + -->
+<!--   ggtitle("Clay brick production in Australia") -->
+<!-- ``` -->
+
+## Model specification
+
+- Model specification in fable supports a formula based interface 
+- A model formula in R is expressed using `response ~ terms`
+    - the formula’s left side describes the response 
+    - the right describes terms used to model the response.
+- `Attention`: MODEL_NAME is in capital letters, e.g. `SNAIVE`
+
+\fontsize{10}{12}\sf
+```{r label, echo=TRUE, eval=FALSE}
+MODEL_NAME(response_variable ~ term1+term2+...)
+SNAIVE(Beer ~ lag("year"))
+```
+
+# Train the model (estimate)
+
+## Model estimation: template
+
+The `model()` function trains models to data.
+- It returns a model table or a `mable` object.
+
+\fontsize{10}{13}\sf
+
+```{r model_template, eval=FALSE, echo=TRUE}
+# Fit the models
+my_mable <- my_data %>%
+  model(
+    choose_name1 = MODEL_1(response_variable ~ term1+...),
+    choose_name2 = MODEL_2(response_variable ~ term1+...),
+    choose_name3 = MODEL_3(response_variable ~ term1+...),
+    choose_name4 = MODEL_4(response_variable ~ term1+...)
+  )
+```
+
+## Model estimation
+
+\fontsize{10}{13}\sf
+
+```{r beer-model}
+# Fit the models
+beer_fit <- aus_production %>%
+  model(
+    mean = MEAN(Beer),
+    naive = NAIVE(Beer),
+    snaive = SNAIVE(Beer, lag="year")
+  )
+
+#beer_fit <- beer_fit %>% stream(new_data), 
+#we can update the fitted models once we have new data
+```
+
+## mable: a model object
+
+\fontsize{10}{13}\sf
+
+```{r beer-mable, echo = TRUE, dependson='beer-model'}
+beer_fit
+```
+
+- A `mable` is a model table, each cell corresponds to a fitted model.
+- A mable contains
+    - a row for each time series
+    - a column for each model specification
+
+## Extract coefficients from `mable`
+
+\fontsize{11}{12}\sf
+```{r beer-mablea, eval= FALSE, dependson='beer-model'}
+beer_fit %>% select(snaive) %>% report()
+beer_fit %>% tidy()
+beer_fit %>% glance()
+```
+
+- The `report()` function gives a formatted model-specific display.
+- The `tidy()` function is used to extract the coefficients from the models.
+- The `glance()` shows a summary from the models.
+- We can extract information about some specific model using the `filter()` and `select()`functions.
+
+## Producing forecasts
+
+- The `forecast()` function is used to produce forecasts from estimated models.
+- **h** can be specified with a number (the number of future observations) or natural language (the length of time to predict).
+
+\fontsize{10}{12}\sf
+
+```{r beer-fc, echo = TRUE, dependson='beer-model'}
+beer_fc <- beer_fit %>%
+  forecast(h = "3 years")
+#h = "3 years" is equivalent to setting h = 12.
+
+```
+
+## Producing forecasts
+
+\fontsize{11}{12}\sf
+```{r beer-fbl, echo = FALSE, dependson='beer-fc'}
+print(beer_fc, n = 4)
+```
+
+A `fable` is a forecast table with point forecasts and distributions.
+
+## Visualising forecasts
+
+\fontsize{8}{9}\sf
+```{r beer-fc-plot, warning=FALSE, message=FALSE, fig.height=2.7}
+beer <- aus_production |> select(Beer)
+# Plot forecasts against actual values
+beer_fc %>%
+  autoplot(beer, level = NULL) +
+    autolayer(filter_index(aus_production, "2007 Q1" ~ .), color = "black") +
+    ggtitle("Forecasts for quarterly beer production") +
+    xlab("Year") + ylab("Megalitres") +
+    guides(colour=guide_legend(title="Forecast"))
+```
+
+# Fitted values and Residuals
+
+## Fitted values
+
+ - $\hat{y}_{T|T-1}$ is the forecast of $y_T$ based on observations $y_1,\dots,y_T-1$.
+ - We call these "fitted values".
+ - Sometimes drop the subscript: $\hat{y}_T \equiv \hat{y}_{T|T-1}$.
+ - Often not true forecasts since parameters are estimated on all data.
+
+### For example:
+
+ - $\hat{y}_{T} = \bar{y}$ for average method.
+ - $\hat{y}_{T} = y_{T-1} + (y_{T}-y_1)/(T-1)$ for drift method.
+  - $\hat{y}_{T} = y_{T-1}$ for naive method.
+
+## Fitted values
+
+\fontsize{11}{12}\sf
+```{r beer-fit-fitted, echo = TRUE, dependson='beer-model',warning=FALSE}
+beer_fit %>% select(naive) %>% augment() %>% 
+  ggplot(aes(x=Quarter, y=Beer))+
+  geom_line()+
+  geom_line(aes(y=.fitted), colour="red")
+
+#beer_fit %>% fitted
+#`augment()` fucntion gets residuals and fitted values
+```
+
+## Residuals
+
+- The "residuals" in a time series model are what is left over after fitting a model.
+- Residuals are useful in checking whether a model has adequately captured the information in the data.
+
+\begin{block}{}
+\textbf{Residuals in forecasting:} difference between observed value and its fitted value: $e_t = y_t-\hat{y}_{t|t-1}$.
+\end{block}
+
+## Residuals
+
+\fontsize{10}{12}\sf
+```{r beer-fit, echo = TRUE, dependson='beer-model',warning=FALSE}
+#beer_fit %>% fitted
+#`augment()` fucntion gets residuals and fitted values
+beer_fit %>% select(snaive) %>% augment() %>% 
+  ggplot(aes(x=Quarter, y=.resid))+
+  geom_line()
+```
+
+## Extract fitted values and residuals
+\fontsize{10}{12}\sf
+```{r f_r_v}
+beer_fit %>% augment()
+#beer_fit %>% fitted
+#beer_fit %>% residual
+```
+ 
+# Prediction intervals
+
+## What is wrong with point forecasts?
+
+- Resource allocation in A&E is assymmetric
+
+    * The cost of over-allocating resources(over estimation) can vastly differ from the cost of under-allocating(under estimation)
+
+- The disadvantage of point forecast:
+
+    * it ignores additional information in future demand;
+    * it does not explain uncertainties around future demand
+    * it can not deal with assymmetric.
+
+## Importance of providing interval forecast
+\fontsize{11}{12}\sf
+Point forecasts are often useless without a measure of uncertainty
+
+```{r p_interval, echo=FALSE, fig.align='center'}
+knitr::include_graphics("figs/point_f.png")
+```
+
+## Prediction intervals
+\fontsize{11}{12}\sf
+ * A prediction interval gives a region within which we expect $y_{T+h}$ to lie with a specified probability
+ * It consists of an upper and a lower limit between which the future value is expected to lie
+ 
+
+```{r fb-fc, echo=FALSE, warning=FALSE}
+fit <- aus_production %>% model(NAIVE(Beer))
+forecast(fit) %>% autoplot(beer)
+```
+
+## Prediction intervals
+ 
+ * Assuming forecast errors are normally distributed, then a c% PI is:
+
+ \begin{alertblock}{}
+\centerline{$
+  \hat{y}_{T+h|T} \pm c \hat\sigma_h
+$}
+\end{alertblock}
+where the multiplier $c$ depends on the coverage probability 
+and $\hat\sigma_h$ is the st dev of the $h$-step distribution.
+
+<!-- ## Prediction intervals -->
+
+<!--  * Assuming forecast errors are normally distributed, then a 95% PI is -->
+<!--  \begin{alertblock}{} -->
+<!-- \centerline{$ -->
+<!--   \hat{y}_{T+h|T} \pm 1.96 \hat\sigma_h -->
+<!-- $} -->
+<!-- \end{alertblock} -->
+<!-- where $\hat\sigma_h$ is the st dev of the $h$-step distribution. -->
+
+<!--  * When $h=1$, $\hat\sigma_h$ can be estimated from the residuals. -->
+
+## Prediction intervals
+
+- Forecast intervals can be extracted using the `hilo()` function
+- Use `level` argument to control coverage.
+
+\fontsize{10}{13}\sf
+```{r fb-fc1, echo=TRUE, warning=FALSE}
+fit <- aus_production %>% model(NAIVE(Beer))
+forecast(fit) %>% hilo(level = c(80, 95))
+```
+
+<!-- ## Prediction intervals -->
+
+<!--   * Computed automatically from the forecast distribution. -->
+<!--   * Use `level` argument to control coverage. -->
+<!--   * Check residual assumptions before believing them (we will see this next session). -->
+
+# lab session 5
+## lab session 5
+
+ * Produce forecasts from the bechmark methods for daily A&E series for 42 days
+ * Plot the results using `autoplot()`.
+      * Use `filter_index()` to show the plot from 2016
+ * Use `augment()` to extract fitted values for snaive method
+ * Extract residuals for mean method

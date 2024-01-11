@@ -1,0 +1,602 @@
+---
+date: "`r Sys.Date()`"
+author: "Akua Kyeraa Sam"
+title: "Purchase of Office Equipment"
+output: 
+  officedown::rdocx_document:
+    mapstyles:
+      Normal: ['First Paragraph']
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.cap = TRUE, message = FALSE, 
+                      
+                      warning = FALSE)
+
+## Install and load package manager
+## NB: This section requires an internet connection
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+        
+}
+
+## Load required packages, installing them if not available
+pacman::p_load(tidyverse, ggthemes, GGally, janitor, skimr, kableExtra, 
+               
+               huxtable, flextable, knitr, rmarkdown, officedown, 
+               
+               officer, corrplot, dendextend, flexclust, NbClust,
+               
+               here, questionr, ggmosaic, OddsPlotty, tidymodels,
+               
+               lift, data.table,  dfidx, bbplot, mlogit, lmtest)
+
+## Set theme for plots
+theme_set(bbplot::bbc_style())
+
+## Set number of significant digits
+options(digits = 2)
+
+
+fp <- fp_par(
+  text.align = "center", 
+  padding.bottom = 20, padding.top = 120, 
+  border.bottom = fp_border())
+
+ft <- fp_text(shading.color='#EFEFEF', bold = TRUE)
+```
+
+\newpage
+
+# Project 1: The Choice of Outlet to Buy Office Equipment
+
+## Background
+
+In this project, I use data from a survey of 200 respondents regarding the importance of several store attributes when choosing where to buy office equipment. The data has the following variables. 
+
+```{r}
+## variables description
+tribble(~ Variable, ~ Description,
+        
+        "respondent_id", "An identifier for our observations",
+        
+        "variety_of_choice", "Importance of this attribute on a 0-10 scale",
+        
+        "electronics", "Importance of this attribute on a 0-10 scale",
+        
+        "furniture", "Importance of this attribute on a 0-10 scale",
+        
+        "quality_of_services", "Importance of this attribute on a 0-10 scale",
+        
+        "low_prices", "Importance of this attribute on a 0-10 scale",
+        
+        "return_policy", "Importance of this attribute on a 0-10 scale",
+        
+        "professional", "Whether the respondent is a professional or not (e.g., student)", 
+        
+        "income", "Gross annual income expressed in thousands of pound sterling",
+        
+        "age", "Respondents’ age in years") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption(caption = "Variables Description")
+```
+
+## QUESTION 1: Descriptive Statistics of Each Variable in the dataset
+
+The data has 200 rows and 10 columns. I first read in the data into `R`. I run a correlation analysis and summary statistics of the variables. The data has no missing observations and no duplicate rows. Figure 1 shows the pairs plot for all the variables in the data set. Some of the variables have very high correlation, for instance, `age` and `income` at 0.74 and `variety of choices` and `furniture` at 0.66. The main diagonal of the pairs plot shows that the variables are highly skewed. Figure 2 shows a visualisation of the correlations. 
+
+```{r}
+## Read the data
+office <- read_csv("office (2).csv") %>% 
+        
+        clean_names()
+
+```
+
+
+
+```{r, eval = FALSE}
+## Examine first six rows of the data.
+office %>% 
+        
+        head() %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption(caption = "First Six Rows of the Data")
+
+
+```
+
+
+```{r}
+## Checking for missing values
+sapply(office, is.na) %>% 
+        
+        colSums() %>% 
+        
+        tibble(Variable = names(office), missing = .) %>% 
+        
+        arrange(desc(missing)) %>% 
+        
+        flextable()
+```
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.width = 10, fig.height = 5, fig.cap = "Pairs Plots of Variables"}
+## Pairs plots for all variables
+office %>% 
+        
+        select(-respondent_id) %>% 
+        
+        relocate(professional, .after = age) %>% 
+        
+        ggpairs(title = "Pairs Plots of Variables") + 
+        
+        theme(axis.text = element_text(size = 2))
+```
+
+
+
+```{r, fig.width = 10, fig.height = 5, fig.cap = "Correlation Matrix"}
+office %>% 
+        
+        select(where(is.numeric), -respondent_id) %>% 
+        
+        cor() %>% 
+        
+        corrplot(type = "lower", diag = FALSE)
+```
+
+
+
+```{r}
+## Summary Statistics for numeric variables
+office %>% 
+        
+        select(where(is.numeric)) %>% 
+        
+        skim_without_charts() %>% 
+        
+        select(-skim_type, -n_missing) %>% 
+        
+        rename(Variable = skim_variable, mean = numeric.mean,
+               
+               SD = numeric.sd, Min = numeric.p0,
+               
+               Q1 = numeric.p25, Median = numeric.p50, 
+               
+               Q3 = numeric.p75, Max = numeric.p100) %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption(caption = "Summary Statistics for Numeric Variables")
+```
+
+
+```{r}
+office %>% 
+        
+        select(where(is.character)) %>% 
+        
+        skim() %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Summary of Character Variables")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+## QUESTION 2: Hierarchical Clustering: Preparing the Data
+In this section, I carry out cluster analysis on the dataset. I create a new dataset containing attitudinal variables by eliminating `age`, `income`, `Professional` and `respondent_id`. I then standardize the variables. 
+
+```{r}
+office_cl <- office %>% 
+        
+        select(-age, -income, -professional, -respondent_id) %>% 
+        
+        scale(center = TRUE, scale = TRUE)
+```
+
+## QUESTION 3: Hierarchical Clustering: 6 Cluster Solution
+I create a distance matrix using the default `euclidean` method and and then use the `hclust` function for hierarchical clustering. 
+
+```{r}
+office_dist <- dist(office_cl)
+set.seed(123)
+office_hclust <- hclust(office_dist, method = "ward.D2")
+```
+
+Figure () below shows the dendogram for the clustering algorithm. 
+
+```{r}
+office_6_clust <- cutree(office_hclust, k = 6)
+```
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.cap = "Dendogram for 6 Clusters", fig.width = 10, fig.height = 5}
+plot(office_hclust)
+rect.hclust(office_hclust , k = 6)
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+## QUESTION 4: Number of Observations in Each of the 6 Clusters
+
+The number of points in each of the clusters in shown in Table () below.
+
+```{r}
+office_assigned_hclust <- office %>% 
+        
+        mutate(cluster = office_6_clust)
+
+table(office_assigned_hclust$cluster)
+
+tribble(~ Cluster, ~ Points,
+        
+        "Cluster 1", "59",
+        
+        "Cluster 2", "8",
+        
+        "Cluster 3", "52",
+        
+        "Cluster 4", "17",
+        
+        "Cluster 5", "35",
+        
+        "Cluster 6", "29") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Number of Observations per Cluster")
+```
+
+## QUESTION 5A: Summary Statistics per Cluster and Flexclust package
+I compute the average of each of the variables per cluster. 
+
+```{r}
+office_assigned_hclust %>% 
+        
+        select(-respondent_id, -age, -income, -professional) %>% 
+        
+        group_by(cluster) %>% 
+        
+        summarise(variety_of_choice = mean(variety_of_choice),
+        electronics = mean(electronics),       
+        furniture = mean(furniture),        
+        quality_of_service = mean(quality_of_service),
+        low_prices = mean(low_prices),       
+        return_policy = mean(return_policy)) %>% 
+        
+flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        
+        set_caption("variable Means for the 6 Cluster Hierarchical Clustering Solution")
+```
+
+The output shows that the clustering does distinguish the clusters. It is notable that each of the clusters appear to have a different mean for each of the variables. Next, I use the `Flexclust` package to repeat the clustering. 
+
+### QUESTION 5B: Clustering Using the FlexClust Package
+
+This section I use the `flexclust` package for clustering.
+
+```{r}
+set.seed(123)
+my_kcca <- kcca(office_cl, k = 6, control = new("flexclustControl"),
+                
+                family = kccaFamily("ejaccard"))
+my_kcca
+```
+
+The cluster assignments in this case are as follows;
+
+```{r}
+tribble(~ Cluster, ~ Points,
+        
+        "Cluster 1", "24",
+        
+        "Cluster 2", "24",
+        
+        "Cluster 3", "21",
+        
+        "Cluster 4", "42",
+        
+        "Cluster 5", "48",
+        
+        "Cluster 6", "41") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Number of Observations per Cluster")
+
+```
+
+I develop a segment separation plot. The first step in making a segment separation plot is to do a `Principal Component Analysis` (PCA). Plotting the first two principal components allows us to develop the desired plot which depict the position of each data point in the clusters using two dimensions. 
+
+```{r}
+office_pca <- prcomp(office_cl)
+```
+
+
+```{r, fig.cap = "Segment Profile Plot"}
+barchart(my_kcca, strip.prefix= "#", shade = TRUE, 
+         
+         layout = c(my_kcca@k, 1), 
+         
+         main = 'Segment Profile Plot')
+```
+
+It is notable that we have a change in cluster memberships between Hierarchical clustering and using `flexclust`. Table () below compares the cluster assignments between the two techniques. Except for the first two clusters, there are significant shifts in cluster memberships. 
+
+```{r}
+tribble(~ Cluster, ~ Points_HC, ~ Points_Flextable,
+        
+        "Cluster 1", "59", "24",
+        
+        "Cluster 2", "8", "24",
+        
+        "Cluster 3", "52", "21",
+        
+        "Cluster 4", "17", "42",
+        
+        "Cluster 5", "35", "48",
+        
+        "Cluster 6", "29", "41") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Number of Observations per Cluster")
+```
+
+## QUESTION 6: Concordance of Hierarchichal and KCCA Procedure
+
+In this section, I examine the degree of overlap between the clustering results for the two clustering methods. There is low overlap between the techniques. For instance, in cluster 1, the two place only four (4) points in the same cluster. Only clusters 5 shows a higher degree of agreement between the two methods. 
+
+```{r}
+table(my_kcca@cluster, office_6_clust)
+```
+
+## QUESTION 7: Why I Would Not go with the 6 Cluster Solution
+
+From the segment profile plot, some clusters appear very similar to each other. For instance, cluster 1 and 2 seem to have a set of similar preferences- favourable return policy, good service quality, and low prices. Furthermore, the variables variety of choice, electronics and furniture appear to follow a similar pattern. It would be better to have the two clusters combined. 
+
+There are techniques to estimate the optimal number of clusters although none is perfect. In this case, I use the `NbClust` package to determine the optimal number of clusters.
+
+```{r, eval=FALSE}
+NbClust(data = office_cl, diss = NULL, distance = "euclidean", min.nc = 2, max.nc = 6, method = "ward.D2", index = "all", alphaBeale = 0.1)
+```
+
+The technique recommends an optimal cluster size of between 3 and 4 based on the elbow method. The code chunk in line 392 shows this technique of determining optimal clusters. 
+
+## QUESTION 8: Implementing a 5 Cluster Solution
+In this section, I implement the 5 cluster solution.
+
+```{r}
+office_5_clust <- cutree(office_hclust, k = 5)
+```
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.cap = "Dendogram for 5 Clusters", fig.width=10, fig.height=5}
+plot(office_hclust)
+rect.hclust(office_hclust , k = 5)
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+## QUESTION 9: Cluster Summary Statistics
+I calculate the cluster means for each of the 5 clusters.
+
+```{r}
+office %>% 
+        
+        mutate(cluster5 = office_5_clust) %>% 
+
+group_by(cluster5) %>% 
+        
+        summarise(variety_of_choice = mean(variety_of_choice),
+        electronics = mean(electronics),       
+        furniture = mean(furniture),        
+        quality_of_service = mean(quality_of_service),
+        low_prices = mean(low_prices),       
+        return_policy = mean(return_policy)) %>% 
+        
+flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("variable Means for the 5 Cluster Hierarchical Clustering Solution")
+```
+
+This section shows clustering using the `flexclust` package using 5 clusters.
+
+```{r}
+set.seed(123)
+my_kcca5 <- kcca(office_cl, k = 5, control = new("flexclustControl"),
+                
+                family = kccaFamily("ejaccard"))
+my_kcca5
+```
+
+The cluster assignments in this case are as follows;
+
+```{r}
+tribble(~ Cluster, ~ Points,
+        
+        "Cluster 1", "31",
+        
+        "Cluster 2", "32",
+        
+        "Cluster 3", "57",
+        
+        "Cluster 4", "34",
+        
+        "Cluster 5", "46") %>% 
+        
+   flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Number of Observations per Cluster")    
+```
+
+
+The segment profile plot gives a business friendly way to describe the clustering. In our case, there appears to be distinct preferences for each of the clusters. 
+
+```{r, fig.cap = "Segment Profile Plot"}
+barchart(my_kcca5, strip.prefix= "#", shade = TRUE, 
+         
+         layout = c(my_kcca5@k, 1), 
+         
+         main = 'Segment Profile Plot')
+```
+
+I attach expressive labels to each of the clusters in Table () below.
+
+```{r}
+tribble(~ Cluster, ~ Top_3_Preferences, ~ Tag,
+        
+        "Cluster 1", "Return Policy, Quality of Service, & Low Prices", 
+        
+        "Return and Service",
+        
+        "Cluster 2", "Return Policy, Low Prices, & Quality of Service",
+        
+        "Return and prices",
+        
+        "Cluster 3", "Furniture, Variety of Choice & Electronics",
+        
+        "Furniture & Electronics Nerds Favouring Variety of Choice at Low Prices",
+        
+        "Cluster 4", "Low Prices, Return Policy & Quality of Service",
+        
+        "Price Sensitive Customers favoring Good Return Policy",
+        
+        "Cluster 5", "Furniture, Variety of Choice & Electronics", 
+        
+        "Furniture & Eletronics Nerds Favouring Variety of Choice with Good Service") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Number of Observations per Cluster")  
+```
+
+## QUESTION 10 Why Prefer the 5 Cluster Solution
+
+Cluster 5 distinguishes the clusters better than the six cluster solution going by the segment profile plot. While cluster 3 and 5 appear similar, customers in cluster 3 favour low prices while those in cluster 5 are keen on the quality of services. The clustering algorithm distinctly describes all the other clusters. 
+
+Next I check the concordance between hierarchical clustering and the flexclust technique. 
+
+```{r}
+table(my_kcca5@cluster, office_5_clust)
+```
+
+There are 26 data points in common between the hierarchical clustering and the flexclust technique. 
+
+In this section I will incorporate all the other variables, `professional`, `age` and `income` to evaluate the usefulness of the 5 cluster solution. First, I group the data by cluster and compute the mean of age and income. As table () shows, the clustering appears to clearly differentiate customers by age and income. For instance, customers in profile 1 have an average age of 29.5 years and with a mean income of 26. By contrast, cluster 5 consists of customers with a mean age of 46 years and an income of 54.8. 
+
+Table () shows the distribution of professionals versus non-professionals by cluster. The bulk of of professionals (48) fall in cluster 1 while most non-professionals fall into cluster 2 (57). Likewise, most high income , relatively old people are in cluster 5. Low income youngsters are in cluster 2. 
+
+```{r}
+cluster_5_labels <- cutree(office_hclust, k = 5)
+
+###################################################
+office %>% 
+        
+        mutate(cluster5 = cluster_5_labels) %>% 
+        
+        group_by(cluster5) %>% 
+        
+        summarise(income = mean(income),
+                  
+                  age = mean(age)) %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Summary per Cluster")  
+##################################################
+
+```
+
+
+```{r}
+office %>% 
+        
+        mutate(cluster5 = cluster_5_labels) %>% 
+        
+        group_by(cluster5) %>% 
+        
+        count(professional) %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption("Summary per Cluster")  
+```
+
+## QUESTION 11: Targeting Each Cluster
+
+We can target the segments as follows;
+
+Cluster 1: Promote mainly electronics equipment with favourable return policies and quality services. This means that the sales to these customers should have suitable warranties. 
+
+Cluster 2: Again, we should target these customers with suitable return policies but, unlike cluster 1, favourable prices.
+
+Cluster 3: Target these customers a wide variety of choices of furniture and electronics.
+
+Cluster 4: For this cluster, we should put equal emphasis on return policy and low prices of electronics. 
+
+Cluster 5: These customers prefer a wide variety of furniture and to a lesser extent electronics with good quality service. 
+
+## QUESTION 12 K Means Clustering
+Finally, I run the `kmeans` clustering using 5 centres. Here, we notice that there are 60 points in cluster 1, 17 in cluster 2, 33 in cluster 3, 29 in cluster 4, and 61 in cluster 5. 
+
+```{r}
+set.seed(123)
+my_kmeans <- kmeans(office_cl, centers = 5, iter.max = 1000, nstart = 100)
+
+table(my_kmeans$cluster)
+table(office_5_clust)
+```
+
+## QUESTION 13 Corcordance K Means and HC
+
+I then check for the concordance between `kmeans` and `hierarchical` clustering and compute the hit rate. 
+
+```{r}
+table(my_kmeans$cluster, office_5_clust)
+```
+
+There appears to be little concordance between the two techniques.
+

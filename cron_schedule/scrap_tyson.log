@@ -1,0 +1,15 @@
+Loading required package: pacman
+# A tibble: 58 × 10
+     No. Result Record   Opponent Type  `Round, time` Date  Age   Location Notes
+   <int> <chr>  <chr>    <chr>    <chr> <chr>         <chr> <chr> <chr>    <chr>
+ 1    58 Loss   50–6 (2) Kevin M… RTD   6 (10), 3:00  Jun … 38 y… MCI Cen… ""   
+ 2    57 Loss   50–5 (2) Danny W… KO    4 (10), 2:51  Jul … 38 y… Freedom… ""   
+ 3    56 Win    50–4 (2) Cliffor… KO    1 (10), 0:49  Feb … 36 y… The Pyr… ""   
+ 4    55 Loss   49–4 (2) Lennox … KO    8 (12), 2:25  Jun … 35 y… The Pyr… "For…
+ 5    54 Win    49–3 (2) Brian N… RTD   6 (10), 3:00  Oct … 35 y… Parken … ""   
+ 6    53 NC     48–3 (2) Andrew … RTD   3 (10), 3:00  Oct … 34 y… The Pal… "Ori…
+ 7    52 Win    48–3 (1) Lou Sav… TKO   1 (10), 0:38  Jun … 33 y… Hampden… ""   
+ 8    51 Win    47–3 (1) Julius … TKO   2 (10), 1:03  Jan … 33 y… MEN Are… ""   
+ 9    50 NC     46–3 (1) Orlin N… NC    1 (10), 3:00  Oct … 33 y… MGM Gra… "Nor…
+10    49 Win    46–3     Francoi… KO    5 (10), 2:59  Jan … 32 y… MGM Gra… ""   
+# … with 48 more rows

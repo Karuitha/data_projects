@@ -1,0 +1,369 @@
+---
+subtitle: "**Financial Condition of Commercial Banks Using XG Boost and Random Forest Models**"
+title: "*Using Machine Learning to Predict Financial Strength of Banks*"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, Kenya"
+      affiliation-url: www.karu.ac.ke
+description: "Independent Data Analysis Project"
+date: today
+title-block-banner: "banks.jpg"
+title-block-banner-color: "black"
+echo: true
+message: false
+warning: false
+format: 
+    html:
+        theme: 
+            light: flatly
+            dark: darkly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+bibliography: ref.bib
+---
+
+```{r}
+#| include: false
+## Load the required packages 
+###################################################
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, kableExtra, 
+               rpart, rpart.plot,  arules, arulesViz, gt,
+               randomForest, vip, themis, xgboost, caret,
+               ranger, doParallel, palmerpenguins, httpgd)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+theme_set(ggthemes::theme_wsj())
+## Read in the data ----
+banks <- read_csv("banks.csv") %>%
+                clean_names() %>%
+                select(-obs) %>%
+                mutate(financial_condition = case_when(
+
+                    financial_condition == 0 ~ "Bad",
+
+                    TRUE ~ "Good"
+                ))
+```
+
+# **Background**
+
+In this analysis, I use data regarding the financial condition of a sample of commercial banks to build machine learning models that predict the financial condition of banks. The data consists of two key explanatory variables in the form of ratios;
+
+-   Total loans and leases to total assets.
+-   Total expenses to total assets.
+
+The dependent variable is binary with two categories; weak and strong.
+
+The objective is to use the two ratios for classifying the financial condition of a new bank.
+
+::: callout-tip
+## **Read More of my Work**
+
+Please visit [my rpubs site](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link <https://www.rpubs.com/Karuitha> into your browser.
+
+My data visualizations projects are available in my [Tableau Public profile page](https://public.tableau.com/app/profile/john.karuitha) or copy and paste the link <https://public.tableau.com/app/profile/john.karuitha>.
+
+My Shiny web apps are available on this [site](https://karuitha.shinyapps.io/). You can copy-paste this web address instead <https://karuitha.shinyapps.io/>
+:::
+
+::: callout-note
+## **Tools Utilized & Skills Applied**
+
+R [@myR], Decision Tree Model, Random Forest Model, Quarto, Data Science, Machine Learning.
+:::
+
+# **Significance of the Analysis**
+
+The analysis would be of significance to regulators and other stakeholders. For instance, the central bank of Kenya could utilise this kind of analysis to narrow down on risky banks before they go under with depositors money.
+
+# **Summary of Results**
+
+# **Data**
+
+The file banks.csv includes data on a sample of 20 banks. The “Financial Condition” column records the judgment of an expert on the financial condition of each bank. This outcome variable takes on of two possible values –weak (1) or strong (0)– according to the financial condition of the bank. The predictors are two ratios used in the financial analysis of banks: TotLns&Lses/Assets is the ratio of total loans and leases to total assets and TotExp/Assets is the ratio of total expenses to total assets. The target is to use the two ratios for classifying the financial condition of a new bank.
+
+The data consists of `r nrow(banks)` rows and and `r ncol(banks)` variables. For each flight (row of data), there is information on the distance of the route, the scheduled time and date of the flight, and so on.Table 2 describes variables in this file.
+
+The variable that we are trying to predict is whether or not a flight is delayed (Fight_Status).
+
+# **Exploring the Data**
+
+The data is well balanced and has no missing values. The two explanatory variables appear to show some degree of discrimination between banks in good condition relative to those commercial banks in poor financial health. The total expenses to assets ratio appears to be particularly useful in predicting the financial health.
+
+```{r}
+#| fig-cap: "Exploring the Data"
+#| fig-width: 10
+#| fig-height: 10
+
+banks %>%
+    sapply(is.na) %>%
+    colSums()
+
+banks %>% 
+    GGally::ggpairs(aes(color = financial_condition,
+    fill = financial_condition),
+    title = "Financial Condition of Banks",
+    columnLabels = c("Financial Condition", "Total Expenses", "Total Loans and Leases")) + 
+    scale_fill_manual(values = c("green", "gray80")) + 
+    scale_color_manual(values = c("green", "gray80"))
+```
+
+# **Machine Learning Models**
+
+In this section, I train three models.
+
+-   The Decision Tree Model.
+-   The Random Forest Model.
+-   Extreme Gradient Boosting (XG Boost) Model.
+
+But first, I split the data into training set and testing set.
+
+## **Creating Training Set and Testing Sets**
+
+In this section, I partition the data into 60% for training and 40% for validation.
+
+```{r}
+## Split the data into training and testing set
+set.seed(300, sample.kind = "Rounding")
+
+banks_split <- banks %>% initial_split(prop = 0.7, strata = financial_condition)
+
+banks_training <- banks_split %>% training()
+
+banks_testing <- banks_split %>% testing()
+
+my_recipe <- recipes::recipe(financial_condition ~ ., data = banks_training) %>%
+step_dummy(all_nominal_predictors()) %>% 
+    prep(data = NULL)
+
+## My workflow
+my_workflow <- workflow() %>%
+    add_recipe(my_recipe)
+```
+
+Next, we train the model using the training set and test the models using the validation or testing set.
+
+## **Logit Model**
+
+I fit a logistic regression model to the financial condition variable using the rest of the predictors in the training set data
+
+```{r}
+logit_model <- logistic_reg() %>%
+    set_mode("classification") %>%
+    set_engine("glm")
+
+
+final_logit_model <- my_workflow %>%
+    add_model(logit_model) %>%
+    fit(data = banks_training)
+
+tidy(final_logit_model)
+```
+
+## **Random Forest Model**
+
+In this section, I run the random forest model.
+
+```{r}
+
+rf_model <- rand_forest() %>%
+        set_mode("classification") %>%
+        set_engine("ranger")
+
+rand_model <- my_workflow %>%
+    add_model(rf_model) %>%
+    fit(data = banks_training)
+```
+
+## Extreme Gradient Boosting
+
+```{r}
+xgb_spec <- boost_tree(
+  trees = 1000,
+  tree_depth = tune(), min_n = tune(),
+  loss_reduction = tune(),                     ## first three: model complexity
+  sample_size = tune(), mtry = tune(),         ## randomness
+  learn_rate = tune()                          ## step size
+) %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+
+xgb_spec
+```
+
+```{r}
+xgb_grid <- grid_latin_hypercube(
+  tree_depth(),
+  min_n(),
+  loss_reduction(),
+  sample_size = sample_prop(),
+  finalize(mtry(), banks_training),
+  learn_rate(),
+  size = 30
+)
+```
+
+```{r}
+set.seed(123)
+banks_folds <- vfold_cv(banks_training, strata = financial_condition)
+
+banks_folds
+```
+
+```{r}
+set.seed(0) 
+
+xgboost_workflow <- my_workflow %>%
+    add_model(xgb_spec)
+
+doParallel::registerDoParallel()
+
+set.seed(234)
+xgb_res <- tune_grid(
+  xgboost_workflow,
+  resamples = banks_folds,
+  grid = xgb_grid,
+  control = control_grid(save_pred = TRUE)
+)
+```
+
+```{r}
+best_auc <- select_best(xgb_res, "roc_auc")
+final_xgb <- xgboost_workflow %>% 
+    finalize_workflow(best_auc)
+```
+
+## **Comparing Model Performance**
+
+### Logit Model
+
+Based on the logit model, I do predictions for the validation set and report their confusion matrix respectively and other model performance metrics.
+
+```{r}
+logit_prediction <- final_logit_model %>% 
+    augment(new_data = banks_testing) %>% 
+    mutate(financial_condition = factor(financial_condition))
+
+head(logit_prediction)
+```
+
+For the logit model, the metrics are as follows:
+
+```{r}
+logit_prediction %>%
+    conf_mat(truth = financial_condition, estimate = .pred_class)
+
+logit_prediction %>%
+    conf_mat(truth = financial_condition, estimate = .pred_class) %>%
+    autoplot()
+
+logit_prediction %>%
+    conf_mat(truth = financial_condition, estimate = .pred_class) %>%
+    summary()
+
+logit_prediction %>%
+    roc_auc(truth = financial_condition, .pred_Good)
+
+logit_prediction %>%
+    roc_curve(truth = financial_condition, .pred_Good) %>%
+    autoplot()
+```
+
+### Random Forest Model
+
+The metrics for the random forest model are as follows:
+
+```{r}
+## Prediction on the testing set
+rf_prediction <- predict(rand_model, 
+                                 newdata = flights_testing, type = "class")
+
+rf_prediction <- flights_testing %>% 
+    select(flight_status) %>% 
+    bind_cols(rf_prediction) %>% 
+    set_names(c("flight_status", "estimate"))
+
+## preview the predcitions
+head(rf_prediction)
+
+```
+
+```{r}
+## Confusion matrix on the testing set
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate)
+
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    autoplot()
+
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    summary()
+```
+
+# **Variable Importance**
+
+The Variable importance shows that weather is of primary importance in determining the timeliness of flights. Day of the month and the carrier are also important drivers of the timeliness of flights.
+
+```{r}
+vip(flights_tree)
+```
+
+```{r}
+vip(rand_model)
+```
+
+# **Conclusion**
+
+In this analysis, I have built machine learning models to predict the financial condition of commercial banks. Specifically, I ran the following models.

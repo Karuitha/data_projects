@@ -1,0 +1,406 @@
+---
+date: "`r Sys.Date()`"
+author: "Akua Kyeraa Sam"
+title: "Website Conversion"
+output: 
+  officedown::rdocx_document:
+    mapstyles:
+      Normal: ['First Paragraph']
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.cap = TRUE, message = FALSE, 
+                      
+                      warning = FALSE)
+
+## Install and load package manager
+## NB: This section requires an internet connection
+
+if(!require(pacman)){
+        
+        install.packages("pacman")
+        
+}
+
+## Load required packages, installing them if not available
+pacman::p_load(tidyverse, ggthemes, GGally, janitor, skimr, kableExtra, 
+               
+               huxtable, flextable, knitr, rmarkdown, officedown, 
+               
+               officer, corrplot, dendextend, flexclust, NbClust,
+               
+               here, questionr, ggmosaic, OddsPlotty, tidymodels,
+               
+               lift, data.table,  dfidx, bbplot, mlogit, lmtest,
+               
+               stargazer)
+
+## Set theme for plots
+theme_set(bbplot::bbc_style())
+
+## Set number of significant digits
+options(digits = 2)
+
+
+fp <- fp_par(
+  text.align = "center", 
+  padding.bottom = 20, padding.top = 120, 
+  border.bottom = fp_border())
+
+ft <- fp_text(shading.color='#EFEFEF', bold = TRUE)
+```
+
+
+# Project 2: Website Conversion
+
+## QUESTION 1: Reading and Inspecting Each Variable in the Dataset
+
+For this project I model website user conversion. I start by reading in the data. 
+
+```{r}
+web_data <- read_csv(here("ecommerce (3).csv"))
+glimpse(web_data)
+```
+
+The data set has `r nrow(web_data)` rows and `r ncol(web_data)` and covers 4 countries. The data set contains the following variables. 
+
+```{r}
+tribble(~ variable, ~ Description,
+        
+        "Country", "The country the user accessed the site from (France,
+Germany, Ireland, or UK)", 
+
+"Source", "The source through which the user accessed the site (ads,
+search, or direct link)", 
+
+"Total_pages_visited", "The number of pages visited by the user", 
+
+"Visit_duration", "The amount of time the user spent in the site (in seconds)", 
+
+"Discount", "Whether the user was offered a discount (10% off first order;
+yes, no)",
+
+"Conversion", "Whether the user converted, or made a purchase (yes, no)") %>% 
+        
+        flextable() %>% 
+        
+        theme_vanilla() %>% 
+        
+        set_caption(caption = "Variables Description")
+```
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.width = 10, fig.height = 5, fig.cap = "Pairs Plots of Variables"}
+web_data %>% 
+        
+        ggpairs()
+```
+
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+What is glaring in the plot is the perfect correlation between total pages and visit duration. Also, total pages visited and visit duration skew to the right.
+
+```{r}
+web_data %>% 
+        
+        summary()
+```
+
+
+## QUESTION 2: Model 1: Conversion versus Discount
+
+I next run a regression between conversion and discount. 
+
+```{r}
+ml <- glm(factor(conversion) ~ factor(discount), data = web_data, family = "binomial")
+
+summary(ml)
+```
+
+Discount has a positive relationship with conversion rate. Specifically, when there is a discount, the chance of converting a website visit into a sale rises by a factor of 31.4 relative to where there is no discount. The coefficient is significant at the 1% significance level. 
+
+## QUESTION 3: Calculate the odds ratio for discountyes. What does this mean?
+For interpretability, I compute the odds ratio. The output contains the estimate and the confidence intervals.
+
+```{r}
+odds.ratio(ml, level = 0.99)
+```
+
+The ration shows that websites with discounts are 3 times more likely to convert compared to websites with no discounts. 
+
+## QUESTION 4: Calculate the 95% confidence interval for the odds ratio for discountyes.
+
+```{r}
+odds.ratio(ml, level = 0.95)
+```
+
+The 95% confidence interval means that ["if the same population were sampled on numerous occasions and confidence interval estimates were made on each occasion, the resulting intervals would contain the true population parameter in approximately 99% of the cases, assuming that there were no biases or confounding"](https://sphweb.bumc.bu.edu/otlt/mph-modules/ep/ep713_randomerror/ep713_randomerror4.html). Next, I plot a mosaic plot.
+
+
+
+## QUESTION 5: Mosaic Plot
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.cap = "Mosaic Plot", fig.width = 5, fig.height = 5}
+ggplot(data = web_data) +
+        
+  geom_mosaic(aes(x = product(discount), fill = conversion), show.legend = FALSE) + 
+        
+  labs(title='Mosaic Plot: Conversion versus Discount',
+       
+       x = "Discount") +
+        
+        scale_fill_brewer(palette = 4) +
+        
+        facet_wrap(~source)
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+The mosaic plot shows that when customers search for a website and the website has a discount, then there is a higher probability of conversion. Access through direct link also shows a similar pattern but not as large as that for search. When consumers access a website via ads, the rate of conversion does not vary depending on discount. 
+
+## QUESTION 6: Model 2 - Conversion, Discount and Source
+
+In this section, I run a regression model using two independent variables; discount and source. 
+
+```{r}
+m2 <- glm(factor(conversion) ~ factor(discount) + factor(source), 
+          
+          data = web_data, 
+          
+          family = binomial)
+
+summary(m2)
+
+```
+
+The coefficients for source direct and source search are positive but less than one. It means that compared to ads, there is a higher and significant likelihood for sites accessed directly or through search to convert. 
+
+## QUESTION 7: Odds Ratio
+Next, I compute the odds ratio. 
+
+```{r}
+odds.ratio(m2)
+```
+
+The coefficients for discount and source are statistically significant. Compared to websites without discounts, websites with a discount are 3 times more likely to convert after controlling for source. Likewise, after controlling for discounts, websites accessed through a search or direct link are twice as likely to convert compared to websites accessed through ads.  
+
+## QUESTION 8: Model 3: Conversion, Discount and Source with Interaction Term
+
+In this section, we run a regression of conversion against discounts and source with an interaction term. 
+
+```{r}
+m3 <- glm(factor(conversion) ~ factor(discount) + factor(source) + 
+            
+            factor(discount):factor(source), data = web_data, family = binomial)
+
+summary(m3)
+```
+
+There is a positive and significant relationship for the interaction terms which means that the effect of a discount varies depending on the source of the customer; ad, direct or search. For instance, if the website has a discount and customer arises from the source `direct`, then this customer has `r (0.0522 + 0.3044)` higher log-odds of converting compared to a website with no discount. 
+
+## QUESTION 9: Log Odds
+I compute the odds ratios and confidence intervals.
+
+```{r}
+odds.ratio(m3, level = 0.95)
+```
+
+The 95% confidence interval means that ["if the same population were sampled on numerous occasions and confidence interval estimates were made on each occasion, the resulting intervals would contain the true population parameter in approximately 99% of the cases, assuming that there were no biases or confounding"](https://sphweb.bumc.bu.edu/otlt/mph-modules/ep/ep713_randomerror/ep713_randomerror4.html).
+
+## QUESTION 10: Model 4: Logistic Regression of all Variables and Interaction
+
+I run a logistic regression using all available variables including an interaction between discount and source. The regression shows the following coefficients to be significant.
+
+- Source: Direct: This variable has a positive and significant relationship with the rate of conversion.
+
+- Discount(yes) and source(search): Again this interaction has a positive relationship with the rate of conversion.
+
+- The intercept is also significant.
+
+```{r}
+m4 <- web_data %>% 
+        
+        mutate(discount = factor(discount),
+               
+               conversion = factor(conversion),
+               
+               source = factor(source),
+               
+               country = factor(country)) %>% 
+        
+glm(conversion ~ . + discount:source, data = ., family = binomial)
+
+summary(m4)
+```
+
+## QUESTION 11: Checking for Multicollinearity Between Pages Visited and Total Duration
+
+I run correlation between the `total pages visited` and `visit duration` below. The analysis shows a perfect positive correlation between the two variables. This high correlation would lead to multicollinearity in the model. Multicollinearity causes instability in model coefficient estimates and unintuitive relationships. However, it does not affect the predictive capacity of the model. In this scenario, it would be best to drop one of the variables, in this case the `visit_duration` variable. 
+
+```{r}
+web_data %>% 
+        
+        select(total_pages_visited, visit_duration) %>% 
+        
+        cor()
+```
+
+
+## QUESTION 12: Model 4: Logistic Regression of all Variables Except `visit_duration` and Interaction
+
+In this section I run a regression analysis using all variables except `visit_duration` due to the high collinearity with pages visited. I also include an interaction term between discount and source. Compared to the previous model, `total_pages_visited` is a positive and significant driver of conversion. This observation is in contrast with the previous model where pages visited had a negative and insignificant effect on conversion. 
+
+```{r}
+m5 <- web_data %>% 
+        
+        mutate(discount = factor(discount),
+               
+               conversion = factor(conversion),
+               
+               source = factor(source),
+               
+               country = factor(country)) %>% 
+        
+        select(-visit_duration) %>% 
+        
+glm(conversion ~ . + discount:source, data = ., family = binomial)
+
+summary(m5)
+```
+
+## QUESTION 13: Visualising Odds Ratios
+Figure () shows the odds ratios plot. Total pages visited has the narrowest confidence interval indicating a high level of statistical significance. 
+
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.cap = "Odds Ratio Plots", fig.height=6, fig.width=10}
+odds_plot(m5, title = "Odds Ratio Plot")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+## QUESTION 14: Prediction Using Model m5
+I use model m5 to predict the probability of conversion. The mean probability of conversion is 0.18. 
+
+```{r}
+base_prob <- predict(m5, type = "response")
+mean(base_prob)
+```
+
+Next, I classify the users into those that convert versus those that do not convert.
+
+## QUESTION 15: Classifying Users: Converters versus Non-Converters
+
+using a threshold of 0.5, the model predicts that only 1358 people will convert compared to 23,688 that do not convert. 
+
+```{r}
+web_data %>% 
+        
+        bind_cols(base_prob) %>% 
+        
+        mutate(pred_conversion = if_else(base_prob >= 0.5, "yes", "no")) %>% 
+        
+        count(pred_conversion)
+```
+
+
+## QUESTION 16: Computing Accuracy
+
+The accuracy of the model is 0.842. However, this metric is misleading due to data imbalance. Note that in the dataset we have a large number of consumers that do not convert. Hence, if we predicted all consumers will not convert, without even using a model, we would have a high accuracy rate. 
+
+```{r}
+web_data %>% 
+        
+        bind_cols(prob = base_prob) %>% 
+        
+        mutate(pred_conversion = if_else(prob >= 0.5, "yes", "no")) %>% 
+        
+        mutate(conversion = factor(conversion),
+               
+               pred_conversion = factor(pred_conversion)) %>% 
+        
+        conf_mat(truth = conversion, estimate = pred_conversion) %>% 
+        
+        summary() %>% 
+        
+        filter(.metric == "accuracy")
+```
+
+
+## QUESTION 17: Area Under Curve (AUC)
+
+In this section, I compute the area under curve (`auc`). The AUC of 1 indicates a perfectly accurate model, while AUC of 0 connotes a perfectly inaccurate test. On the other hand, an AUC of 0.5 indicates a model with no discrimination [@mandrekar2010receiver]. 
+
+```{r}
+web_data %>% 
+        
+        bind_cols(prob = base_prob) %>% 
+        
+        mutate(pred_conversion = if_else(base_prob >= 0.5, "yes", "no")) %>% 
+        
+        mutate(conversion = factor(conversion),
+               
+               pred_conversion = factor(pred_conversion)) %>% 
+        
+        roc_auc(truth = conversion, prob)
+
+```
+
+I also plot a `roc_auc_curve` to visualize the area under curve. The output shows that our model fares much worse than guessing which customer will convert. 
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r, fig.cap = "ROC AUC Curve", fig.height=6, fig.width=10}
+web_data %>% 
+        
+        bind_cols(prob = base_prob) %>% 
+        
+        mutate(pred_conversion = if_else(base_prob >= 0.5, "yes", "no")) %>% 
+        
+        mutate(conversion = factor(conversion),
+               
+               pred_conversion = factor(pred_conversion)) %>% 
+        
+        roc_curve(truth = conversion, prob) %>% 
+        
+        autoplot() + labs(title = "ROC Curve for Model M5")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+## QUESTION 18: Lift After Increasing Pages Visited by Customer by One Page
+
+In this section, I make a prediction using the original data with a slight change; the total pages visited by a customer increase by one unit. Without this change, the mean probability of conversion was 0.18. After enacting the change, the mean probability of a customer converting rises to 0.23. 
+
+```{r}
+new_prob <- web_data %>% 
+        
+        mutate(total_pages_visited = total_pages_visited + 1) %>% 
+        
+        predict(m5, newdata = ., type = "response") 
+        
+mean(new_prob)
+```
+
+
+The lift metric is 0.54. The lift metric consists of two parts; the first part is the ratio of "yes" in the predictions, that is, the number of yes divided by total rows in the dataset. The second part is the ratio of the actual "yes" in the data to the total rows in the dataset. Once we divide these two ratios we get the lift. 
+
+```{r}
+lift_data <- web_data %>% 
+        
+        mutate(my_lift = if_else(new_prob >= 0.5, "yes", "no"))
+
+lift_a <- lift_data %>% filter(my_lift == "yes") %>% count() %>% pull(n) / nrow(web_data)
+
+lift_b <- lift_data %>% filter(conversion == "yes") %>% count() %>% pull(n) / nrow(web_data)
+
+lift_a / lift_b
+```
+

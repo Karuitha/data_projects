@@ -1,0 +1,17 @@
+# **The Data**
+
+This dataset ([source](https://www.kaggle.com/itssuru/loan-data)) consists of data from almost 10,000 borrowers that took loans - with some paid back and others still in progress. It was extracted from lendingclub.com which is an organization that connects borrowers with investors. We've included a few suggested questions at the end of this template to help you get started.
+
+## ***Understanding the Data***
+The dataset has `r nrow(loans)` rows and `r ncol(loans)` variables. Table () below describes the variables. 
+
+```{r, echo = FALSE}
+library(tibble)
+tribble(~ Variable, ~ Class, ~ Description,
+        "Credit_policy", "Numeric", "1 if the customer meets the credit underwriting criteria, and 0 otherwise.", "Purpose", "Character", "The purpose of the loan. One of: small business, major purchase, home improvement, educational, debt_consolidation, credit card, and all other types lumped together", "Int_rate (Interest Rate)", "Numeric", "The interest rate of the loan (more risky borrowers are assigned higher interest rates", "Installment", "Numeric", "The monthly installments owed by the borrower if the loan is funded.", "log_annual_inc", "Numeric", "The natural log of the self-reported annual income of the borrower.", "dti", "Numeric", "The debt-to-income ratio of the borrower (amount of debt divided by annual income).", "fico", "Numeric", "The FICO credit score of the borrower.", "days_with_cr_line", "Numeric", "The number of days the borrower has had a credit line.", "revol_bal", "Numeric", "The borrower's revolving balance; the amount unpaid at the end of the credit card billing cycle.", "revol_util", "Numeric", "The borrower's revolving line utilization rate; the amount of the credit line used relative to total credit available.", "inq_last_6mths", "Numeric", "The borrower's number of inquiries by creditors in the last 6 months.", "delinq_2yrs", "Numeric", "The number of times the borrower had been 30+ days past due on a payment in the past 2 years.", "pub_rec", "Numeric", "The borrower's number of derogatory public records.", "not_fully_paid", "Numeric", "1 if the loan is not fully paid; 0 otherwise.") %>% 
+  
+  kableExtra::kbl(., booktabs = TRUE, caption = "Variables Description") %>% 
+  
+  kableExtra::kable_classic(full_width = TRUE, lightable_options = "striped")
+```
+

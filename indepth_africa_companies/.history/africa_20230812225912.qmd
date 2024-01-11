@@ -1,0 +1,15 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+```{python}
+africa = pd.read_excel("africa250.xlsx")
+```
+

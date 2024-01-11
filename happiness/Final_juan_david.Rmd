@@ -1,0 +1,388 @@
+---
+title: "**Happiness and Television Consumption**"
+subtitle: "***What is the Relationship Between Individual Happiness and TV Consumption in Germany?***"
+author:
+  - name: John Karuitha
+    orcid: 0000-0002-8204-7034
+    email: jkaruitha@karu.ac.ke
+    affiliations:
+      - name: Karatina University, School of Business
+        address: P.O. Box 1957-00100
+        city: Karatina
+        state: Kenya
+        postal-code: 10101
+      - name: Graduate School of Business Administration, University of the Witwatersrand
+        address: 2nd St Davids Pl & St Andrew Rd, Parktown
+        city: Johannesburg
+        state: South Africa
+        postal-code: 2193
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    number_depth: 3
+    code_folding: hide
+    toc_title: "Contents"
+    theme: journal
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+bibliography: Final_juan_david_refs.bib 
+csl: juan.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+options(scipen = 999)
+options(digits = 3)
+```
+
+# **Introduction**
+
+In this analysis, we use data from [the Socio-Economic Panel (SOEP)](https://www.diw.de/sixcms/detail.php?id=875914) to examine the relationship between happiness and the hours of television that respondents watch ^[The description of the variables is available on this [site](http://companion.soep.de/Topics%20of%20SOEPcore/Family%20and%20Social%20Networks.html) or link <http://companion.soep.de/Topics%20of%20SOEPcore/Family%20and%20Social%20Networks.html>]. The motivation for the analysis is that maximizing happiness is the key goal of human existence [@doi:10.1504/IJHD.2012.050833; @singh2023health]. 
+
+Humans derive happiness from a diverse range activities and life situations. Among the variables associated with happiness include mental, emotional and physical health [@zhang2019systematic], work-life balance, nurturing social relationships for self and others and the harmony with one’s culture, traditions, community, religion, and environment [@singh2023health]. The extent to which each of these variables affects happiness varies with individuals [@ali2020happiness].
+
+```{r packages}
+if (!require(pacman)) {
+  install.packages("pacman")
+}
+
+p_load(
+  tidyverse, performance,
+  janitor, GGally, psych,
+  skimr, gt, kableExtra, styler,
+  haven, doParallel, naniar,
+  ggthemes, Amelia, plotly,
+  nnet, patchwork
+)
+
+## Create a parallel computing cluster
+cl <- makePSOCKcluster(2)
+registerDoParallel(cl)
+
+## Set a theme for plots
+theme_set(ggthemes::theme_clean() +
+  theme(axis.text = element_text()))
+```
+
+At the macro-level, the drivers of happiness as captured in the [World Happiness Report 2023](https://worldhappiness.report/) include social support, income (per capita income), health (access to quality health care), independence (personal freedoms), generosity, and lack of corruption [@clark2017key; @helliwell2023world]. The report ranks Scandinavian countries as the happiest with poor, conflict and corruption prone countries like Afghanistan and Somalia at the bottom ^[You can access the country-level happiness ranking on this [site](https://www.theglobaleconomy.com/rankings/happiness/) or link <https://www.theglobaleconomy.com/rankings/happiness/>]. 
+
+We define the terms happiness and TV consumption as follows.
+
+- Happiness: I follow the [Oxford dictionary definition of happiness](https://www.oxfordlearnersdictionaries.com/definition/english/happiness). The state of being satisfied that something is good or right. Happiness is hence synonymous with satisfaction. 
+
+- TV Consumption: How often a respondent watches television in a  week. This metric is categorical varying from watching TV `Daily` to `never` watching TV.
+
+# **Main**
+
+In this section, I load and clean the data and perform data exploration and analysis.
+
+## **Data**
+
+As noted earlier, the data comes from [SOEP]( https://www.diw.de/sixcms/detail.php?id=875914). It is from this data that I pick the variables of interest. Again, the analysis explores the relationship between happiness and television consumption. Consequently, happiness and television consumption are the primary variables. However, I also include some control variables. I define these variables next. 
+
+## **Variables**
+
+I select the variables defined in Table 1 below based on the review of literature. Researchers have linked mental, emotional and physical health [@zhang2019systematic], work-life balance, nurturing social relationships for self and others and the harmony with one’s culture, traditions, community, religion, and environment [@singh2023health] to happiness. 
+
+```{r variables}
+tribble(
+  ~Variable, ~Description,
+  "happy", "Frequency of being happy in the last 4 weeks from 1: very rare to 5: very often",
+  "tv", "Hours per week on tv from 1: Daily to 5: Never",
+  "mcs", "Summary Scale Mental: Mental Health Indicator", "pcs", "Summary Scale Physical: Physical Health Indicator", "sf_nbs", "Social functioning: Indicator of the state of social life", "sex_v1", "Gender of Individual from 1: Male to 2: Female", "income", "Gross salary as employee Amount previous year"
+) %>%
+  kbl(caption = "Variables Description") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+## **Data Management**
+
+I read into R the following data sets that contain the variables of interest. 
+
+- jugendl.
+- Health.
+- pl.
+
+```{r read_data}
+jugendl <- read_dta("jugendl.dta")
+health <- read_dta("health.dta")
+pl <- read_dta("pl.dta")
+```
+
+Next, I clean up the data by coding missing values and extracting relevant values. We start with jugendal data.
+
+```{r clean_jug_data}
+dt1 <- jugendl %>%
+  select(pid, jl0383, sex_v1, jl0088) %>%
+  ## Extract codes from happiness and sex
+  mutate(jl0383 = str_extract(jl0383, "^-?\\d{1}$")) %>%
+  mutate(sex_v1 = str_extract(sex_v1, "^-?\\d{1}$")) %>%
+  ## Rename column jl0383 to happy
+  rename(happy = jl0383, tv1 = jl0088) %>%
+  ## Convert to numeric
+  mutate(
+    pid = as.numeric(pid),
+    happy = as.numeric(happy),
+    sex_v1 = as.numeric(sex_v1)
+  ) %>%
+  ## Code missing values
+  mutate(sex_v1 = case_when(
+    sex_v1 %in% c(1, 2) ~ sex_v1,
+    .default = NA
+  )) %>%
+  mutate(happy = case_when(
+    happy >= 1 ~ happy,
+    .default = NA
+  )) %>%
+  ## Fill up sex as it barely changes
+  group_by(pid) %>%
+  fill(sex_v1, .direction = "updown") %>%
+  fill(sex_v1, .direction = "downup") %>%
+  ungroup() %>%
+  ## Filter for non-missing data
+  filter(happy >= 1) %>%
+  ## Convert variables to factors
+  mutate(sex_v1 = factor(sex_v1,
+    levels = c(1, 2),
+    labels = c("Male", "Female")
+  )) %>%
+  mutate(happy = factor(happy,
+    levels = 1:5,
+    labels = c(
+      "Very Rare", "Rare",
+      "Sometime", "Often",
+      "Very Often"
+    )
+  )) %>%
+  group_by(pid) %>%
+  fill(happy, .direction = "updown")
+
+head(dt1) %>%
+  kbl(caption = "Jugendl Dataset Extract") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+Next, I extract some variables from the health data. 
+
+```{r clean_health_data}
+dt2 <- health %>%
+  select(pid, mcs, pcs, sf_nbs, gh_nbs)
+
+head(dt2) %>%
+  kbl(caption = "Health Dataset Extract") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+Next, I get the data from the pl set of data.
+
+```{r clean_pl_data}
+## TV usage per week ----
+dt3 <- pl %>%
+  select(pid, pli0083, plb0471_h) %>%
+  rename(tv = pli0083, income = plb0471_h) %>%
+  ## Extract the code
+  mutate(tv = str_extract(tv, "^-?\\d{1}$")) %>%
+  ## Extract the salary
+  mutate(income = str_extract(income, "^-?\\d{1,5}$")) %>%
+  ## Convert tv to numeric
+  mutate(tv = parse_number(tv)) %>%
+  mutate(
+    pid = as.numeric(pid),
+    income = as.numeric(income)
+  ) %>%
+  mutate(tv = case_when(
+    tv < 1 ~ NA,
+    .default = tv
+  )) %>%
+  mutate(income = case_when(
+    income < 1 ~ NA,
+    .default = income
+  )) %>%
+  filter(tv >= 1, !is.na(tv)) %>%
+  ## Convert to factor
+  mutate(tv = factor(tv,
+    levels = 1:5,
+    labels = c(
+      "Daily",
+      "Weekly",
+      "Monthly",
+      "Rarely",
+      "Never"
+    )
+  ))
+
+head(dt1) %>%
+  kbl(caption = "Pl Dataset Extract") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+```{r join_data}
+final_data <- dt2 %>%
+  left_join(dt3, by = join_by(pid)) %>%
+  left_join(dt1, by = join_by(pid)) %>%
+  drop_na(tv, happy)
+
+# head(final_data)
+```
+
+```{r missing_values}
+final_data %>%
+  Amelia::missmap()
+```
+
+
+## **Sample**
+
+I pick a sample from the observations with complete cases for both TV consumption and happiness. These two are the main variables and hence it is sensible to pick a sample that has these observations in full.
+
+## **Data Visualizations and Data Analysis**
+
+### Summary Statistics {.tabset .tabset-pills}
+
+In this section, I summarize the data. I start by doing summary statistics for the entire data set.
+
+#### Numeric Summary
+
+```{r}
+final_data %>%
+  select(
+    where(is.numeric), -pid,
+    -starts_with("syear")
+  ) %>%
+  skimr::skim_without_charts() %>%
+  select(-n_missing, -skim_type) %>%
+  rename(
+    Mean = numeric.mean,
+    SD = numeric.sd,
+    Min = numeric.p0,
+    Q1 = numeric.p25,
+    Median = numeric.p50,
+    Q3 = numeric.p75,
+    Max = numeric.p100,
+    Variable = skim_variable
+  ) %>%
+  kbl(caption = "Summary Statistics") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+#### Non-Numeric Summary
+
+```{r}
+final_data %>%
+  select(where(is.factor)) %>%
+  skimr::skim_without_charts() %>%
+  select(-n_missing, -skim_type) %>%
+  kbl(caption = "Summary Statistics") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: https://paneldata.org/soep-core/")
+```
+
+
+#### Summary Chart
+
+```{r}
+final_data %>%
+  select(
+    -pid, -tv1,
+    -starts_with("syear")
+  ) %>%
+  GGally::ggpairs(mapping = aes(fill = happy))
+```
+
+### {-}
+
+Let us examine further the extent of happiness and how much TV respondents in the sample watch. We see that a lot more people watch TV daily compared to those that never watch TV. Proportionately, people who watch TV report a higher relative incidence of experiencing happiness (very often, often, sometimes). However, of people who experience happiness `often`, the larger proportion never watch TV. Panel C and D also tell the same story with happy people watching TV more frequently. 
+
+```{r}
+(final_data %>%
+  ggplot(mapping = aes(x = tv)) +
+  geom_bar(show.legend = FALSE) +
+  labs(
+    x = "", y = "Frequency",
+    title = "Watching TV"
+  ) +
+  final_data %>%
+  ggplot(mapping = aes(x = tv, fill = happy)) +
+  geom_bar(position = "fill") +
+  labs(
+    x = "", y = "",
+    title = "Watching TV"
+  ) +
+  scale_fill_colorblind()) /
+
+  (final_data %>%
+    ggplot(mapping = aes(x = happy)) +
+    geom_bar(show.legend = FALSE) +
+    labs(
+      x = "", y = "Frequency",
+      title = "Happiness"
+    ) +
+    final_data %>%
+    ggplot(mapping = aes(x = happy, fill = tv)) +
+    geom_bar(position = "fill") +
+    labs(
+      x = "", y = "",
+      title = "Happiness"
+    ) +
+    scale_fill_colorblind())
+```
+
+
+### Happiness vs TV Consumption {.tabset .tabset-pills}
+
+The heat map and numerical summary show the relationship between watching TV and happiness. The chart shows that people that express more happiness tend to watch mote TV than people that do not. The opposite is also true. This relationship does not imply causality as there could be some underlying factors that drive or mitigate this relationship.  
+
+#### Chart
+```{r}
+final_data %>%
+  count(happy, tv) %>%
+  ggplot(mapping = aes(
+    y = happy, x = tv,
+    fill = n
+  )) +
+  geom_tile() +
+  scale_fill_gradient(
+    low = "blue",
+    high = "red"
+  ) +
+  labs(
+    y = "Happiness",
+    x = "Watching TV",
+    title = "Happiness and Watching TV",
+    subtitle = "The graph shows that happy people watch more TV. This does not imply causality.",
+    caption = "Data Source: https://paneldata.org/soep-core/"
+  )
+```
+
+#### Table
+
+```{r}
+final_data %>%
+  count(happy, tv) %>%
+  kbl(caption = "Happiness and TV Consumption") %>%
+  kable_classic(full_width = FALSE) %>%
+  footnote(general = "Source: Author's Construction Using Data from https://paneldata.org/soep-core/")
+```
+
+### {-}
+
+
+# **Conclusion**
+
+In this analysis, I have examined the relationship between happiness and the extent to which people watch TV.  The analysis shows that people that watch more TV are, on average, happier than those people that do not watch as much TV. However, this relationship does not imply causality as there could be other underlying factors behind this relationship. Only an experimental approach could reasonably attribute such causality. 
+
+```{r}
+styler::style_file("Final_juan_david.Rmd")
+Sys.info()
+```
+
+
+# **References** {.unnumbered}

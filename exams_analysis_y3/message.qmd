@@ -1,0 +1,57 @@
+---
+title: "Incomplete Results, Year 3"
+author: "John Karuitha, PhD"
+format: pdf
+editor: visual
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+# **Issue**
+
+The following students have incomplete results. If you are on the list, could you please reach me on 0736917717 and clarify?
+
+If you did not sit for either CAT or FINAL EXAM or did not sit for both CAT and FINAL exam, just SMS me with that information (**and your admission number**), no need to call. Craft a message as follows;
+
+         
+>***Hi, I am **YOUR NAME** admission number **YOUR ADMISSION NUMBER**. I did NOT sit for CATs and exams in the following subjects.*** 
+
+
+But if it is indicated that you did not sit for a CAT when you know you wrote it please call. The same case applies for the final exams.
+
+See next page for the listing. Note that I have listed them by area of specialization.
+
+```{r}
+if(!require(pacman)){
+  install.packages('pacman')
+}
+
+p_load(tidyverse, janitor, readxl, rio, kableExtra)
+```
+
+\newpage
+
+```{r}
+read_csv("bis.csv") %>% 
+  kableExtra::kbl(caption = "Business Information Systems") %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = 'hold_position')
+```
+
+```{r}
+read_csv("accounting.csv") %>% 
+  kableExtra::kbl(caption = "Accounting") %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = 'hold_position')
+```
+
+\newpage
+
+```{r}
+read_csv("finance.csv") %>% 
+  kableExtra::kbl(caption = "Finance") %>% 
+  kable_classic(full_width = FALSE,
+                latex_options = 'hold_position')
+```

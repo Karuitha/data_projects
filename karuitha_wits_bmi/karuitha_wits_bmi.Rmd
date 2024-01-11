@@ -1,0 +1,404 @@
+---
+title: "BODY FAT"
+author: "John Karuitha"
+date: "`r format(Sys.Date(), '%A, %B %d, %Y')`"
+always_allow_html: true
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1]{fontenc}
+- \usepackage{amsmath}
+- \usepackage{subcaption}
+mainfont: firacode
+output:
+  pdf_document:
+    toc: true
+  prettydoc::html_pretty:
+    theme: hpstr
+  word_document: default
+  html_document:
+    theme: readable
+    highlight: haddock
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: FALSE
+    code_folding: hide
+bibliography: citation.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load( "knitr", "tidyverse", "tidyquant", "skimr", "gt", "ggthemes", "MASS", "readxl", "psych", "corrplot", "gvlma", "prettydoc", "kableExtra")
+
+options(digits = 4)
+
+library(tidyverse)
+library(tidyquant)
+library(skimr)
+library(gt)
+library(ggthemes)
+library(MASS)
+library(readxl)
+library(psych)
+library(corrplot)
+library(gvlma)
+library(prettydoc)
+```
+
+
+# **1 Introduction**
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+BodyFat4 <- read_excel("BodyFat4.xlsx")
+BodyFat4 <- BodyFat4 %>% 
+  
+  janitor::clean_names() 
+```
+
+The dataset `Bodyfat4` shows the body fat percentage for 252 individuals. There are 13 variables. First, there is an identifier variable (IDNO) that uniquely identifies each observation. The body fat (BODYFAT) content is the dependent variable. The remaining eleven (11) are the independent variables that could explain the variability of body fat among the different individuals. The dataset has no missing values. The task is to build a regression model that can be useful in explaining and predicting the body fat of individuals. The data analysis proceeds as follows. In the next section, I visualize the data and then present summary statistics. Next, I present the correlation analysis and then the results of the regression.
+
+# **2 Analysis and Interpretation of Results**
+In this section, we describe the data by generating summary statistics and a correlation matrix. We then visualize the data. 
+
+## **2.1 Descriptive Statistics**
+
+Table () below shows a summary of the variables. Among the dependent variables, the highest variability(SD- standard deviation) is observed between individuals' abdomen, age, and weight. For the dependent variable body fat, the mean is 18.9, with an unusual observation of zero body fat as the minimum value. Given that there is a base level of body fat necessary for humans to survive, this is a peculiar observation. For robustness, it would be advisable to drop this case.
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+BodyFat4 %>% 
+  
+  dplyr::select(-1) %>% 
+  
+  skim_without_charts() %>% 
+  
+  dplyr::select(-c(skim_type, n_missing)) %>% tibble() %>% 
+  
+  rename(Variable = skim_variable, Complete = complete_rate, 
+         
+         Mean = numeric.mean, SD = numeric.sd, Min = numeric.p0,
+         
+         Q1 = numeric.p25, Median = numeric.p50, Q3 = numeric.p75,
+         
+         Max = numeric.p100) %>% 
+  
+  kableExtra::kbl(., booktabs = TRUE, caption = "Summary Statistics") %>% 
+  
+  kableExtra::kable_classic(full_width = FALSE, font_size = 12) %>% 
+  
+  footnote(general = "Source: Author's construction from title",
+           
+           general_title = "")
+```
+
+## **2.2 Correlation Analysis**
+
+In this section, I present the pairwise plots for all the variables, excluding the identifier variable (IDNO). The upper part of the figure shows the pairwise correlation between the variables. The main diagonal shows the distribution of the respective variable. For instance, the plot on the intersection of the first row and the first column shows the distribution of the body fat (BODYFAT) variable. The lower half shows the scatter plots for each pair of variables.
+
+\blandscape
+
+Figure 3.1:
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width=9, fig.height=6}
+
+BodyFat4 %>% 
+  
+  GGally::ggpairs(columns = 2:13)
+```
+
+\elandscape
+
+Figure () below is an extension of Figure () above and visualizes the correlation between the variables with the circle sizes showing the size of the correlation while the colour shows the direction (positive or negative).The red colouring corresponds to negative correlation while blue shows positive correlation. White is neutral indicating little correlation in either direction. It is important to note that in interpreting this visualization, I am Ignoring the main diagonal (which is the correlation of a variable with itself).
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+corrplot(cor(BodyFat4[,-1]), type = "lower")
+```
+
+The correlation shows the high levels of correlation between most of the variables in the dataset. I focus on the dependent variables as a high degree of correlation between them leads to the problem of multicollinearity. Using a cut off of 0.7 that some researchers have used (). The correlation analysis shows 18 pairs of independent variables have a correlation beyond the threshold of 0.7. In the cases where correlation exceeds the threshold, the variables involved are Adiposity, weight, and abdomen (6 times each), knee, thigh and hip (5 times each), density (twice), and wrist (once). when we lower the threshold to 0.6, we get 25 pairs of variables with correlation between the threshold.
+
+Multicollinearity is a problem because the independent variables in a regression model should ideally be independent. If not, the regression coefficient estimates become unstable (that is they vary a lot). The reduced precision of the estimates reduces the predictive power of the model [@frost2019introduction]. Scholars have suggested several solutions to the multicollinearity problem. The first is to drop the variables that exhibit multicollinearity. The second common technique is to use principal component analysis (PCA) to generate a new set of new variables (called components) that are linear combinations of the original variables but that have low correlation between them. In the next section, I describe and run the principal components analysis.
+
+## **2.3 Principal Components Analysis (PCA)**
+
+Principal components analysis (PCA) is a technique for dimension reduction, increasing interpretability while minimizing the loss of information [@jolliffe2016principal]. PCA is especially useful where there are many variables in a dataset or as in this case where variables are highly correlated. The dimensions of the body fat dataset could be reduced to get rid of the highly correlated dependent variables by creating a new set of fewer variables called principle components that are not correlated. The principal components are linear combinations of the original variables that capture much of the variation in the original dataset. In this section, I construct principal components and discuss the applicability and limitations of the PCA analysis.
+
+### **2.3.1 Running PCA**
+
+PCA is sensitive to differences in scale between the variables used. Hence, it is recommended to first scale the variables [@7835187]. In this case, I scale the variables by subtracting the mean and dividing by the standard deviation.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+pca <- BodyFat4[,3:13] %>% prcomp(scale. = TRUE, center = TRUE)
+pca[1]
+pca[2] %>% 
+  
+  kableExtra::kbl(., booktabs = TRUE, caption = "Principal Components") %>% 
+  
+  kableExtra::kable_classic(full_width = FALSE, font_size = 12) %>% 
+  
+  footnote(general = "Source: Author's construction from title",
+           
+           general_title = "")
+  
+  
+```
+
+Note that the PCA allows us to deal with the problem of correlation between variables. Table () below shows that the correlations between the principal components is now zero.
+
+\blandscape
+
+```{r echo=FALSE, fig.height=6, fig.width=9, message=FALSE, warning=FALSE}
+pca$x %>% 
+  
+  data.frame() %>% 
+  
+  GGally::ggpairs()
+```
+
+
+\elandscape
+
+### **2.3.2 Composition of PCA**
+
+The PCA output has two components
+
+-   Rotations
+
+Table () shows the rotations where the original variables have reduced to the 11 principal components. As an example, principal component one (PC1) is formed by combining the respective variables using the weights given.
+
+PC1 = -0.27 x density + 0.02 x age + ........... + 0.34 x knee
+
+Note that I have rounded the coefficients to 2 decimal places.
+
+-   Standard Deviations and importance of components
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+summary(pca) 
+```
+
+The standard deviation refers to the variability of the data along a principal component. The proportion of variance is the proportion of total variability in the data captured by the first principal component. For instance, principal component 1 accounts for 60.37% (0.6037) of the data. The cumulative proportion sums up the variability captured by the respective principal components. In column 3, for instance, PC1, PC2, and PC3 together account for 89.951% (0.83951) of the variation in the data. Similarly, the first two principal components capture 74.5% of the variation in the data. In the figure () below, I visualize the proportion of variance explained away by the respective principal component (on the x-axis), starting with PC1. The figure illustrates that PC1 and PC2 account for most of the variability in the data. However, the other principal components also do account for a significant but smaller proportion.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+plot(pca, type = "l", main = "Principal Component Analysis")
+```
+
+### **2.3.3 Exploring the Principal Components**
+
+Given that the first two principal components account for almost 75% of the variation, I will explore them more. I extract the principal components and attach them to the dataset BodyFat. Plotting PC1 against PC2 shows that PC2 captures people with higher body fat compared to PC1. For ease of comparison, I categorize individuals into four categories according to the level of body fat.
+
+-   Low: 0 to 10 inclusive
+
+-   Medium: Greater than 10 but less than or equal to 20.
+
+-   High Greater than 20 but less than or equal to 30.
+
+-   Very high: Greater than 30.
+
+\blandscape
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
+BodyFat4 <- BodyFat4 %>% 
+  
+  bind_cols(pca$x %>% data.frame())
+
+BodyFat4 <- BodyFat4 %>% 
+  
+  mutate(Body_Fat_Level = case_when(
+    
+  bodyfat >= 0 & bodyfat <= 10 ~ "Low", 
+  bodyfat > 10 & bodyfat <= 20 ~ "Medium",
+  bodyfat > 20 & bodyfat <= 30 ~ "High", 
+  TRUE ~ "Very high"
+))
+
+BodyFat4$Body_Fat_Level <- factor(BodyFat4$Body_Fat_Level, ordered = TRUE, levels = c("Low", "Medium", "High", "Very high"))
+
+BodyFat4 %>% ggplot(aes(x = PC1, y = PC2, col = Body_Fat_Level)) + geom_point() + 
+  labs(title = "Visualization of First Two Principal Components") + 
+  theme(legend.title = element_text("Body Fat")) + tidyquant::theme_tq()
+```
+
+\elandscape
+
+I also visualize each of the principal components faceted by the `Body_Fat_Level` defined above. 
+
+\blandscape
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height=6, fig.width=9}
+BodyFat4 %>% .[,-c(1:13)] %>% 
+  
+  pivot_longer(cols = starts_with("PC"), 
+               
+               names_to = "prcomp", values_to = "value") %>% 
+  
+  ggplot(aes(x = reorder(prcomp, value, sd), 
+             
+             y = value, fill = Body_Fat_Level)) +
+  
+  geom_boxplot() + 
+  
+  labs(x = "Principal Components", 
+       
+       title = "Contributions of Principal Componets in Explaining Variance") + 
+  
+  ggthemes::theme_economist()
+```
+
+\elandscape
+
+lastly, we examine the correlation between PC1, PC2 and PC3 and the variables of BodyFat dataset. Table () shows that PC1 has very high correlation with most of the variables. For instance, PC1 has a correlation greater than 0.7 (absolute value) with 7 of the 11 independent variables. PC2 is not so strong but still has a correlation above 0.6 (absolute) with 2 variables, while PC3 has a correlation greater than 0.6 with one variable. In this case, it appears like PC1 and PC2 are adequate to capture most of the variability in the data.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+cor(BodyFat4[, 3:13], BodyFat4[,14:16]) %>% knitr::kable()
+```
+
+## **2.4 Regression Analysis**
+
+In this section, I start by doing a forward stepwise regression followed by the required backward stepwise regression. Forward stepwise regression starts with no independent variables in the model and iteratively adds predictors that are the most significant. The process stops when the improvement is no longer statistically significant. On the contrary, the backward stepwise regression starts with all the independent variables in the model and removes the least contributing variables until all variables remaining are significant [@bruce2020practical][@james2013introduction].
+
+### **2.4.1 Forward Stepwise Regression**
+
+I include the forward stepwise selection method for purposes of comparison. Note that the optimal model here includes all variables, although only the density is significant. Overall, the model captures 97.74% of the variation in body fat (see adjusted R squared in the table below).
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Fit full model
+forward.full.model <- lm(bodyfat ~ density + age + weight + height + adiposity + 
+                           thigh + abdomen + ankle + hip + wrist + knee, 
+                           data = BodyFat4)
+
+# Do forward selection
+forward.step.model <- step(forward.full.model, direction = "forward", 
+                      trace = TRUE)
+
+summary(forward.step.model)
+```
+
+### **2.4.2 Backward Stepwise Regression**
+
+As noted, backward step selection begins with all the variables in the model and iteratively removes the least contributive ones. The Akaike Information Citerion (AIC) informs the selection of the best model, with the optimal model being the one with the least AIC. The series of tables below show the procedure (note the AIC value stated at the beginning of each model). In the end, the model consisting of density, age, and abdomen as independent variables has the least AIC (75.39). Note that the model selected in this case is as follows ;
+
+bodyfat = 0.041 - (0.038 \* density) + (9.51 \* age) + (0.048 \* abdomen)
+
+The AIC captures the extent to which the model fits the data without being overly complex. Complexity refers to the number of parameters in the model and fittingly, AIC is the difference between the number of parameters in the model (k) and the maximum value of the likelihood function of the model (L).
+
+AIC = (2 \* k ) - (2 \* ln(L)), where ln stands for natural log.
+
+The central idea of AIC is to balance between fitting the data and the need not to overfit the dataset [@portet2020primer].
+
+The model is captured at the bottom of the series of tables. In the model, only age is not significant at 10% significance level. As expected, the model explains 97.79% of the variation in body fat - the adjusted R-Squared - which is a high level of in sample sensitivity. The adjusted R-Squared derives from the R-squared, a goodness-of-fit measure for linear regression models that indicates the percentage of the variance in the dependent variable that the independent variables explain collectively [@frost2019regression]. Like the AIC, the adjusted R-squared penalizes the R-squared as the model gets more complex, that is, gets more predictors.
+
+In our body fat case, body fat is negatively related to body fat. Specifically, for every one unit increase in density, body fat reduces by 0.038 units (rounded to two decimal places). Abdomen relates positively with body fat with a one unit rise in abdomen associated with 0.048 units rise in body fat. Although not significant at 10%, age has a positive relationship with body fat, with a one unit increase in age associated with a 9.5 units rise in body fat, a relatively large amount.
+
+Furthermore the model as a whole is highly significant going by the F-test . The F-test of overall significance tests how well the linear regression model better fits the data compared to a model that has no independent variables or in other words where the coefficients of the independent variables are all zero. In out case the F-test is highly significant meaning that the model better explains the model better than a model with no predictors. If our model fits the data just as well as a model with no predictors, then the F\_statistic should be close to one. In this case it is 3703.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Fit full model
+backward.full.model <- lm(bodyfat ~ density + age + weight + height + adiposity + 
+                           thigh + abdomen + ankle + hip + wrist + knee, 
+                           data = BodyFat4)
+
+# Do forward selection
+backward.step.model <- step(backward.full.model, direction = "backward", 
+                      trace = TRUE)
+
+summary(backward.step.model)
+```
+
+### **2.4.3 Checking the Regression Assumptions**
+
+In this section, I work with the regression model selected in section 5 above- which uses density, age and abdomen as independent variables. The regression has five key assumptions:
+
+-   *Linear relationship*: here, the assumption is that the relationship between the dependent and the independent variables is linear. a visual inspection of the figure 3.1 (see section 3) shows that with the exception of age, the relationship between body fat and the independent variables is approximately linear. Furthermore in the figure below, the plot titled residuals versus fitted also largely coloborates the linear relationship between dependent and independent variables.
+
+-   *Multivariate normality*: The presumption here is that all variables are multivariate normal. I check this assumption with the normal QQ-plot below. In this case, the plotted residuals versus theoretical quantiles show that the assumption is reasonably met as they lie on approximately the straight line.
+
+-   *No or little multicollinearity*. There appears to be a violation of this assumption as density and abdomen have a high negative correlation coefficient.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+cor(BodyFat4[,3], BodyFat4[,c(4, 9)]) %>% knitr::kable()
+```
+
+
+In this case, **I remove the least contributive variable**, abdomen, and rerun the model.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+lm(bodyfat ~ density + age, data = BodyFat4) %>% summary()
+```
+
+Note that this simplified model consisting of density and age (to the exclusion of abdomen) captures most of the information. The adjusted R-squared is 97.64% compared to 97.79% of the previous model that included abdomen. Age remains insignificant in both cases (10% significant level).
+
+-   *No auto-correlation*: The data has not time element so we do not evaluate this assumption.
+
+-   *Homoscedasticity*: In the figure below, the graph titled "scale location" provides a useful assessment of how residuals are evenly spread across the predictors. In this case, the roughly horizontal fit line indicates that the residuals are homoscedastic.
+
+Another important issue arising here is that of some influential observations (outliers) the graph titled residuals versus leverage shows. In this case, there is an influential observation that may affect our inferences.
+
+```{r}
+plot(backward.full.model)
+```
+
+
+### **2.4.4 Hypothesis Tests for the Parameters**
+The final model selected is as folows.
+
+bodyfat = a + b1(density) + bn(factor(age_group)) + error
+
+where a is a constant and b1 and bn are respective coefficients. Note that bn coefficients will be for each of the categories representing age less the reference category (age 22 years). I test the foloowing hypothesis. 
+
+- For density: NULL: b1 = 0, versus alternative b1 != 0
+P-value is close to zero meaning that there is very little probability that the null hypothesis is true. having failed to accept the null hypothesis we go with the alternative hypothesis.
+
+- For age: NULL: bn = 0, versus alternative bn != 0
+Likewise, for each age category, the probabilities are quite large (> 10%). Hence in this case we accept the null hypothesis that age is not a significant determinant of body fat.
+
+- The overall model fit: The F-test
+As noted the F-test evaluates whether our model does better than a model with no predictors. As a ratio, if our model does just as well as that with no predictors, the F-ratio would be close to one.
+
+NULL: b1 = bn = 0
+Alternative: b1 != 0 and bn != 0
+
+The F-statistic is 274.6 and the p-value is close to zero, meaning that we cannot accept the null hypothesis and hence go with the alternative hypothesis that our model is better than a model with no predictors. 
+
+The associated degree of freedom in our case are 51 and 200.
+
+### **2.4.5 The Final Model- Making age a Categorical Variable**
+One of the steps in selecting the model is dropping one of the independent variable, abdomen, that is highly related to another independent variable, density. A final procedure is to convert age to a categorical variable. Technically, age is a continuous variable measured on a ratio scale as we have a true zero for age. Age maybe considered discrete because of the way it is measured. Specifically, age suffers from the "discretization" problem where people do not record their exact age, preferring instead to round up to the nearest year. In the case of body fat, the effect of age on body fat may not be apparent at exact age points but on a range of age groups. We could say, for instance that people between ages 20-30 years have lower body fat than those between 30 - 40 years. In this case, I translate the age to a categorical variable and re-run the analysis. The analysis shows that encoding age as a categorical variable does improve the model to one with an adjusted R-squared of 97.64%. Thus the model with density and age explains 97.64% of the variation in body fat. 
+
+I encode the age variable into the following categories and rerun the regression model;
+20 - 29 year
+30 - 39 years
+40 - 49 years
+50 - 59 years 
+Over 60 years
+
+I call the new variable age_group. 
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+BodyFat4 <- BodyFat4 %>% 
+  
+  mutate(age_group = case_when(
+  age >= 20 & age <= 29 ~ "20-29", 
+  age >= 30 & age <= 39 ~ "30-39", 
+  age >= 40 & age <= 49 ~ "40-49", 
+  age >= 50 & age <= 59 ~ "50-59", 
+  TRUE ~ "Over 60"))
+
+lm(bodyfat ~ density + factor(age_group), data = BodyFat4) %>% summary()
+```
+
+
+### **2.4.6 Interpreting the Results**
+For the final model that consists of density and age (coded as factors) the interpretation of the results is as follows. 
+
+Density: Density is a significant determinant of body fat. Age also appears to be an important factor but is not significant. Although abdomen is significant, density alone appears to subsume the effects of abdomen. 
+
+# **Limitations**
+Disusss limitations here - for instance is the dataset too small? Can we generalize this to the whole world given genetic differences? You are the expert in the area so you should get the limitations in the books.
+
+# **3 Conclusion**
+Overall it appears that the best predictors of body fat are density and age. However, only density is significant, with a 1 unit rise in density associating with a 401 unit decrease in body fat. 
+
+# **References**

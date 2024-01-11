@@ -1,0 +1,1508 @@
+month,year,source,lender_type,outstanding_debt_start,outstanding_debt_end,borrower
+May,2014,Banco Nacional De Comercio Exterior,c,1588000,1059000,central government
+May,2014,Government of Venezuela,m,177348000,223035000,central government
+May,2014,Kuwait Fund for Arab Economic Development,b,20530000,19771000,central government
+May,2014,Republic Of China,b,280733000,270887000,central government
+May,2014,Caribbean Development Bank,m,206511000,207327000,central government
+May,2014,Caricom Development Fund,m,3936000,3736000,central government
+May,2014,European Economic Community,m,13071000,12704000,central government
+May,2014,Inter-American Development Bank,m,239973000,235692000,central government
+May,2014,International Fund for Agricultural Development,m,2113000,2430000,central government
+May,2014,International Bank for Reconstruction and Development,m,23766000,23153000,central government
+May,2014,Opec Fund for International Development,m,39166000,39610000,central government
+May,2014,Central American Bank For Economic Integration,m,8212000,9624000,central government
+May,2014,Bank of New York,c,1053004000,1053004000,central government
+April,2012,Banco Nacional De Comercio Exterior,c,3705000,3176000,central government
+April,2012,Government of the United States,m,748000,568000,central government
+April,2012,Government of Venezuela,m,37492000,37133000,central government
+April,2012,Kuwait Fund for Arab Economic Development,b,20350000,19948000,central government
+April,2012,Republic Of China,b,280740000,273380000,central government
+April,2012,Caribbean Development Bank,m,199235000,198183000,central government
+April,2012,European Economic Community,m,13795000,13897000,central government
+April,2012,Inter-American Development Bank,m,220755000,222071000,central government
+April,2012,International Fund for Agricultural Development,m,2192000,1937000,central government
+April,2012,International Bank for Reconstruction and Development,m,19539000,19351000,central government
+April,2012,Opec Fund for International Development,m,17645000,17478000,central government
+April,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+April,2012,Bear Stearns & Company,c,5916000,5916000,central government
+April,2012,Bank of New York,c,1087613000,1087613000,central government
+April,2011,Banco Nacional De Comercio Exterior,c,4764000,4235000,central government
+April,2011,Government of the United States,m,1096000,924000,central government
+April,2011,Government Of Trinidad And Tobago,m,0,0,central government
+April,2011,Government of Venezuela,m,39148000,38732000,central government
+April,2011,Kuwait Fund for Arab Economic Development,b,16930000,16868000,central government
+April,2011,Republic Of China,b,280884000,273789000,central government
+April,2011,Caribbean Development Bank,m,188939000,186925000,central government
+April,2011,European Economic Community,m,14775000,16412000,central government
+April,2011,European Investment Bank,m,91000,102000,central government
+April,2011,Inter-American Development Bank,m,205922000,218451000,central government
+April,2011,International Fund for Agricultural Development,m,1408000,1739000,central government
+April,2011,International Bank for Reconstruction and Development,m,22795000,20631000,central government
+April,2011,Opec Fund for International Development,m,13782000,14108000,central government
+April,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+April,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+April,2011,Heritage International Bank & Trust,c,0,0,central government
+April,2011,Bear Stearns & Company,c,5916000,5916000,central government
+April,2011,Bank of New York,c,1087613000,1087613000,central government
+December,2010,Banco Nacional De Comercio Exterior,c,5844000,4764000,central government
+December,2010,Government of the United States,m,1735000,1096000,central government
+December,2010,Government Of Trinidad And Tobago,m,4000,0,central government
+December,2010,Government of Venezuela,m,39527000,39148000,central government
+December,2010,Kuwait Fund for Arab Economic Development,b,18293000,16930000,central government
+December,2010,Republic Of China,b,281148000,280884000,central government
+December,2010,Caribbean Development Bank,m,171036000,188939000,central government
+December,2010,European Economic Community,m,16917000,14775000,central government
+December,2010,European Investment Bank,m,196000,91000,central government
+December,2010,Inter-American Development Bank,m,204450000,205922000,central government
+December,2010,International Fund for Agricultural Development,m,877000,1408000,central government
+December,2010,International Bank for Reconstruction and Development,m,30446000,22795000,central government
+December,2010,Opec Fund for International Development,m,14514000,13782000,central government
+December,2010,Central American Bank For Economic Integration,m,0,980000,central government
+December,2010,Manufacturers & Traders Trust Co.,c,2595000,865000,central government
+December,2010,Heritage International Bank & Trust,c,1e+06,0,central government
+December,2010,Bear Stearns & Company,c,5916000,5916000,central government
+December,2010,Bank of New York,c,1087613000,1087613000,central government
+February,2011,Banco Nacional De Comercio Exterior,c,4764000,4235000,central government
+February,2011,Government of the United States,m,1096000,1096000,central government
+February,2011,Government of Venezuela,m,39148000,39044000,central government
+February,2011,Kuwait Fund for Arab Economic Development,b,16930000,16644000,central government
+February,2011,Republic Of China,b,280884000,275455000,central government
+February,2011,Caribbean Development Bank,m,188939000,187548000,central government
+February,2011,European Economic Community,m,14775000,15380000,central government
+February,2011,European Investment Bank,m,91000,95000,central government
+February,2011,Inter-American Development Bank,m,205922000,204301000,central government
+February,2011,International Fund for Agricultural Development,m,1408000,1438000,central government
+February,2011,International Bank for Reconstruction and Development,m,22795000,20666000,central government
+February,2011,Opec Fund for International Development,m,13782000,14092000,central government
+February,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+February,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+February,2011,Bear Stearns & Company,c,5916000,5916000,central government
+February,2011,Bank of New York,c,1087613000,1087613000,central government
+February,2012,Banco Nacional De Comercio Exterior,c,3705000,3176000,central government
+February,2012,Government of the United States,m,748000,748000,central government
+February,2012,Government of Venezuela,m,37492000,37358000,central government
+February,2012,Kuwait Fund for Arab Economic Development,b,20350000,19981000,central government
+February,2012,Republic Of China,b,280740000,275046000,central government
+February,2012,Caribbean Development Bank,m,199235000,197626000,central government
+February,2012,European Economic Community,m,13795000,14193000,central government
+February,2012,Inter-American Development Bank,m,220755000,221853000,central government
+February,2012,International Fund for Agricultural Development,m,2192000,2222000,central government
+February,2012,International Bank for Reconstruction and Development,m,19256000,19582000,central government
+February,2012,Opec Fund for International Development,m,17645000,17645000,central government
+February,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+February,2012,Bear Stearns & Company,c,5916000,5916000,central government
+February,2012,Bank of New York,c,1087613000,1087613000,central government
+February,2012,Banco Nacional De Comercio Exterior,c,3705000,3176000,central government
+February,2012,Government of the United States,m,748000,748000,central government
+February,2012,Government of Venezuela,m,37492000,37358000,central government
+February,2012,Kuwait Fund for Arab Economic Development,b,20350000,19981000,central government
+February,2012,Republic Of China,b,280740000,275046000,central government
+February,2012,Caribbean Development Bank,m,199235000,197626000,central government
+February,2012,European Economic Community,m,13795000,14193000,central government
+February,2012,Inter-American Development Bank,m,220755000,221853000,central government
+February,2012,International Fund for Agricultural Development,m,2192000,2222000,central government
+February,2012,International Bank for Reconstruction and Development,m,19256000,19582000,central government
+February,2012,Opec Fund for International Development,m,17645000,17645000,central government
+February,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+February,2012,Bear Stearns & Company,c,5916000,5916000,central government
+February,2012,Bank of New York,c,1087613000,1087613000,central government
+January,2011,Banco Nacional De Comercio Exterior,c,4764000,4235000,central government
+January,2011,Government of the United States,m,1096000,1096000,central government
+January,2011,Government of Venezuela,m,39148000,39162000,central government
+January,2011,Kuwait Fund for Arab Economic Development,b,16930000,16597000,central government
+January,2011,Republic Of China,b,280884000,279414000,central government
+January,2011,Caribbean Development Bank,m,188939000,186788000,central government
+January,2011,European Economic Community,m,14775000,15241000,central government
+January,2011,European Investment Bank,m,91000,94000,central government
+January,2011,Inter-American Development Bank,m,205922000,205136000,central government
+January,2011,International Fund for Agricultural Development,m,1408000,1428000,central government
+January,2011,International Bank for Reconstruction and Development,m,22795000,22795000,central government
+January,2011,Opec Fund for International Development,m,13782000,13782000,central government
+January,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+January,2011,Manufacturers & Traders Trust Co.,c,865000,865000,central government
+January,2011,Bear Stearns & Company,c,5916000,5916000,central government
+January,2011,Bank of New York,c,1087613000,1087613000,central government
+May,2011,Banco Nacional De Comercio Exterior,c,4764000,4235000,central government
+May,2011,Government of the United States,m,1096000,924000,central government
+May,2011,Government of Venezuela,m,39148000,38675000,central government
+May,2011,Kuwait Fund for Arab Economic Development,b,16930000,16886000,central government
+May,2011,Republic Of China,b,280884000,292480000,central government
+May,2011,Caribbean Development Bank,m,189187000,187490000,central government
+May,2011,European Economic Community,m,14775000,15998000,central government
+May,2011,European Investment Bank,m,91000,99000,central government
+May,2011,Inter-American Development Bank,m,205922000,216621000,central government
+May,2011,International Fund for Agricultural Development,m,1408000,1717000,central government
+May,2011,International Bank for Reconstruction and Development,m,22795000,20179000,central government
+May,2011,Opec Fund for International Development,m,13782000,13508000,central government
+May,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+May,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+May,2011,Heritage International Bank & Trust,c,0,0,central government
+May,2011,Bear Stearns & Company,c,5916000,5916000,central government
+May,2011,Bank of New York,c,1087613000,1087613000,central government
+May,2012,Banco Nacional De Comercio Exterior,c,3705000,3176000,central government
+May,2012,Government of the United States,m,749000,568000,central government
+May,2012,Government of Venezuela,m,37492000,37133000,central government
+May,2012,Kuwait Fund for Arab Economic Development,b,20350000,19135000,central government
+May,2012,Republic Of China,b,280740000,292071000,central government
+May,2012,Caribbean Development Bank,m,196985000,196593000,central government
+May,2012,Caricom Development Fund,m,2e+06,2e+06,central government
+May,2012,European Economic Community,m,13795000,12862000,central government
+May,2012,Inter-American Development Bank,m,220755000,224406000,central government
+May,2012,International Fund for Agricultural Development,m,2192000,1887000,central government
+May,2012,International Bank for Reconstruction and Development,m,19539000,18665000,central government
+May,2012,Opec Fund for International Development,m,17645000,17278000,central government
+May,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+May,2012,Bear Stearns & Company,c,5916000,5916000,central government
+May,2012,Bank of New York,c,1087613000,1087613000,central government
+July,2021,Government of Venezuela,m,429720000,429720000,central government
+July,2021,Kuwait Fund for Arab Economic Development,b,34482000,32816000,central government
+July,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+July,2021,Republic Of China/Taiwan,b,285584000,277776000,central government
+July,2021,Caribbean Development Bank,m,282189000,295183000,central government
+July,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+July,2021,European Economic Community,m,4311000,4184000,central government
+July,2021,Inter-American Development Bank,m,289002000,290310000,central government
+July,2021,International Fund for Agricultural Development,m,6287000,6106000,central government
+July,2021,International Bank for Reconstruction and Development,m,56090000,74464000,central government
+July,2021,Opec Fund for International Development,m,131501000,154152000,central government
+July,2021,Central American Bank For Economic Integration,m,23073000,22186000,central government
+July,2021,Bank of New York,c,1092319000,1105802000,central government
+July,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+July,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+March,2021,Government of Venezuela,m,429720000,429720000,central government
+March,2021,Kuwait Fund for Arab Economic Development,b,34482000,34020000,central government
+March,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+March,2021,Republic Of China/Taiwan,b,285584000,277850000,central government
+March,2021,Caribbean Development Bank,m,282189000,289939000,central government
+March,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+March,2021,European Economic Community,m,4311000,4421000,central government
+March,2021,Inter-American Development Bank,m,289002000,286527000,central government
+March,2021,International Fund for Agricultural Development,m,6287000,6255000,central government
+March,2021,International Bank for Reconstruction and Development,m,56090000,66421000,central government
+March,2021,Opec Fund for International Development,m,131501000,140768000,central government
+March,2021,Central American Bank For Economic Integration,m,23073000,22895000,central government
+March,2021,Bank of New York,c,1092319000,1105802000,central government
+March,2021,Caribbean Community Climate Change Center,b,2.4e+07,1.8e+07,central government
+March,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+October,2020,Government of Venezuela,m,429697000,429720000,central government
+October,2020,Kuwait Fund for Arab Economic Development,b,33239000,34727000,central government
+October,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+October,2020,Republic Of China/Taiwan,b,234676000,266518000,central government
+October,2020,Caribbean Development Bank,m,264204000,269412000,central government
+October,2020,Caricom Development Fund,m,873000,3210000,central government
+October,2020,European Economic Community,m,5075000,4634000,central government
+October,2020,Inter-American Development Bank,m,245323000,287085000,central government
+October,2020,International Fund for Agricultural Development,m,5031000,6247000,central government
+October,2020,International Bank for Reconstruction and Development,m,38523000,56090000,central government
+October,2020,Opec Fund for International Development,m,93679000,121356000,central government
+October,2020,Central American Bank For Economic Integration,m,24847000,23782000,central government
+October,2020,Bank of New York,c,1053004000,1.079e+09,central government
+October,2020,Caribbean Community Climate Change Center,b,1.1e+07,2.4e+07,central government
+October,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+October,2020,Government of Venezuela,m,429697000,429720000,central government
+October,2020,Kuwait Fund for Arab Economic Development,b,33239000,34727000,central government
+October,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+October,2020,Republic Of China/Taiwan,b,234676000,266518000,central government
+October,2020,Caribbean Development Bank,m,264204000,269412000,central government
+October,2020,Caricom Development Fund,m,873000,3210000,central government
+October,2020,European Economic Community,m,5075000,4634000,central government
+October,2020,Inter-American Development Bank,m,245323000,287085000,central government
+October,2020,International Fund for Agricultural Development,m,5031000,6247000,central government
+October,2020,International Bank for Reconstruction and Development,m,38523000,56090000,central government
+October,2020,Opec Fund for International Development,m,93679000,121356000,central government
+October,2020,Central American Bank For Economic Integration,m,24847000,23782000,central government
+October,2020,Bank of New York,c,1053004000,1.079e+09,central government
+October,2020,Caribbean Community Climate Change Center,b,1.1e+07,2.4e+07,central government
+October,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+February,2014,Banco Nacional De Comercio Exterior,c,1588000,1059000,central government
+February,2014,Government of Venezuela,m,177348000,197744000,central government
+February,2014,Kuwait Fund for Arab Economic Development,b,19699000,18738000,central government
+February,2014,Republic Of China,b,280733000,273863000,central government
+February,2014,Caribbean Development Bank,m,206511000,206093000,central government
+February,2014,Caricom Development Fund,m,3936000,3936000,central government
+February,2014,European Economic Community,m,13071000,12945000,central government
+February,2014,Inter-American Development Bank,m,239819000,238406000,central government
+February,2014,International Fund for Agricultural Development,m,2113000,2794000,central government
+February,2014,International Bank for Reconstruction and Development,m,23766000,23766000,central government
+February,2014,Opec Fund for International Development,m,39166000,39949000,central government
+February,2014,Central American Bank For Economic Integration,m,8131000,9631000,central government
+February,2014,Bank of New York,c,1053004000,1053004000,central government
+April,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+April,2015,Government of Venezuela,m,291537000,321428000,central government
+April,2015,Kuwait Fund for Arab Economic Development,b,20375000,19062000,central government
+April,2015,Republic Of China,b,254441000,246905000,central government
+April,2015,Caribbean Development Bank,m,213243000,208204000,central government
+April,2015,Caricom Development Fund,m,3350000,2974000,central government
+April,2015,European Economic Community,m,10772000,9716000,central government
+April,2015,Inter-American Development Bank,m,239374000,241911000,central government
+April,2015,International Fund for Agricultural Development,m,2956000,2574000,central government
+April,2015,International Bank for Reconstruction and Development,m,25098000,25557000,central government
+April,2015,Opec Fund for International Development,m,42627000,43438000,central government
+April,2015,Central American Bank For Economic Integration,m,15772000,18988000,central government
+April,2015,Bank of New York,c,1053004000,1053004000,central government
+August,2014,Banco Nacional De Comercio Exterior,c,1588000,529000,central government
+August,2014,Government of Venezuela,m,177348000,262685000,central government
+August,2014,Kuwait Fund for Arab Economic Development,b,20711000,19022000,central government
+August,2014,Republic Of China,b,280733000,260717000,central government
+August,2014,Caribbean Development Bank,m,206511000,209684000,central government
+August,2014,Caricom Development Fund,m,3936000,3536000,central government
+August,2014,European Economic Community,m,13071000,11956000,central government
+August,2014,Inter-American Development Bank,m,240527000,238278000,central government
+August,2014,International Fund for Agricultural Development,m,2113000,2999000,central government
+August,2014,International Bank for Reconstruction and Development,m,24366000,25173000,central government
+August,2014,Opec Fund for International Development,m,39166000,40868000,central government
+August,2014,Central American Bank For Economic Integration,m,8212000,10965000,central government
+August,2014,Bank of New York,c,1053004000,1053004000,central government
+July,2014,Banco Nacional De Comercio Exterior,c,1588000,529000,central government
+July,2014,Government of Venezuela,m,177348000,262874000,central government
+July,2014,Kuwait Fund for Arab Economic Development,b,20711000,19116000,central government
+July,2014,Republic Of China,b,280733000,264675000,central government
+July,2014,Caribbean Development Bank,m,206511000,207491000,central government
+July,2014,Caricom Development Fund,m,3936000,3536000,central government
+July,2014,European Economic Community,m,13071000,12154000,central government
+July,2014,Inter-American Development Bank,m,240527000,235437000,central government
+July,2014,International Fund for Agricultural Development,m,2113000,3025000,central government
+July,2014,International Bank for Reconstruction and Development,m,24366000,24289000,central government
+July,2014,Opec Fund for International Development,m,39166000,40463000,central government
+July,2014,Central American Bank For Economic Integration,m,8212000,10965000,central government
+July,2014,Bank of New York,c,1053004000,1053004000,central government
+April,2016,Government of Venezuela,m,373269000,374616000,central government
+April,2016,Kuwait Fund for Arab Economic Development,b,17710000,17860000,central government
+April,2016,Republic Of China,b,249150000,240613000,central government
+April,2016,Caribbean Development Bank,m,227202000,223270000,central government
+April,2016,Caricom Development Fund,m,2398000,2203000,central government
+April,2016,European Economic Community,m,8893000,9287000,central government
+April,2016,Inter-American Development Bank,m,239026000,237654000,central government
+April,2016,International Fund for Agricultural Development,m,2685000,2491000,central government
+April,2016,International Bank for Reconstruction and Development,m,25290000,28559000,central government
+April,2016,Opec Fund for International Development,m,47925000,47131000,central government
+April,2016,Central American Bank For Economic Integration,m,24317000,24139000,central government
+April,2016,Bank of New York,c,1053004000,1053004000,central government
+April,2017,Government of Venezuela,m,405985000,416256000,central government
+April,2017,Kuwait Fund for Arab Economic Development,b,17296000,17387000,central government
+April,2017,Republic Of China/Taiwan,b,244247000,255564000,central government
+April,2017,Caribbean Development Bank,m,244520000,245297000,central government
+April,2017,Caricom Development Fund,m,1610000,1410000,central government
+April,2017,European Economic Community,m,8071000,8194000,central government
+April,2017,Inter-American Development Bank,m,231486000,227731000,central government
+April,2017,International Fund for Agricultural Development,m,2820000,3002000,central government
+April,2017,International Bank for Reconstruction and Development,m,30684000,29229000,central government
+April,2017,Opec Fund for International Development,m,52645000,52390000,central government
+April,2017,Central American Bank For Economic Integration,m,23221000,23042000,central government
+April,2017,Bank of New York,c,1053004000,1053004000,central government
+April,2019,Government of Venezuela,m,429450000,429577000,central government
+April,2019,Kuwait Fund for Arab Economic Development,b,25264000,25201000,central government
+April,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+April,2019,Republic Of China/Taiwan,b,236143000,225614000,central government
+April,2019,Caribbean Development Bank,m,259745000,254128000,central government
+April,2019,Caricom Development Fund,m,1735000,1522000,central government
+April,2019,European Economic Community,m,7240000,7040000,central government
+April,2019,Inter-American Development Bank,m,236736000,234603000,central government
+April,2019,International Fund for Agricultural Development,m,2565000,2396000,central government
+April,2019,International Bank for Reconstruction and Development,m,35282000,35640000,central government
+April,2019,Opec Fund for International Development,m,69597000,70390000,central government
+April,2019,Central American Bank For Economic Integration,m,26621000,26442000,central government
+April,2019,Bank of New York,c,1053004000,1053004000,central government
+April,2020,Government of Venezuela,m,429697000,429720000,central government
+April,2020,Kuwait Fund for Arab Economic Development,b,33241000,33647000,central government
+April,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+April,2020,Republic Of China,b,234676000,254605000,central government
+April,2020,Caribbean Development Bank,m,264204000,259204000,central government
+April,2020,Caricom Development Fund,m,873000,654000,central government
+April,2020,European Economic Community,m,5075000,5205000,central government
+April,2020,Inter-American Development Bank,m,245323000,241690000,central government
+April,2020,International Fund for Agricultural Development,m,5031000,4847000,central government
+April,2020,International Bank for Reconstruction and Development,m,38523000,38528000,central government
+April,2020,Opec Fund for International Development,m,94076000,102808000,central government
+April,2020,Central American Bank For Economic Integration,m,24847000,24669000,central government
+April,2020,Bank of New York,c,1053004000,1053004000,central government
+April,2021,Government of Venezuela,m,429720000,429720000,central government
+April,2021,Kuwait Fund for Arab Economic Development,b,34482000,34162000,central government
+April,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+April,2021,Republic Of China/Taiwan,b,285584000,277850000,central government
+April,2021,Caribbean Development Bank,m,282189000,294688000,central government
+April,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+April,2021,European Economic Community,m,4311000,4299000,central government
+April,2021,Inter-American Development Bank,m,289002000,290798000,central government
+April,2021,International Fund for Agricultural Development,m,6287000,6116000,central government
+April,2021,International Bank for Reconstruction and Development,m,56090000,64464000,central government
+April,2021,Opec Fund for International Development,m,131501000,138916000,central government
+April,2021,Central American Bank For Economic Integration,m,23073000,22895000,central government
+April,2021,Bank of New York,c,1092319000,1105802000,central government
+April,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+April,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+August,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+August,2015,Government of Venezuela,m,291537000,349372000,central government
+August,2015,Kuwait Fund for Arab Economic Development,b,20375000,18738000,central government
+August,2015,Republic Of China,b,254441000,255426000,central government
+August,2015,Caribbean Development Bank,m,213242000,212058000,central government
+August,2015,Caricom Development Fund,m,3350000,2783000,central government
+August,2015,European Economic Community,m,10772000,9519000,central government
+August,2015,Inter-American Development Bank,m,238867000,244418000,central government
+August,2015,International Fund for Agricultural Development,m,2956000,2972000,central government
+August,2015,International Bank for Reconstruction and Development,m,25098000,26953000,central government
+August,2015,Opec Fund for International Development,m,42627000,49226000,central government
+August,2015,Central American Bank For Economic Integration,m,15803000,22113000,central government
+August,2015,Bank of New York,c,1053004000,1053004000,central government
+August,2016,Government of Venezuela,m,373269000,387357000,central government
+August,2016,Kuwait Fund for Arab Economic Development,b,19300000,18458000,central government
+August,2016,Republic Of China,b,249150000,248988000,central government
+August,2016,Caribbean Development Bank,m,227840000,231469000,central government
+August,2016,Caricom Development Fund,m,2398000,2007000,central government
+August,2016,European Economic Community,m,8893000,8765000,central government
+August,2016,Inter-American Development Bank,m,239026000,232377000,central government
+August,2016,International Fund for Agricultural Development,m,2685000,2637000,central government
+August,2016,International Bank for Reconstruction and Development,m,25290000,30496000,central government
+August,2016,Opec Fund for International Development,m,47925000,50145000,central government
+August,2016,Central American Bank For Economic Integration,m,24317000,24139000,central government
+August,2016,Bank of New York,c,1053004000,1053004000,central government
+August,2017,Government of Venezuela,m,405985000,414961000,central government
+August,2017,Kuwait Fund for Arab Economic Development,b,22221000,24034000,central government
+August,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+August,2017,Republic Of China,b,244247000,245473000,central government
+August,2017,Caribbean Development Bank,m,244452000,253608000,central government
+August,2017,Caricom Development Fund,m,1610000,1208000,central government
+August,2017,European Economic Community,m,8071000,8590000,central government
+August,2017,Inter-American Development Bank,m,231486000,221890000,central government
+August,2017,International Fund for Agricultural Development,m,2820000,3002000,central government
+August,2017,International Bank for Reconstruction and Development,m,30684000,29478000,central government
+August,2017,Opec Fund for International Development,m,52645000,55578000,central government
+August,2017,Central American Bank For Economic Integration,m,23221000,22334000,central government
+August,2017,Bank of New York,c,1053004000,1053004000,central government
+August,2018,Government of Venezuela,m,419615000,429232000,central government
+August,2018,Kuwait Fund for Arab Economic Development,b,26512000,25453000,central government
+August,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+August,2018,Republic Of China,b,241601000,240179000,central government
+August,2018,Caribbean Development Bank,m,259751000,256740000,central government
+August,2018,Caricom Development Fund,m,799000,384000,central government
+August,2018,European Economic Community,m,8442000,7716000,central government
+August,2018,Inter-American Development Bank,m,228478000,226281000,central government
+August,2018,International Fund for Agricultural Development,m,2924000,2686000,central government
+August,2018,International Bank for Reconstruction and Development,m,32242000,35651000,central government
+August,2018,Opec Fund for International Development,m,70574000,70312000,central government
+August,2018,Central American Bank For Economic Integration,m,21447000,20560000,central government
+August,2018,Bank of New York,c,1053004000,1053004000,central government
+August,2019,Government of Venezuela,m,429450000,429627000,central government
+August,2019,Kuwait Fund for Arab Economic Development,b,27424000,28974000,central government
+August,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+August,2019,Republic Of China/Taiwan,b,236143000,237417000,central government
+August,2019,Caribbean Development Bank,m,259765000,253312000,central government
+August,2019,Caricom Development Fund,m,1735000,1307000,central government
+August,2019,European Economic Community,m,7240000,6644000,central government
+August,2019,Inter-American Development Bank,m,237873000,237589000,central government
+August,2019,International Fund for Agricultural Development,m,2565000,5178000,central government
+August,2019,International Bank for Reconstruction and Development,m,37598000,38803000,central government
+August,2019,Opec Fund for International Development,m,71327000,84697000,central government
+August,2019,Central American Bank For Economic Integration,m,26621000,25734000,central government
+August,2019,Bank of New York,c,1053004000,1053004000,central government
+August,2020,Government of Venezuela,m,429697000,429720000,central government
+August,2020,Kuwait Fund for Arab Economic Development,b,33239000,34358000,central government
+August,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+August,2020,Republic Of China/Taiwan,b,234676000,271166000,central government
+August,2020,Caribbean Development Bank,m,264204000,264336000,central government
+August,2020,Caricom Development Fund,m,873000,433000,central government
+August,2020,European Economic Community,m,5075000,4533000,central government
+August,2020,Inter-American Development Bank,m,245323000,281623000,central government
+August,2020,International Fund for Agricultural Development,m,5031000,6421000,central government
+August,2020,International Bank for Reconstruction and Development,m,38523000,57768000,central government
+August,2020,Opec Fund for International Development,m,94076000,114580000,central government
+August,2020,Central American Bank For Economic Integration,m,24847000,23960000,central government
+August,2020,Bank of New York,c,1053004000,1053004000,central government
+August,2020,Caribbean Community Climate Change Center,b,1.1e+07,0,central government
+August,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+August,2021,Government of Venezuela,m,429692000,429692000,central government
+August,2021,Kuwait Fund for Arab Economic Development,b,34482000,32773000,central government
+August,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+August,2021,Republic Of China/Taiwan,b,285584000,277776000,central government
+August,2021,Caribbean Development Bank,m,282189000,298571000,central government
+August,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+August,2021,European Economic Community,m,4311000,4203000,central government
+August,2021,Inter-American Development Bank,m,289002000,294174000,central government
+August,2021,International Fund for Agricultural Development,m,6287000,6101000,central government
+August,2021,International Bank for Reconstruction and Development,m,56090000,77464000,central government
+August,2021,Opec Fund for International Development,m,131501000,155242000,central government
+August,2021,Central American Bank For Economic Integration,m,23073000,22186000,central government
+August,2021,Bank of New York,c,1092319000,1105802000,central government
+August,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+August,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+December,2014,Banco Nacional De Comercio Exterior,c,1588000,529000,central government
+December,2014,Government of Venezuela,m,177415000,291537000,central government
+December,2014,Kuwait Fund for Arab Economic Development,b,20711000,20375000,central government
+December,2014,Republic Of China,b,280733000,254441000,central government
+December,2014,Caribbean Development Bank,m,206511000,213243000,central government
+December,2014,Caricom Development Fund,m,3936000,3350000,central government
+December,2014,European Economic Community,m,13071000,10772000,central government
+December,2014,Inter-American Development Bank,m,240567000,239374000,central government
+December,2014,International Fund for Agricultural Development,m,2113000,2956000,central government
+December,2014,International Bank for Reconstruction and Development,m,24366000,25098000,central government
+December,2014,Opec Fund for International Development,m,39166000,42627000,central government
+December,2014,Central American Bank For Economic Integration,m,8212000,15772000,central government
+December,2014,Bank of New York,c,1053004000,1053004000,central government
+December,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+December,2015,Government of Venezuela,m,291537000,373269000,central government
+December,2015,Kuwait Fund for Arab Economic Development,b,20375000,17710000,central government
+December,2015,Republic Of China/Taiwan,b,254441000,249150000,central government
+December,2015,Caribbean Development Bank,m,213242000,227231000,central government
+December,2015,Caricom Development Fund,m,3350000,2398000,central government
+December,2015,European Economic Community,m,10772000,8893000,central government
+December,2015,Inter-American Development Bank,m,238867000,239026000,central government
+December,2015,International Fund for Agricultural Development,m,2956000,2685000,central government
+December,2015,International Bank for Reconstruction and Development,m,25098000,25290000,central government
+December,2015,Opec Fund for International Development,m,42627000,47925000,central government
+December,2015,Central American Bank For Economic Integration,m,15803000,24317000,central government
+December,2015,Bank of New York,c,1053004000,1053004000,central government
+December,2016,Government of Venezuela,m,373269000,404286000,central government
+December,2016,Kuwait Fund for Arab Economic Development,b,19300000,17296000,central government
+December,2016,Republic Of China,b,249150000,244247000,central government
+December,2016,Caribbean Development Bank,m,227870000,248228000,central government
+December,2016,Caricom Development Fund,m,2398000,1810000,central government
+December,2016,European Economic Community,m,8893000,8071000,central government
+December,2016,Inter-American Development Bank,m,238682000,226835000,central government
+December,2016,International Fund for Agricultural Development,m,2685000,2446000,central government
+December,2016,International Bank for Reconstruction and Development,m,25290000,29680000,central government
+December,2016,Opec Fund for International Development,m,47925000,51778000,central government
+December,2016,Central American Bank For Economic Integration,m,24317000,23252000,central government
+December,2016,Bank of New York,c,1053004000,1053004000,central government
+December,2017,Government of Venezuela,m,406090000,419499000,central government
+December,2017,Kuwait Fund for Arab Economic Development,b,22221000,25326000,central government
+December,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+December,2017,Republic Of China,b,244247000,241601000,central government
+December,2017,Caribbean Development Bank,m,244452000,259804000,central government
+December,2017,Caricom Development Fund,m,1610000,799000,central government
+December,2017,European Economic Community,m,8071000,8442000,central government
+December,2017,Inter-American Development Bank,m,231486000,227333000,central government
+December,2017,International Fund for Agricultural Development,m,2820000,2924000,central government
+December,2017,International Bank for Reconstruction and Development,m,33189000,32242000,central government
+December,2017,Opec Fund for International Development,m,52645000,69844000,central government
+December,2017,Central American Bank For Economic Integration,m,23221000,21447000,central government
+December,2017,Bank of New York,c,1053004000,1053004000,central government
+December,2018,Government of Venezuela,m,419615000,429450000,central government
+December,2018,Kuwait Fund for Arab Economic Development,b,26512000,24447000,central government
+December,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+December,2018,Republic Of China,b,241601000,236143000,central government
+December,2018,Caribbean Development Bank,m,259751000,259745000,central government
+December,2018,Caricom Development Fund,m,2571000,1735000,central government
+December,2018,European Economic Community,m,8442000,7240000,central government
+December,2018,Inter-American Development Bank,m,228478000,234198000,central government
+December,2018,International Fund for Agricultural Development,m,2924000,2475000,central government
+December,2018,International Bank for Reconstruction and Development,m,32242000,34895000,central government
+December,2018,Opec Fund for International Development,m,70574000,68263000,central government
+December,2018,Central American Bank For Economic Integration,m,21447000,26621000,central government
+December,2018,Bank of New York,c,1053004000,1053004000,central government
+December,2019,Government of Venezuela,m,429450000,429697000,central government
+December,2019,Kuwait Fund for Arab Economic Development,b,27424000,31923000,central government
+December,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+December,2019,Republic Of China/Taiwan,b,236143000,234676000,central government
+December,2019,Caribbean Development Bank,m,259765000,264204000,central government
+December,2019,Caricom Development Fund,m,1735000,873000,central government
+December,2019,European Economic Community,m,7240000,5075000,central government
+December,2019,Inter-American Development Bank,m,237873000,245250000,central government
+December,2019,International Fund for Agricultural Development,m,2565000,5031000,central government
+December,2019,International Bank for Reconstruction and Development,m,37598000,38523000,central government
+December,2019,Opec Fund for International Development,m,71327000,94076000,central government
+December,2019,Central American Bank For Economic Integration,m,26621000,24847000,central government
+December,2019,Bank of New York,c,1053004000,1053004000,central government
+December,2020,Government of Venezuela,m,429697000,429720000,central government
+December,2020,Kuwait Fund for Arab Economic Development,b,33239000,35783000,central government
+December,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+December,2020,Republic Of China/Taiwan,b,234676000,265063000,central government
+December,2020,Caribbean Development Bank,m,264204000,282140000,central government
+December,2020,Caricom Development Fund,m,873000,3e+06,central government
+December,2020,European Economic Community,m,5075000,4311000,central government
+December,2020,Inter-American Development Bank,m,245323000,288238000,central government
+December,2020,International Fund for Agricultural Development,m,5031000,6287000,central government
+December,2020,International Bank for Reconstruction and Development,m,38523000,56090000,central government
+December,2020,Opec Fund for International Development,m,93679000,131105000,central government
+December,2020,Central American Bank For Economic Integration,m,24847000,23073000,central government
+December,2020,Bank of New York,c,1053004000,1091998000,central government
+December,2020,Caribbean Community Climate Change Center,b,1.1e+07,2.4e+07,central government
+December,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+February,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+February,2015,Government of Venezuela,m,291537000,321234000,central government
+February,2015,Kuwait Fund for Arab Economic Development,b,20375000,19159000,central government
+February,2015,Republic Of China,b,254441000,247571000,central government
+February,2015,Caribbean Development Bank,m,213243000,210494000,central government
+February,2015,Caricom Development Fund,m,3350000,3163000,central government
+February,2015,European Economic Community,m,10772000,9849000,central government
+February,2015,Inter-American Development Bank,m,239374000,238682000,central government
+February,2015,International Fund for Agricultural Development,m,2956000,2872000,central government
+February,2015,International Bank for Reconstruction and Development,m,25098000,25610000,central government
+February,2015,Opec Fund for International Development,m,42627000,42410000,central government
+February,2015,Central American Bank For Economic Integration,m,15772000,16084000,central government
+February,2015,Bank of New York,c,1053004000,1053004000,central government
+February,2016,Government of Venezuela,m,373269000,371612000,central government
+February,2016,Kuwait Fund for Arab Economic Development,b,17710000,17875000,central government
+February,2016,Republic Of China,b,249150000,242280000,central government
+February,2016,Caribbean Development Bank,m,227202000,224859000,central government
+February,2016,Caricom Development Fund,m,2398000,2398000,central government
+February,2016,European Economic Community,m,8893000,8892000,central government
+February,2016,Inter-American Development Bank,m,239026000,237347000,central government
+February,2016,International Fund for Agricultural Development,m,2685000,2676000,central government
+February,2016,International Bank for Reconstruction and Development,m,25290000,26562000,central government
+February,2016,Opec Fund for International Development,m,47925000,47925000,central government
+February,2016,Central American Bank For Economic Integration,m,24317000,24317000,central government
+February,2016,Bank of New York,c,1053004000,1053004000,central government
+February,2017,Government of Venezuela,m,405902000,411883000,central government
+February,2017,Kuwait Fund for Arab Economic Development,b,17296000,17325000,central government
+February,2017,Republic Of China,b,244247000,237230000,central government
+February,2017,Caribbean Development Bank,m,244520000,244061000,central government
+February,2017,Caricom Development Fund,m,1810000,1810000,central government
+February,2017,European Economic Community,m,8071000,8008000,central government
+February,2017,Inter-American Development Bank,m,231486000,229807000,central government
+February,2017,International Fund for Agricultural Development,m,2970000,3159000,central government
+February,2017,International Bank for Reconstruction and Development,m,30592000,30801000,central government
+February,2017,Opec Fund for International Development,m,52645000,52645000,central government
+February,2017,Central American Bank For Economic Integration,m,23221000,23221000,central government
+February,2017,Bank of New York,c,1053004000,1053004000,central government
+February,2018,Government of Venezuela,m,419615000,426613000,central government
+February,2018,Kuwait Fund for Arab Economic Development,b,26512000,26609000,central government
+February,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+February,2018,Republic Of China,b,241601000,234584000,central government
+February,2018,Caribbean Development Bank,m,259805000,257637000,central government
+February,2018,Caricom Development Fund,m,799000,799000,central government
+February,2018,European Economic Community,m,8442000,8475000,central government
+February,2018,Inter-American Development Bank,m,228478000,226799000,central government
+February,2018,International Fund for Agricultural Development,m,2924000,2969000,central government
+February,2018,International Bank for Reconstruction and Development,m,32242000,33442000,central government
+February,2018,Opec Fund for International Development,m,70574000,70574000,central government
+February,2018,Central American Bank For Economic Integration,m,21447000,21447000,central government
+February,2019,Government of Venezuela,m,429450000,429540000,central government
+February,2019,Kuwait Fund for Arab Economic Development,b,25264000,25272000,central government
+February,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+February,2019,Republic Of China/Taiwan,b,236143000,227411000,central government
+February,2019,Caribbean Development Bank,m,259745000,258570000,central government
+February,2019,Caricom Development Fund,m,1735000,1735000,central government
+February,2019,European Economic Community,m,7240000,7201000,central government
+February,2019,Inter-American Development Bank,m,236736000,235057000,central government
+February,2019,International Fund for Agricultural Development,m,2475000,2488000,central government
+February,2019,International Bank for Reconstruction and Development,m,35282000,35282000,central government
+February,2019,Opec Fund for International Development,m,69894000,69894000,central government
+February,2019,Central American Bank For Economic Integration,m,26621000,26621000,central government
+February,2019,Bank of New York,c,1053004000,1053004000,central government
+February,2020,Government of Venezuela,m,429697000,429720000,central government
+February,2020,Kuwait Fund for Arab Economic Development,b,33241000,32947000,central government
+February,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+February,2020,Republic Of China,b,234676000,254037000,central government
+February,2020,Caribbean Development Bank,m,264204000,262781000,central government
+February,2020,Caricom Development Fund,m,873000,873000,central government
+February,2020,European Economic Community,m,5075000,5193000,central government
+February,2020,Inter-American Development Bank,m,245323000,244644000,central government
+February,2020,International Fund for Agricultural Development,m,5031000,5016000,central government
+February,2020,International Bank for Reconstruction and Development,m,38523000,39701000,central government
+February,2020,Opec Fund for International Development,m,94076000,95093000,central government
+February,2020,Central American Bank For Economic Integration,m,24847000,24847000,central government
+February,2020,Bank of New York,c,1053004000,1053004000,central government
+February,2021,Government of Venezuela,m,429720000,429720000,central government
+February,2021,Kuwait Fund for Arab Economic Development,b,34482000,33959000,central government
+February,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+February,2021,Republic Of China/Taiwan,b,285584000,279945000,central government
+February,2021,Caribbean Development Bank,m,282189000,286423000,central government
+February,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+February,2021,European Economic Community,m,4311000,4283000,central government
+February,2021,Inter-American Development Bank,m,289002000,287324000,central government
+February,2021,International Fund for Agricultural Development,m,6287000,6286000,central government
+February,2021,International Bank for Reconstruction and Development,m,56090000,66421000,central government
+February,2021,Opec Fund for International Development,m,131501000,140658000,central government
+February,2021,Central American Bank For Economic Integration,m,23073000,23073000,central government
+February,2021,Bank of New York,c,1092319000,1105802000,central government
+February,2021,Caribbean Community Climate Change Center,b,2.4e+07,1.8e+07,central government
+February,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+January,2015,Banco Nacional De Comercio Exterior,c,529000,529000,central government
+January,2015,Government of Venezuela,m,291537000,291537000,central government
+January,2015,Kuwait Fund for Arab Economic Development,b,20375000,19256000,central government
+January,2015,Republic Of China,b,254441000,251530000,central government
+January,2015,Caribbean Development Bank,m,213243000,210161000,central government
+January,2015,Caricom Development Fund,m,3350000,3163000,central government
+January,2015,European Economic Community,m,10772000,9924000,central government
+January,2015,Inter-American Development Bank,m,239374000,238532000,central government
+January,2015,International Fund for Agricultural Development,m,2956000,2877000,central government
+January,2015,International Bank for Reconstruction and Development,m,25098000,25098000,central government
+January,2015,Opec Fund for International Development,m,42627000,42410000,central government
+January,2015,Central American Bank For Economic Integration,m,15772000,15772000,central government
+January,2015,Bank of New York,c,1053004000,1053004000,central government
+January,2016,Government of Venezuela,m,373269000,372852000,central government
+January,2016,Kuwait Fund for Arab Economic Development,b,17710000,17704000,central government
+January,2016,Republic Of China,b,249150000,246238000,central government
+January,2016,Caribbean Development Bank,m,227232000,224518000,central government
+January,2016,Caricom Development Fund,m,2398000,2398000,central government
+January,2016,European Economic Community,m,8893000,8876000,central government
+January,2016,Inter-American Development Bank,m,239026000,238183000,central government
+January,2016,International Fund for Agricultural Development,m,2685000,2674000,central government
+January,2016,International Bank for Reconstruction and Development,m,25290000,26562000,central government
+January,2016,Opec Fund for International Development,m,47925000,47925000,central government
+January,2016,Central American Bank For Economic Integration,m,24317000,24317000,central government
+January,2016,Bank of New York,c,1053004000,1053004000,central government
+January,2017,Government of Venezuela,m,405902000,405153000,central government
+January,2017,Kuwait Fund for Arab Economic Development,b,17296000,17336000,central government
+January,2017,Republic Of China,b,244247000,241336000,central government
+January,2017,Caribbean Development Bank,m,244520000,243019000,central government
+January,2017,Caricom Development Fund,m,1810000,1810000,central government
+January,2017,European Economic Community,m,8071000,8126000,central government
+January,2017,Inter-American Development Bank,m,231486000,230644000,central government
+January,2017,International Fund for Agricultural Development,m,2970000,3002000,central government
+January,2017,International Bank for Reconstruction and Development,m,30592000,30801000,central government
+January,2017,Opec Fund for International Development,m,52645000,52645000,central government
+January,2017,Central American Bank For Economic Integration,m,23221000,23221000,central government
+January,2017,Bank of New York,c,1053004000,1053004000,central government
+January,2018,Government of Venezuela,m,419615000,419691000,central government
+January,2018,Kuwait Fund for Arab Economic Development,b,26187000,26336000,central government
+January,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+January,2018,Republic Of China,b,241601000,238689000,central government
+January,2018,Caribbean Development Bank,m,259804000,255563000,central government
+January,2018,Caricom Development Fund,m,799000,799000,central government
+January,2018,European Economic Community,m,8442000,8654000,central government
+January,2018,Inter-American Development Bank,m,228478000,227636000,central government
+January,2018,International Fund for Agricultural Development,m,2924000,2992000,central government
+January,2018,International Bank for Reconstruction and Development,m,32242000,33442000,central government
+January,2018,Opec Fund for International Development,m,70574000,70574000,central government
+January,2018,Central American Bank For Economic Integration,m,21447000,21447000,central government
+January,2018,Bank of New York,c,1053004000,1053004000,central government
+January,2019,Government of Venezuela,m,429450000,429493000,central government
+January,2019,Kuwait Fund for Arab Economic Development,b,25264000,25314000,central government
+January,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+January,2019,Republic Of China,b,236143000,234097000,central government
+January,2019,Caribbean Development Bank,m,259745000,256776000,central government
+January,2019,Caricom Development Fund,m,1735000,1735000,central government
+January,2019,European Economic Community,m,7240000,7268000,central government
+January,2019,Inter-American Development Bank,m,236114000,235272000,central government
+January,2019,International Fund for Agricultural Development,m,2475000,2493000,central government
+January,2019,International Bank for Reconstruction and Development,m,34895000,34895000,central government
+January,2019,Opec Fund for International Development,m,69894000,69894000,central government
+January,2019,Central American Bank For Economic Integration,m,26621000,26621000,central government
+January,2019,Bank of New York,c,1053004000,1053004000,central government
+January,2020,Government of Venezuela,m,429697000,429697000,central government
+January,2020,Kuwait Fund for Arab Economic Development,b,33241000,33154000,central government
+January,2020,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+January,2020,Republic Of China,b,234676000,254184000,central government
+January,2020,Caribbean Development Bank,m,264204000,260360000,central government
+January,2020,Caricom Development Fund,m,873000,873000,central government
+January,2020,European Economic Community,m,5075000,5158000,central government
+January,2020,Inter-American Development Bank,m,245323000,245481000,central government
+January,2020,International Fund for Agricultural Development,m,5031000,5022000,central government
+January,2020,International Bank for Reconstruction and Development,m,38523000,39701000,central government
+January,2020,Opec Fund for International Development,m,94076000,94076000,central government
+January,2020,Central American Bank For Economic Integration,m,24847000,24847000,central government
+January,2020,Bank of New York,c,1053004000,1053004000,central government
+January,2021,Government of Venezuela,m,429720000,429720000,central government
+January,2021,Kuwait Fund for Arab Economic Development,b,34482000,33970000,central government
+January,2021,Mega International Commercial Bank Company Limited,b,47143000,47143000,central government
+January,2021,Republic Of China/Taiwan,b,285584000,282673000,central government
+January,2021,Caribbean Development Bank,m,282189000,284071000,central government
+January,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+January,2021,European Economic Community,m,4311000,4271000,central government
+January,2021,Inter-American Development Bank,m,289002000,288160000,central government
+January,2021,International Fund for Agricultural Development,m,6287000,6287000,central government
+January,2021,International Bank for Reconstruction and Development,m,56090000,66421000,central government
+January,2021,Opec Fund for International Development,m,131501000,131682000,central government
+January,2021,Central American Bank For Economic Integration,m,23073000,23073000,central government
+January,2021,Bank of New York,c,1092615000,1092615000,central government
+January,2021,Caribbean Community Climate Change Center,b,2.4e+07,1.8e+07,central government
+January,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+July,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+July,2015,Government of Venezuela,m,291537000,349226000,central government
+July,2015,Kuwait Fund for Arab Economic Development,b,20375000,17905000,central government
+July,2015,Republic Of China,b,254441000,259384000,central government
+July,2015,Caribbean Development Bank,m,213242000,211420000,central government
+July,2015,Caricom Development Fund,m,3350000,2783000,central government
+July,2015,European Economic Community,m,10772000,9392000,central government
+July,2015,Inter-American Development Bank,m,239374000,240503000,central government
+July,2015,International Fund for Agricultural Development,m,2956000,2953000,central government
+July,2015,International Bank for Reconstruction and Development,m,25098000,26261000,central government
+July,2015,Opec Fund for International Development,m,42627000,49097000,central government
+July,2015,Central American Bank For Economic Integration,m,15803000,19019000,central government
+July,2015,Bank of New York,c,1053004000,1053004000,central government
+July,2016,Government of Venezuela,m,373269000,387966000,central government
+July,2016,Kuwait Fund for Arab Economic Development,b,17710000,16849000,central government
+July,2016,Republic Of China,b,249150000,253093000,central government
+July,2016,Caribbean Development Bank,m,227840000,230015000,central government
+July,2016,Caricom Development Fund,m,2398000,2007000,central government
+July,2016,European Economic Community,m,8893000,8781000,central government
+July,2016,Inter-American Development Bank,m,239026000,232614000,central government
+July,2016,International Fund for Agricultural Development,m,2685000,2635000,central government
+July,2016,International Bank for Reconstruction and Development,m,25290000,29630000,central government
+July,2016,Opec Fund for International Development,m,47925000,46022000,central government
+July,2016,Central American Bank For Economic Integration,m,24317000,24139000,central government
+July,2016,Bank of New York,c,1053004000,1053004000,central government
+July,2017,Government of Venezuela,m,405985000,416903000,central government
+July,2017,Kuwait Fund for Arab Economic Development,b,22221000,24022000,central government
+July,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+July,2017,Republic Of China,b,244247000,249578000,central government
+July,2017,Caribbean Development Bank,m,244452000,248563000,central government
+July,2017,Caricom Development Fund,m,1610000,1208000,central government
+July,2017,European Economic Community,m,8071000,8514000,central government
+July,2017,Inter-American Development Bank,m,231486000,222726000,central government
+July,2017,International Fund for Agricultural Development,m,2820000,3002000,central government
+July,2017,International Bank for Reconstruction and Development,m,30684000,29123000,central government
+July,2017,Opec Fund for International Development,m,52645000,55578000,central government
+July,2017,Central American Bank For Economic Integration,m,23221000,22334000,central government
+July,2017,Bank of New York,c,1053004000,1053004000,central government
+July,2018,Government of Venezuela,m,419615000,429164000,central government
+July,2018,Kuwait Fund for Arab Economic Development,b,26512000,25462000,central government
+July,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+July,2018,Republic Of China,b,241601000,246865000,central government
+July,2018,Caribbean Development Bank,m,259805000,256415000,central government
+July,2018,Caricom Development Fund,m,799000,384000,central government
+July,2018,European Economic Community,m,8442000,7772000,central government
+July,2018,Inter-American Development Bank,m,228478000,227118000,central government
+July,2018,International Fund for Agricultural Development,m,2924000,2693000,central government
+July,2018,International Bank for Reconstruction and Development,m,32242000,34051000,central government
+July,2018,Opec Fund for International Development,m,70574000,68973000,central government
+July,2018,Central American Bank For Economic Integration,m,21447000,20560000,central government
+July,2018,Bank of New York,c,1053004000,1053004000,central government
+July,2019,Government of Venezuela,m,429450000,429601000,central government
+July,2019,Kuwait Fund for Arab Economic Development,b,27424000,28927000,central government
+July,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+July,2019,Republic Of China/Taiwan,b,236143000,220145000,central government
+July,2019,Caribbean Development Bank,m,259765000,252544000,central government
+July,2019,Caricom Development Fund,m,1735000,1307000,central government
+July,2019,European Economic Community,m,7240000,6700000,central government
+July,2019,Inter-American Development Bank,m,237873000,237825000,central government
+July,2019,International Fund for Agricultural Development,m,2565000,5178000,central government
+July,2019,International Bank for Reconstruction and Development,m,37598000,38803000,central government
+July,2019,Opec Fund for International Development,m,71327000,83239000,central government
+July,2019,Central American Bank For Economic Integration,m,26621000,25734000,central government
+July,2019,Bank of New York,c,1053004000,1053004000,central government
+July,2020,Government of Venezuela,m,429697000,429720000,central government
+July,2020,Kuwait Fund for Arab Economic Development,b,33239000,34347000,central government
+July,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+July,2020,Republic Of China/Taiwan,b,234676000,270620000,central government
+July,2020,Caribbean Development Bank,m,264204000,263719000,central government
+July,2020,Caricom Development Fund,m,873000,433000,central government
+July,2020,European Economic Community,m,5075000,4576000,central government
+July,2020,Inter-American Development Bank,m,245323000,248230000,central government
+July,2020,International Fund for Agricultural Development,m,5031000,6412000,central government
+July,2020,International Bank for Reconstruction and Development,m,38523000,57768000,central government
+July,2020,Opec Fund for International Development,m,94076000,114580000,central government
+July,2020,Central American Bank For Economic Integration,m,24847000,23960000,central government
+July,2020,Bank of New York,c,1053004000,1053004000,central government
+July,2020,Caribbean Community Climate Change Center,b,1.1e+07,0,central government
+July,2020,US$30mn Fixed Rate Notes,c,0,30800000,central government
+June,2018,Government of Venezuela,m,419615000,429144000,central government
+June,2018,Kuwait Fund for Arab Economic Development,b,26512000,26390000,central government
+June,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+June,2018,Republic Of China,b,241601000,249777000,central government
+June,2018,Caribbean Development Bank,m,259805000,258957000,central government
+June,2018,Caricom Development Fund,m,799000,384000,central government
+June,2018,European Economic Community,m,8442000,7724000,central government
+June,2018,Inter-American Development Bank,m,228478000,227307000,central government
+June,2018,International Fund for Agricultural Development,m,2924000,2696000,central government
+June,2018,International Bank for Reconstruction and Development,m,32242000,34051000,central government
+June,2018,Opec Fund for International Development,m,70574000,68436000,central government
+June,2018,Central American Bank For Economic Integration,m,21447000,20560000,central government
+June,2018,Bank of New York,c,1053004000,1053004000,central government
+June,2019,Government of Venezuela,m,429450000,429601000,central government
+June,2019,Kuwait Fund for Arab Economic Development,b,27424000,29156000,central government
+June,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+June,2019,Republic Of China/Taiwan,b,236143000,222686000,central government
+June,2019,Caribbean Development Bank,m,259745000,257016000,central government
+June,2019,Caricom Development Fund,m,1735000,1307000,central government
+June,2019,European Economic Community,m,7240000,6959000,central government
+June,2019,Inter-American Development Bank,m,237873000,233031000,central government
+June,2019,International Fund for Agricultural Development,m,2565000,5204000,central government
+June,2019,International Bank for Reconstruction and Development,m,37598000,37957000,central government
+June,2019,Opec Fund for International Development,m,71327000,80510000,central government
+June,2019,Central American Bank For Economic Integration,m,26621000,25734000,central government
+June,2019,Bank of New York,c,1053004000,1053004000,central government
+June,2020,Government of Venezuela,m,429697000,429720000,central government
+June,2020,Kuwait Fund for Arab Economic Development,b,33239000,34965000,central government
+June,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+June,2020,Republic Of China/Taiwan,b,234676000,254112000,central government
+June,2020,Caribbean Development Bank,m,264204000,261161000,central government
+June,2020,Caricom Development Fund,m,873000,433000,central government
+June,2020,European Economic Community,m,5075000,4915000,central government
+June,2020,Inter-American Development Bank,m,245323000,247793000,central government
+June,2020,International Fund for Agricultural Development,m,5031000,6356000,central government
+June,2020,International Bank for Reconstruction and Development,m,38523000,38764000,central government
+June,2020,Opec Fund for International Development,m,94076000,109029000,central government
+June,2020,Central American Bank For Economic Integration,m,24847000,23960000,central government
+June,2020,Bank of New York,c,1053004000,1053004000,central government
+June,2020,Caribbean Community Climate Change Center,b,1.1e+07,8100000,central government
+June,2020,US$30mn Fixed Rate Notes,c,0,30600000,central government
+June,2021,Government of Venezuela,m,429720000,429720000,central government
+June,2021,Kuwait Fund for Arab Economic Development,b,34482000,33409000,central government
+June,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+June,2021,Republic Of China/Taiwan,b,285584000,277776000,central government
+June,2021,Caribbean Development Bank,m,282189000,297803000,central government
+June,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+June,2021,European Economic Community,m,4311000,4273000,central government
+June,2021,Inter-American Development Bank,m,289002000,286116000,central government
+June,2021,International Fund for Agricultural Development,m,6287000,6103000,central government
+June,2021,International Bank for Reconstruction and Development,m,56090000,74464000,central government
+June,2021,Opec Fund for International Development,m,131501000,145107000,central government
+June,2021,Central American Bank For Economic Integration,m,23073000,22186000,central government
+June,2021,Bank of New York,c,1092319000,1105802000,central government
+June,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+June,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+March,2019,Government of Venezuela,m,429450000,429560000,central government
+March,2019,Kuwait Fund for Arab Economic Development,b,25264000,25218000,central government
+March,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+March,2019,Republic Of China/Taiwan,b,236143000,225614000,central government
+March,2019,Caribbean Development Bank,m,259745000,258978000,central government
+March,2019,Caricom Development Fund,m,1735000,1522000,central government
+March,2019,European Economic Community,m,7240000,7104000,central government
+March,2019,Inter-American Development Bank,m,236736000,236761000,central government
+March,2019,International Fund for Agricultural Development,m,2475000,2471000,central government
+March,2019,International Bank for Reconstruction and Development,m,35282000,35282000,central government
+March,2019,Opec Fund for International Development,m,69894000,69498000,central government
+March,2019,Central American Bank For Economic Integration,m,26621000,26442000,central government
+March,2019,Bank of New York,c,1053004000,1053004000,central government
+March,2020,Government of Venezuela,m,429697000,429720000,central government
+March,2020,Kuwait Fund for Arab Economic Development,b,33241000,33218000,central government
+March,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+March,2020,Republic Of China,b,234676000,254605000,central government
+March,2020,Caribbean Development Bank,m,264204000,263824000,central government
+March,2020,Caricom Development Fund,m,873000,654000,central government
+March,2020,European Economic Community,m,5075000,5199000,central government
+March,2020,Inter-American Development Bank,m,245323000,243848000,central government
+March,2020,International Fund for Agricultural Development,m,5031000,5002000,central government
+March,2020,International Bank for Reconstruction and Development,m,38523000,39701000,central government
+March,2020,Opec Fund for International Development,m,94076000,104754000,central government
+March,2020,Central American Bank For Economic Integration,m,24847000,24669000,central government
+March,2020,Bank of New York,c,1053004000,1053004000,central government
+May,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+May,2015,Government of Venezuela,m,291537000,321548000,central government
+May,2015,Kuwait Fund for Arab Economic Development,b,20375000,18845000,central government
+May,2015,Republic Of China,b,254441000,265596000,central government
+May,2015,Caribbean Development Bank,m,213243000,211078000,central government
+May,2015,Caricom Development Fund,m,3350000,2974000,central government
+May,2015,European Economic Community,m,10772000,9593000,central government
+May,2015,Inter-American Development Bank,m,239374000,238780000,central government
+May,2015,International Fund for Agricultural Development,m,2956000,2588000,central government
+May,2015,International Bank for Reconstruction and Development,m,25098000,25450000,central government
+May,2015,Opec Fund for International Development,m,42627000,43280000,central government
+May,2015,Central American Bank For Economic Integration,m,15772000,18988000,central government
+May,2015,Bank of New York,c,1053004000,1053004000,central government
+May,2016,Government of Venezuela,m,373269000,374128000,central government
+May,2016,Kuwait Fund for Arab Economic Development,b,17710000,17786000,central government
+May,2016,Republic Of China,b,249150000,236005000,central government
+May,2016,Caribbean Development Bank,m,227202000,224037000,central government
+May,2016,Caricom Development Fund,m,2398000,2203000,central government
+May,2016,European Economic Community,m,8893000,8919000,central government
+May,2016,Inter-American Development Bank,m,239026000,235123000,central government
+May,2016,International Fund for Agricultural Development,m,2685000,2466000,central government
+May,2016,International Bank for Reconstruction and Development,m,25290000,26838000,central government
+May,2016,Opec Fund for International Development,m,47925000,46973000,central government
+May,2016,Central American Bank For Economic Integration,m,24317000,24139000,central government
+May,2016,Bank of New York,c,1053004000,1053004000,central government
+May,2017,Government of Venezuela,m,405985000,415487000,central government
+May,2017,Kuwait Fund for Arab Economic Development,b,22221000,23888000,central government
+May,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+May,2017,Republic Of China,b,244247000,254255000,central government
+May,2017,Caribbean Development Bank,m,244452000,246898000,central government
+May,2017,Caricom Development Fund,m,1610000,1410000,central government
+May,2017,European Economic Community,m,8071000,8429000,central government
+May,2017,Inter-American Development Bank,m,231486000,224252000,central government
+May,2017,International Fund for Agricultural Development,m,2820000,3002000,central government
+May,2017,International Bank for Reconstruction and Development,m,30684000,29123000,central government
+May,2017,Opec Fund for International Development,m,52645000,52232000,central government
+May,2017,Central American Bank For Economic Integration,m,23221000,23042000,central government
+May,2017,Bank of New York,c,1053004000,1053004000,central government
+May,2018,Government of Venezuela,m,419615000,429089000,central government
+May,2018,Kuwait Fund for Arab Economic Development,b,26512000,26442000,central government
+May,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+May,2018,Republic Of China,b,241601000,251541000,central government
+May,2018,Caribbean Development Bank,m,259805000,258086000,central government
+May,2018,Caricom Development Fund,m,799000,592000,central government
+May,2018,European Economic Community,m,8442000,8045000,central government
+May,2018,Inter-American Development Bank,m,228478000,220929000,central government
+May,2018,International Fund for Agricultural Development,m,2924000,2715000,central government
+May,2018,International Bank for Reconstruction and Development,m,32242000,34051000,central government
+May,2018,Opec Fund for International Development,m,70574000,69386000,central government
+May,2018,Central American Bank For Economic Integration,m,21447000,21269000,central government
+May,2018,Bank of New York,c,1053004000,1053004000,central government
+May,2019,Government of Venezuela,m,429450000,429591000,central government
+May,2019,Kuwait Fund for Arab Economic Development,b,27424000,28422000,central government
+May,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+May,2019,Republic Of China/Taiwan,b,236143000,222686000,central government
+May,2019,Caribbean Development Bank,m,259745000,256484000,central government
+May,2019,Caricom Development Fund,m,1735000,1522000,central government
+May,2019,European Economic Community,m,7240000,7001000,central government
+May,2019,Inter-American Development Bank,m,237873000,232629000,central government
+May,2019,International Fund for Agricultural Development,m,2565000,5182000,central government
+May,2019,International Bank for Reconstruction and Development,m,37598000,37957000,central government
+May,2019,Opec Fund for International Development,m,71327000,77705000,central government
+May,2019,Central American Bank For Economic Integration,m,26621000,26442000,central government
+May,2019,Bank of New York,c,1053004000,1053004000,central government
+May,2020,Government of Venezuela,m,429697000,429720000,central government
+May,2020,Kuwait Fund for Arab Economic Development,b,33171000,34841000,central government
+May,2020,Mega International Commercial Bank Company Limited,b,5e+07,48571000,central government
+May,2020,Republic Of China,b,234676000,255877000,central government
+May,2020,Caribbean Development Bank,m,264204000,260619000,central government
+May,2020,Caricom Development Fund,m,873000,654000,central government
+May,2020,European Economic Community,m,5075000,5083000,central government
+May,2020,Inter-American Development Bank,m,245323000,238059000,central government
+May,2020,International Fund for Agricultural Development,m,5031000,5056000,central government
+May,2020,International Bank for Reconstruction and Development,m,38523000,38764000,central government
+May,2020,Opec Fund for International Development,m,94076000,104483000,central government
+May,2020,Central American Bank For Economic Integration,m,24847000,24669000,central government
+May,2020,Bank of New York,c,1053004000,1053004000,central government
+May,2021,Government of Venezuela,m,429720000,429720000,central government
+May,2021,Kuwait Fund for Arab Economic Development,b,34482000,34388000,central government
+May,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+May,2021,Republic Of China/Taiwan,b,285584000,279541000,central government
+May,2021,Caribbean Development Bank,m,282189000,294836000,central government
+May,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+May,2021,European Economic Community,m,4311000,4256000,central government
+May,2021,Inter-American Development Bank,m,289002000,287783000,central government
+May,2021,International Fund for Agricultural Development,m,6287000,6127000,central government
+May,2021,International Bank for Reconstruction and Development,m,56090000,64464000,central government
+May,2021,Opec Fund for International Development,m,131501000,142901000,central government
+May,2021,Central American Bank For Economic Integration,m,23073000,22895000,central government
+May,2021,Bank of New York,c,1092319000,1105802000,central government
+May,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+May,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+November,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+November,2015,Government of Venezuela,m,291537000,365012000,central government
+November,2015,Kuwait Fund for Arab Economic Development,b,20375000,18585000,central government
+November,2015,Republic Of China,b,254441000,252450000,central government
+November,2015,Caribbean Development Bank,m,213242000,218345000,central government
+November,2015,Caricom Development Fund,m,3350000,2591000,central government
+November,2015,European Economic Community,m,10772000,8913000,central government
+November,2015,Inter-American Development Bank,m,238867000,238840000,central government
+November,2015,International Fund for Agricultural Development,m,2956000,2658000,central government
+November,2015,International Bank for Reconstruction and Development,m,25098000,25290000,central government
+November,2015,Opec Fund for International Development,m,42627000,48875000,central government
+November,2015,Central American Bank For Economic Integration,m,15803000,24317000,central government
+November,2015,Bank of New York,c,1053004000,1053004000,central government
+November,2016,Government of Venezuela,m,373269000,400584000,central government
+November,2016,Kuwait Fund for Arab Economic Development,b,19300000,18270000,central government
+November,2016,Republic Of China,b,249150000,246012000,central government
+November,2016,Caribbean Development Bank,m,227840000,242052000,central government
+November,2016,Caricom Development Fund,m,2398000,1810000,central government
+November,2016,European Economic Community,m,8893000,8305000,central government
+November,2016,Inter-American Development Bank,m,238682000,228501000,central government
+November,2016,International Fund for Agricultural Development,m,2685000,2464000,central government
+November,2016,International Bank for Reconstruction and Development,m,25290000,29680000,central government
+November,2016,Opec Fund for International Development,m,47925000,52728000,central government
+November,2016,Central American Bank For Economic Integration,m,24317000,23960000,central government
+November,2016,Bank of New York,c,1053004000,1053004000,central government
+November,2017,Government of Venezuela,m,406090000,415570000,central government
+November,2017,Kuwait Fund for Arab Economic Development,b,22221000,24030000,central government
+November,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+November,2017,Republic Of China,b,244247000,243365000,central government
+November,2017,Caribbean Development Bank,m,244452000,254265000,central government
+November,2017,Caricom Development Fund,m,1610000,1004000,central government
+November,2017,European Economic Community,m,8071000,8538000,central government
+November,2017,Inter-American Development Bank,m,231486000,219889000,central government
+November,2017,International Fund for Agricultural Development,m,2820000,2906000,central government
+November,2017,International Bank for Reconstruction and Development,m,33189000,32242000,central government
+November,2017,Opec Fund for International Development,m,52645000,56729000,central government
+November,2017,Central American Bank For Economic Integration,m,23221000,22156000,central government
+November,2017,Bank of New York,c,1053004000,1053004000,central government
+November,2018,Government of Venezuela,m,419615000,429384000,central government
+November,2018,Kuwait Fund for Arab Economic Development,b,26512000,25327000,central government
+November,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+November,2018,Republic Of China,b,241601000,237754000,central government
+November,2018,Caribbean Development Bank,m,259189000,259049000,central government
+November,2018,Caricom Development Fund,m,799000,174000,central government
+November,2018,European Economic Community,m,8442000,7479000,central government
+November,2018,Inter-American Development Bank,m,228478000,221067000,central government
+November,2018,International Fund for Agricultural Development,m,2924000,2462000,central government
+November,2018,International Bank for Reconstruction and Development,m,32207000,34895000,central government
+November,2018,Opec Fund for International Development,m,70574000,69214000,central government
+November,2018,Central American Bank For Economic Integration,m,21447000,27329000,central government
+November,2018,Bank of New York,c,1053004000,1053004000,central government
+November,2019,Government of Venezuela,m,429450000,429672000,central government
+November,2019,Kuwait Fund for Arab Economic Development,b,27424000,32466000,central government
+November,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+November,2019,Republic Of China/Taiwan,b,236143000,234164000,central government
+November,2019,Caribbean Development Bank,m,259765000,249194000,central government
+November,2019,Caricom Development Fund,m,1735000,1091000,central government
+November,2019,European Economic Community,m,7240000,5302000,central government
+November,2019,Inter-American Development Bank,m,237873000,232717000,central government
+November,2019,International Fund for Agricultural Development,m,2565000,5026000,central government
+November,2019,International Bank for Reconstruction and Development,m,37598000,38523000,central government
+November,2019,Opec Fund for International Development,m,71327000,87490000,central government
+November,2019,Central American Bank For Economic Integration,m,26621000,25555000,central government
+November,2019,Bank of New York,c,1053004000,1053004000,central government
+November,2020,Government of Venezuela,m,429697000,429720000,central government
+November,2020,Kuwait Fund for Arab Economic Development,b,33239000,36540000,central government
+November,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+November,2020,Republic Of China/Taiwan,b,234676000,266209000,central government
+November,2020,Caribbean Development Bank,m,264204000,271708000,central government
+November,2020,Caricom Development Fund,m,873000,3210000,central government
+November,2020,European Economic Community,m,5075000,4515000,central government
+November,2020,Inter-American Development Bank,m,245323000,288905000,central government
+November,2020,International Fund for Agricultural Development,m,5031000,6273000,central government
+November,2020,International Bank for Reconstruction and Development,m,38523000,56090000,central government
+November,2020,Opec Fund for International Development,m,93679000,121841000,central government
+November,2020,Central American Bank For Economic Integration,m,24847000,23782000,central government
+November,2020,Bank of New York,c,1053004000,1091998000,central government
+November,2020,Caribbean Community Climate Change Center,b,1.1e+07,2.4e+07,central government
+November,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+October,2015,Banco Nacional De Comercio Exterior,c,529000,0,central government
+October,2015,Government of Venezuela,m,291537000,365541000,central government
+October,2015,Kuwait Fund for Arab Economic Development,b,20375000,18686000,central government
+October,2015,Republic Of China,b,254441000,253759000,central government
+October,2015,Caribbean Development Bank,m,213242000,217828000,central government
+October,2015,Caricom Development Fund,m,3350000,2591000,central government
+October,2015,European Economic Community,m,10772000,9296000,central government
+October,2015,Inter-American Development Bank,m,238867000,243390000,central government
+October,2015,International Fund for Agricultural Development,m,2956000,2706000,central government
+October,2015,International Bank for Reconstruction and Development,m,25098000,25397000,central government
+October,2015,Opec Fund for International Development,m,42627000,49034000,central government
+October,2015,Central American Bank For Economic Integration,m,15803000,21935000,central government
+October,2015,Bank of New York,c,1053004000,1053004000,central government
+October,2016,Government of Venezuela,m,373269000,395190000,central government
+October,2016,Kuwait Fund for Arab Economic Development,b,19300000,18385000,central government
+October,2016,Republic Of China,b,249150000,247321000,central government
+October,2016,Caribbean Development Bank,m,227840000,236503000,central government
+October,2016,Caricom Development Fund,m,2398000,1810000,central government
+October,2016,European Economic Community,m,8893000,8553000,central government
+October,2016,Inter-American Development Bank,m,238682000,231637000,central government
+October,2016,International Fund for Agricultural Development,m,2685000,2500000,central government
+October,2016,International Bank for Reconstruction and Development,m,25290000,31528000,central government
+October,2016,Opec Fund for International Development,m,47925000,52887000,central government
+October,2016,Central American Bank For Economic Integration,m,24317000,23960000,central government
+October,2016,Bank of New York,c,1053004000,1053004000,central government
+October,2017,Government of Venezuela,m,405649000,415077000,central government
+October,2017,Kuwait Fund for Arab Economic Development,b,22221000,23974000,central government
+October,2017,Mega International Commercial Bank Company Limited,b,0,5e+07,central government
+October,2017,Republic Of China,b,244247000,244674000,central government
+October,2017,Caribbean Development Bank,m,244452000,253771000,central government
+October,2017,Caricom Development Fund,m,1610000,1004000,central government
+October,2017,European Economic Community,m,8071000,8378000,central government
+October,2017,Inter-American Development Bank,m,231486000,224177000,central government
+October,2017,International Fund for Agricultural Development,m,2820000,3076000,central government
+October,2017,International Bank for Reconstruction and Development,m,33189000,32349000,central government
+October,2017,Opec Fund for International Development,m,52645000,56887000,central government
+October,2017,Central American Bank For Economic Integration,m,23221000,22156000,central government
+October,2017,Bank of New York,c,1053004000,1053004000,central government
+October,2018,Government of Venezuela,m,419615000,429341000,central government
+October,2018,Kuwait Fund for Arab Economic Development,b,26512000,25348000,central government
+October,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+October,2018,Republic Of China/Taiwan,b,241601000,239063000,central government
+October,2018,Caribbean Development Bank,m,259751000,258079000,central government
+October,2018,Caricom Development Fund,m,799000,174000,central government
+October,2018,European Economic Community,m,8442000,7453000,central government
+October,2018,Inter-American Development Bank,m,228478000,224699000,central government
+October,2018,International Fund for Agricultural Development,m,2924000,2460000,central government
+October,2018,International Bank for Reconstruction and Development,m,32242000,34895000,central government
+October,2018,Opec Fund for International Development,m,70574000,69372000,central government
+October,2018,Central American Bank For Economic Integration,m,21447000,27329000,central government
+October,2018,Bank of New York,c,1053004000,1053004000,central government
+October,2019,Government of Venezuela,m,429450000,429649000,central government
+October,2019,Kuwait Fund for Arab Economic Development,b,27424000,31632000,central government
+October,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+October,2019,Republic Of China/Taiwan,b,236143000,236098000,central government
+October,2019,Caribbean Development Bank,m,259765000,249090000,central government
+October,2019,Caricom Development Fund,m,1735000,1091000,central government
+October,2019,European Economic Community,m,7240000,6649000,central government
+October,2019,Inter-American Development Bank,m,237873000,236348000,central government
+October,2019,International Fund for Agricultural Development,m,2565000,5026000,central government
+October,2019,International Bank for Reconstruction and Development,m,37598000,37682000,central government
+October,2019,Opec Fund for International Development,m,71327000,85793000,central government
+October,2019,Central American Bank For Economic Integration,m,26621000,25555000,central government
+October,2019,Bank of New York,c,1053004000,1053004000,central government
+October,2021,Government of Venezuela,m,429692000,429692000,central government
+October,2021,Kuwait Fund for Arab Economic Development,b,34482000,32685000,central government
+October,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+October,2021,Republic Of China/Taiwan,b,285584000,277348000,central government
+October,2021,Caribbean Development Bank,m,282189000,296908000,central government
+October,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+October,2021,European Economic Community,m,4311000,4275000,central government
+October,2021,Inter-American Development Bank,m,289002000,300847000,central government
+October,2021,International Fund for Agricultural Development,m,6287000,5926000,central government
+October,2021,International Bank for Reconstruction and Development,m,56090000,75228000,central government
+October,2021,Opec Fund for International Development,m,131501000,160360000,central government
+October,2021,Central American Bank For Economic Integration,m,23073000,22008000,central government
+October,2021,Bank of New York,c,1092319000,1105802000,central government
+October,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+October,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+September,2018,Government of Venezuela,m,419615000,429276000,central government
+September,2018,Kuwait Fund for Arab Economic Development,b,26512000,25395000,central government
+September,2018,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+September,2018,Republic Of China/Taiwan,b,241601000,239063000,central government
+September,2018,Caribbean Development Bank,m,259751000,261413000,central government
+September,2018,Caricom Development Fund,m,799000,384000,central government
+September,2018,European Economic Community,m,8442000,7683000,central government
+September,2018,Inter-American Development Bank,m,228478000,225985000,central government
+September,2018,International Fund for Agricultural Development,m,2924000,2674000,central government
+September,2018,International Bank for Reconstruction and Development,m,32242000,35651000,central government
+September,2018,Opec Fund for International Development,m,70574000,70303000,central government
+September,2018,Central American Bank For Economic Integration,m,21447000,20382000,central government
+September,2018,Bank of New York,c,1053004000,1053004000,central government
+September,2019,Government of Venezuela,m,429450000,429627000,central government
+September,2019,Kuwait Fund for Arab Economic Development,b,27424000,31316000,central government
+September,2019,Mega International Commercial Bank Company Limited,b,5e+07,5e+07,central government
+September,2019,Republic Of China/Taiwan,b,236143000,236098000,central government
+September,2019,Caribbean Development Bank,m,259765000,253845000,central government
+September,2019,Caricom Development Fund,m,1735000,1091000,central government
+September,2019,European Economic Community,m,7240000,6556000,central government
+September,2019,Inter-American Development Bank,m,237873000,237292000,central government
+September,2019,International Fund for Agricultural Development,m,2565000,5157000,central government
+September,2019,International Bank for Reconstruction and Development,m,37598000,38803000,central government
+September,2019,Opec Fund for International Development,m,71327000,85790000,central government
+September,2019,Central American Bank For Economic Integration,m,26621000,25555000,central government
+September,2019,Bank of New York,c,1053004000,1053004000,central government
+September,2020,Government of Venezuela,m,429697000,429720000,central government
+September,2020,Kuwait Fund for Arab Economic Development,b,33239000,34660000,central government
+September,2020,Mega International Commercial Bank Company Limited,b,5e+07,47143000,central government
+September,2020,Republic Of China/Taiwan,b,234676000,266518000,central government
+September,2020,Caribbean Development Bank,m,264204000,266741000,central government
+September,2020,Caricom Development Fund,m,873000,210000,central government
+September,2020,European Economic Community,m,5075000,4629000,central government
+September,2020,Inter-American Development Bank,m,245323000,287097000,central government
+September,2020,International Fund for Agricultural Development,m,5031000,6404000,central government
+September,2020,International Bank for Reconstruction and Development,m,38523000,57768000,central government
+September,2020,Opec Fund for International Development,m,93679000,120855000,central government
+September,2020,Central American Bank For Economic Integration,m,24847000,23782000,central government
+September,2020,Bank of New York,c,1053004000,1.079e+09,central government
+September,2020,Caribbean Community Climate Change Center,b,1.1e+07,0,central government
+September,2020,US$30mn Fixed Rate Notes,c,0,34600000,central government
+September,2021,Government of Venezuela,m,429692000,429692000,central government
+September,2021,Kuwait Fund for Arab Economic Development,b,34482000,32675000,central government
+September,2021,Mega International Commercial Bank Company Limited,b,47143000,45714000,central government
+September,2021,Republic Of China/Taiwan,b,285584000,277348000,central government
+September,2021,Caribbean Development Bank,m,282189000,299784000,central government
+September,2021,Caricom Development Fund,m,3e+06,3e+06,central government
+September,2021,European Economic Community,m,4311000,4289000,central government
+September,2021,Inter-American Development Bank,m,289002000,303627000,central government
+September,2021,International Fund for Agricultural Development,m,6287000,6081000,central government
+September,2021,International Bank for Reconstruction and Development,m,56090000,77464000,central government
+September,2021,Opec Fund for International Development,m,131501000,156936000,central government
+September,2021,Central American Bank For Economic Integration,m,23073000,22008000,central government
+September,2021,Bank of New York,c,1092319000,1105802000,central government
+September,2021,Caribbean Community Climate Change Center,b,2.4e+07,0,central government
+September,2021,US$30mn Fixed Rate Notes,c,34600000,34600000,central government
+April,2014,Banco Nacional De Comercio Exterior,c,1588000,1059000,central government
+April,2014,Government of Venezuela,m,177348000,222892000,central government
+April,2014,Kuwait Fund for Arab Economic Development,b,20530000,19820000,central government
+April,2014,Republic Of China,b,280733000,272196000,central government
+April,2014,Caribbean Development Bank,m,206511000,205604000,central government
+April,2014,Caricom Development Fund,m,3936000,3736000,central government
+April,2014,European Economic Community,m,13071000,12927000,central government
+April,2014,Inter-American Development Bank,m,239973000,237288000,central government
+April,2014,International Fund for Agricultural Development,m,2113000,2444000,central government
+April,2014,International Bank for Reconstruction and Development,m,23766000,22965000,central government
+April,2014,Opec Fund for International Development,m,39166000,39372000,central government
+April,2014,Central American Bank For Economic Integration,m,8131000,9544000,central government
+April,2014,Bank of New York,c,1053004000,1053004000,central government
+August,2011,Banco Nacional De Comercio Exterior,c,4764000,3705000,central government
+August,2011,Government of the United States,m,1096000,924000,central government
+August,2011,Government of Venezuela,m,38857000,37916000,central government
+August,2011,Kuwait Fund for Arab Economic Development,b,16930000,15950000,central government
+August,2011,Republic Of China,b,280884000,285251000,central government
+August,2011,Caribbean Development Bank,m,189187000,187374000,central government
+August,2011,European Economic Community,m,14903000,15644000,central government
+August,2011,European Investment Bank,m,91000,99000,central government
+August,2011,Inter-American Development Bank,m,205922000,216916000,central government
+August,2011,International Fund for Agricultural Development,m,1439000,1790000,central government
+August,2011,International Bank for Reconstruction and Development,m,22585000,19950000,central government
+August,2011,Opec Fund for International Development,m,14849000,14575000,central government
+August,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+August,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+August,2011,Bear Stearns & Company,c,5916000,5916000,central government
+August,2011,Bank of New York,c,1087613000,1087613000,central government
+August,2012,Banco Nacional De Comercio Exterior,c,3705000,2646000,central government
+August,2012,Government of the United States,m,749000,568000,central government
+August,2012,Government of Venezuela,m,37492000,36257000,central government
+August,2012,Kuwait Fund for Arab Economic Development,b,20363000,19291000,central government
+August,2012,Republic Of China,b,280740000,284842000,central government
+August,2012,Caribbean Development Bank,m,196985000,195918000,central government
+August,2012,Caricom Development Fund,m,2e+06,2e+06,central government
+August,2012,European Economic Community,m,13795000,12951000,central government
+August,2012,Inter-American Development Bank,m,220755000,227097000,central government
+August,2012,International Fund for Agricultural Development,m,2192000,1900000,central government
+August,2012,International Bank for Reconstruction and Development,m,19539000,19187000,central government
+August,2012,Opec Fund for International Development,m,17645000,20221000,central government
+August,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+August,2012,Bear Stearns & Company,c,5916000,5916000,central government
+August,2012,Bank of New York,c,1087613000,1087613000,central government
+August,2013,Banco Nacional De Comercio Exterior,c,2647000,1588000,central government
+August,2013,Government of the United States,m,384000,194000,central government
+August,2013,Government of Venezuela,m,36050000,133087000,central government
+August,2013,Kuwait Fund for Arab Economic Development,b,18744000,17463000,central government
+August,2013,Republic Of China,b,280331000,284580000,central government
+August,2013,Caribbean Development Bank,m,199240000,202291000,central government
+August,2013,Caricom Development Fund,m,2140000,2140000,central government
+August,2013,European Economic Community,m,13154000,12784000,central government
+August,2013,Inter-American Development Bank,m,234198000,233455000,central government
+August,2013,International Fund for Agricultural Development,m,1642000,2955000,central government
+August,2013,International Bank for Reconstruction and Development,m,21459000,24811000,central government
+August,2013,Opec Fund for International Development,m,21566000,33666000,central government
+August,2013,Central American Bank For Economic Integration,m,958000,4615000,central government
+August,2013,Bear Stearns & Company,c,5492000,0,central government
+August,2013,Bank of New York,c,1079348000,1053004000,central government
+December,2011,Banco Nacional De Comercio Exterior,c,4764000,3705000,central government
+December,2011,Government of the United States,m,1096000,748000,central government
+December,2011,Government of Venezuela,m,38760000,37492000,central government
+December,2011,Kuwait Fund for Arab Economic Development,b,16930000,14987000,central government
+December,2011,Republic Of China,b,280884000,280740000,central government
+December,2011,Caribbean Development Bank,m,189383000,199237000,central government
+December,2011,European Economic Community,m,14903000,13795000,central government
+December,2011,European Investment Bank,m,91000,0,central government
+December,2011,Inter-American Development Bank,m,207082000,217790000,central government
+December,2011,International Fund for Agricultural Development,m,1450000,2192000,central government
+December,2011,International Bank for Reconstruction and Development,m,22585000,19256000,central government
+December,2011,Opec Fund for International Development,m,14814000,16691000,central government
+December,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+December,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+December,2011,Bear Stearns & Company,c,5916000,5916000,central government
+December,2011,Bank of New York,c,1087613000,1087613000,central government
+December,2012,Banco Nacional De Comercio Exterior,c,3705000,2647000,central government
+December,2012,Government of the United States,m,749000,384000,central government
+December,2012,Government of Venezuela,m,37492000,36050000,central government
+December,2012,Kuwait Fund for Arab Economic Development,b,20412000,17788000,central government
+December,2012,Republic Of China,b,280740000,280331000,central government
+December,2012,Caribbean Development Bank,m,196985000,199204000,central government
+December,2012,Caricom Development Fund,m,2e+06,2140000,central government
+December,2012,European Economic Community,m,13795000,13003000,central government
+December,2012,Inter-American Development Bank,m,220765000,234615000,central government
+December,2012,International Fund for Agricultural Development,m,2192000,1642000,central government
+December,2012,International Bank for Reconstruction and Development,m,19539000,21459000,central government
+December,2012,Opec Fund for International Development,m,17645000,21566000,central government
+December,2012,Central American Bank For Economic Integration,m,1e+06,958000,central government
+December,2012,Bear Stearns & Company,c,5916000,5916000,central government
+December,2012,Bank of New York,c,1087613000,1087613000,central government
+February,2013,Banco Nacional De Comercio Exterior,c,2647000,2117000,central government
+February,2013,Government of the United States,m,384000,384000,central government
+February,2013,Government of Venezuela,m,36050000,71742000,central government
+February,2013,Kuwait Fund for Arab Economic Development,b,18744000,18599000,central government
+February,2013,Republic Of China,b,280331000,275961000,central government
+February,2013,Caribbean Development Bank,m,199240000,198649000,central government
+February,2013,Caricom Development Fund,m,2140000,2140000,central government
+February,2013,European Economic Community,m,13003000,12940000,central government
+February,2013,Inter-American Development Bank,m,233654000,231433000,central government
+February,2013,International Fund for Agricultural Development,m,1642000,2209000,central government
+February,2013,International Bank for Reconstruction and Development,m,21459000,23048000,central government
+February,2013,Opec Fund for International Development,m,21566000,23224000,central government
+February,2013,Central American Bank For Economic Integration,m,958000,958000,central government
+February,2013,Bear Stearns & Company,c,5916000,5916000,central government
+February,2013,Bank of New York,c,1087613000,1087613000,central government
+January,2012,Banco Nacional De Comercio Exterior,c,3705000,3176000,central government
+January,2012,Government of the United States,m,748000,748000,central government
+January,2012,Government of Venezuela,m,37492000,37492000,central government
+January,2012,Kuwait Fund for Arab Economic Development,b,20350000,19963000,central government
+January,2012,Republic Of China,b,280740000,279005000,central government
+January,2012,Caribbean Development Bank,m,199235000,197522000,central government
+January,2012,European Economic Community,m,13795000,13865000,central government
+January,2012,Inter-American Development Bank,m,220755000,221028000,central government
+January,2012,International Fund for Agricultural Development,m,2192000,2214000,central government
+January,2012,International Bank for Reconstruction and Development,m,19256000,19582000,central government
+January,2012,Opec Fund for International Development,m,17645000,17645000,central government
+January,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+January,2012,Bear Stearns & Company,c,5916000,5916000,central government
+January,2012,Bank of New York,c,1087613000,1087613000,central government
+January,2013,Banco Nacional De Comercio Exterior,c,2647000,2647000,central government
+January,2013,Government of the United States,m,384000,384000,central government
+January,2013,Government of Venezuela,m,36050000,35870000,central government
+January,2013,Kuwait Fund for Arab Economic Development,b,17788000,17788000,central government
+January,2013,Republic Of China,b,280331000,277419000,central government
+January,2013,Caribbean Development Bank,m,199240000,196918000,central government
+January,2013,Caricom Development Fund,m,2140000,2140000,central government
+January,2013,European Economic Community,m,13003000,13359000,central government
+January,2013,Inter-American Development Bank,m,233654000,232811000,central government
+January,2013,International Fund for Agricultural Development,m,1642000,1647000,central government
+January,2013,International Bank for Reconstruction and Development,m,21459000,21459000,central government
+January,2013,Opec Fund for International Development,m,21566000,21566000,central government
+January,2013,Central American Bank For Economic Integration,m,958000,958000,central government
+January,2013,Bear Stearns & Company,c,5916000,5916000,central government
+January,2013,Bank of New York,c,1087613000,1087613000,central government
+July,2011,Banco Nacional De Comercio Exterior,c,4764000,3705000,central government
+July,2011,Government of the United States,m,1096000,924000,central government
+July,2011,Government of Venezuela,m,39148000,38506000,central government
+July,2011,Kuwait Fund for Arab Economic Development,b,16930000,15875000,central government
+July,2011,Republic Of China,b,280884000,289209000,central government
+July,2011,Caribbean Development Bank,m,189187000,187222000,central government
+July,2011,European Economic Community,m,14775000,15552000,central government
+July,2011,European Investment Bank,m,91000,98000,central government
+July,2011,Inter-American Development Bank,m,205922000,217755000,central government
+July,2011,International Fund for Agricultural Development,m,1408000,1715000,central government
+July,2011,International Bank for Reconstruction and Development,m,22795000,20380000,central government
+July,2011,Opec Fund for International Development,m,13782000,13508000,central government
+July,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+July,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+July,2011,Bear Stearns & Company,c,5916000,5916000,central government
+July,2011,Bank of New York,c,1087613000,1087613000,central government
+July,2012,Banco Nacional De Comercio Exterior,c,3705000,2646000,central government
+July,2012,Government of the United States,m,749000,568000,central government
+July,2012,Government of Venezuela,m,37492000,36559000,central government
+July,2012,Kuwait Fund for Arab Economic Development,b,20350000,19122000,central government
+July,2012,Republic Of China,b,280740000,288800000,central government
+July,2012,Caribbean Development Bank,m,196985000,195918000,central government
+July,2012,Caricom Development Fund,m,2e+06,2e+06,central government
+July,2012,European Economic Community,m,13795000,12609000,central government
+July,2012,Inter-American Development Bank,m,220755000,227100000,central government
+July,2012,International Fund for Agricultural Development,m,2192000,1883000,central government
+July,2012,International Bank for Reconstruction and Development,m,19539000,19187000,central government
+July,2012,Opec Fund for International Development,m,17645000,20221000,central government
+July,2012,Central American Bank For Economic Integration,m,1e+06,1e+06,central government
+July,2012,Bear Stearns & Company,c,5916000,5916000,central government
+July,2012,Bank of New York,c,1087613000,1087613000,central government
+July,2013,Banco Nacional De Comercio Exterior,c,2647000,1588000,central government
+July,2013,Government of the United States,m,384000,194000,central government
+July,2013,Government of Venezuela,m,36050000,133396000,central government
+July,2013,Kuwait Fund for Arab Economic Development,b,18744000,17509000,central government
+July,2013,Republic Of China,b,280331000,268539000,central government
+July,2013,Caribbean Development Bank,m,199240000,199645000,central government
+July,2013,Caricom Development Fund,m,2140000,2140000,central government
+July,2013,European Economic Community,m,13154000,12791000,central government
+July,2013,Inter-American Development Bank,m,234198000,233364000,central government
+July,2013,International Fund for Agricultural Development,m,1642000,2955000,central government
+July,2013,International Bank for Reconstruction and Development,m,21459000,24601000,central government
+July,2013,Opec Fund for International Development,m,21566000,33666000,central government
+July,2013,Central American Bank For Economic Integration,m,958000,4615000,central government
+July,2013,Bear Stearns & Company,c,5492000,0,central government
+July,2013,Bank of New York,c,1088080000,1053004000,central government
+May,2013,Banco Nacional De Comercio Exterior,c,2647000,2117000,central government
+May,2013,Government of the United States,m,384000,194000,central government
+May,2013,Government of Venezuela,m,36050000,100423000,central government
+May,2013,Kuwait Fund for Arab Economic Development,b,18744000,18439000,central government
+May,2013,Republic Of China,b,280331000,272986000,central government
+May,2013,Caribbean Development Bank,m,199240000,198490000,central government
+May,2013,Caricom Development Fund,m,2140000,2140000,central government
+May,2013,European Economic Community,m,13154000,12726000,central government
+May,2013,Inter-American Development Bank,m,234198000,232849000,central government
+May,2013,International Fund for Agricultural Development,m,1642000,1929000,central government
+May,2013,International Bank for Reconstruction and Development,m,21459000,23002000,central government
+May,2013,Opec Fund for International Development,m,21566000,32796000,central government
+May,2013,Central American Bank For Economic Integration,m,958000,3615000,central government
+May,2013,Bear Stearns & Company,c,5492000,0,central government
+May,2013,Bank of New York,c,1088080000,1061673000,central government
+November,2011,Banco Nacional De Comercio Exterior,c,4764000,3705000,central government
+November,2011,Government of the United States,m,1096000,748000,central government
+November,2011,Government of Venezuela,m,38857000,37916000,central government
+November,2011,Kuwait Fund for Arab Economic Development,b,16930000,15680000,central government
+November,2011,Republic Of China,b,280884000,282275000,central government
+November,2011,Caribbean Development Bank,m,189383000,197789000,central government
+November,2011,European Economic Community,m,14903000,14415000,central government
+November,2011,European Investment Bank,m,91000,0,central government
+November,2011,Inter-American Development Bank,m,207082000,216015000,central government
+November,2011,International Fund for Agricultural Development,m,1450000,2282000,central government
+November,2011,International Bank for Reconstruction and Development,m,22585000,19256000,central government
+November,2011,Opec Fund for International Development,m,14814000,16691000,central government
+November,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+November,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+November,2011,Bear Stearns & Company,c,5916000,5916000,central government
+November,2011,Bank of New York,c,1087613000,1087613000,central government
+November,2012,Banco Nacional De Comercio Exterior,c,3705000,2647000,central government
+November,2012,Government of the United States,m,749000,384000,central government
+November,2012,Government of Venezuela,m,37492000,36050000,central government
+November,2012,Kuwait Fund for Arab Economic Development,b,20412000,19487000,central government
+November,2012,Republic Of China,b,280740000,281867000,central government
+November,2012,Caribbean Development Bank,m,196985000,198204000,central government
+November,2012,Caricom Development Fund,m,2e+06,2140000,central government
+November,2012,European Economic Community,m,13795000,13285000,central government
+November,2012,Inter-American Development Bank,m,220765000,233778000,central government
+November,2012,International Fund for Agricultural Development,m,2192000,1646000,central government
+November,2012,International Bank for Reconstruction and Development,m,19539000,20640000,central government
+November,2012,Opec Fund for International Development,m,17645000,21197000,central government
+November,2012,Central American Bank For Economic Integration,m,1e+06,958000,central government
+November,2012,Bear Stearns & Company,c,5916000,5916000,central government
+November,2012,Bank of New York,c,1087613000,1087613000,central government
+November,2014,Banco Nacional De Comercio Exterior,c,1588000,529000,central government
+November,2014,Government of Venezuela,m,177415000,291590000,central government
+November,2014,Kuwait Fund for Arab Economic Development,b,20711000,19458000,central government
+November,2014,Republic Of China,b,280733000,257741000,central government
+November,2014,Caribbean Development Bank,m,206511000,210877000,central government
+November,2014,Caricom Development Fund,m,3936000,3350000,central government
+November,2014,European Economic Community,m,13071000,11271000,central government
+November,2014,Inter-American Development Bank,m,240567000,234062000,central government
+November,2014,International Fund for Agricultural Development,m,2113000,2533000,central government
+November,2014,International Bank for Reconstruction and Development,m,24366000,25098000,central government
+November,2014,Opec Fund for International Development,m,39166000,42323000,central government
+November,2014,Central American Bank For Economic Integration,m,8212000,15772000,central government
+November,2014,Bank of New York,c,1053004000,1053004000,central government
+October,2011,Banco Nacional De Comercio Exterior,c,4764000,3705000,central government
+October,2011,Government of the United States,m,1096000,748000,central government
+October,2011,Government of Venezuela,m,38857000,37916000,central government
+October,2011,Kuwait Fund for Arab Economic Development,b,16930000,15857000,central government
+October,2011,Republic Of China,b,280884000,283584000,central government
+October,2011,Caribbean Development Bank,m,189383000,195944000,central government
+October,2011,European Economic Community,m,14903000,15307000,central government
+October,2011,European Investment Bank,m,91000,0,central government
+October,2011,Inter-American Development Bank,m,207082000,217272000,central government
+October,2011,International Fund for Agricultural Development,m,1450000,2332000,central government
+October,2011,International Bank for Reconstruction and Development,m,22585000,19943000,central government
+October,2011,Opec Fund for International Development,m,14814000,15129000,central government
+October,2011,Central American Bank For Economic Integration,m,980000,980000,central government
+October,2011,Manufacturers & Traders Trust Co.,c,865000,0,central government
+October,2011,Bear Stearns & Company,c,5916000,5916000,central government
+October,2011,Bank of New York,c,1087613000,1087613000,central government
+October,2012,Banco Nacional De Comercio Exterior,c,3705000,2647000,central government
+October,2012,Government of the United States,m,749000,384000,central government
+October,2012,Government of Venezuela,m,37492000,36257000,central government
+October,2012,Kuwait Fund for Arab Economic Development,b,20412000,19532000,central government
+October,2012,Republic Of China,b,280740000,283175000,central government
+October,2012,Caribbean Development Bank,m,196985000,196204000,central government
+October,2012,Caricom Development Fund,m,2e+06,2140000,central government
+October,2012,European Economic Community,m,13795000,12928000,central government
+October,2012,Inter-American Development Bank,m,220765000,231756000,central government
+October,2012,International Fund for Agricultural Development,m,2192000,1596000,central government
+October,2012,International Bank for Reconstruction and Development,m,19539000,20626000,central government
+October,2012,Opec Fund for International Development,m,17645000,20941000,central government
+October,2012,Central American Bank For Economic Integration,m,1e+06,958000,central government
+October,2012,Bear Stearns & Company,c,5916000,5916000,central government
+October,2012,Bank of New York,c,1087613000,1087613000,central government
+October,2014,Banco Nacional De Comercio Exterior,c,1588000,529000,central government
+October,2014,Government of Venezuela,m,177415000,291432000,central government
+October,2014,Kuwait Fund for Arab Economic Development,b,20711000,19565000,central government
+October,2014,Republic Of China,b,280733000,260717000,central government
+October,2014,Caribbean Development Bank,m,206511000,209925000,central government
+October,2014,Caricom Development Fund,m,3936000,3350000,central government
+October,2014,European Economic Community,m,13071000,11288000,central government
+October,2014,Inter-American Development Bank,m,240567000,236008000,central government
+October,2014,International Fund for Agricultural Development,m,2113000,2573000,central government
+October,2014,International Bank for Reconstruction and Development,m,24366000,24700000,central government
+October,2014,Opec Fund for International Development,m,39166000,41403000,central government
+October,2014,Central American Bank For Economic Integration,m,8212000,15772000,central government
+October,2014,Bank of New York,c,1053004000,1053004000,central government
+December,2013,Banco Nacional De Comercio Exterior,c,2647000,1588000,central government
+December,2013,Government of the United States,m,384000,0,central government
+December,2013,Government of Venezuela,m,36050000,177348000,central government
+December,2013,Kuwait Fund for Arab Economic Development,b,18744000,17658000,central government
+December,2013,Republic Of China,b,280331000,280805000,central government
+December,2013,Caribbean Development Bank,m,199240000,206497000,central government
+December,2013,Caricom Development Fund,m,2140000,3936000,central government
+December,2013,European Economic Community,m,13154000,13071000,central government
+December,2013,Inter-American Development Bank,m,233429000,239505000,central government
+December,2013,International Fund for Agricultural Development,m,1642000,2730000,central government
+December,2013,International Bank for Reconstruction and Development,m,21459000,23090000,central government
+December,2013,Opec Fund for International Development,m,21566000,39166000,central government
+December,2013,Central American Bank For Economic Integration,m,958000,8131000,central government
+December,2013,Bear Stearns & Company,c,5492000,0,central government
+December,2013,Bank of New York,c,1079348000,1053004000,central government
+January,2014,Banco Nacional De Comercio Exterior,c,1588000,1588000,central government
+January,2014,Government of Venezuela,m,177348000,197936000,central government
+January,2014,Kuwait Fund for Arab Economic Development,b,19699000,18652000,central government
+January,2014,Republic Of China,b,280733000,277821000,central government
+January,2014,Caribbean Development Bank,m,206511000,203374000,central government
+January,2014,Caricom Development Fund,m,3936000,3936000,central government
+January,2014,European Economic Community,m,13071000,12670000,central government
+January,2014,Inter-American Development Bank,m,239819000,238977000,central government
+January,2014,International Fund for Agricultural Development,m,2113000,2794000,central government
+January,2014,International Bank for Reconstruction and Development,m,23766000,23766000,central government
+January,2014,Opec Fund for International Development,m,39166000,39949000,central government
+January,2014,Central American Bank For Economic Integration,m,8131000,8131000,central government
+January,2014,Bank of New York,c,1053004000,1053004000,central government
+November,2013,Banco Nacional De Comercio Exterior,c,2647000,1588000,central government
+November,2013,Government of the United States,m,384000,0,central government
+November,2013,Government of Venezuela,m,36050000,177474000,central government
+November,2013,Kuwait Fund for Arab Economic Development,b,18744000,17629000,central government
+November,2013,Republic Of China,b,280331000,284105000,central government
+November,2013,Caribbean Development Bank,m,199240000,203608000,central government
+November,2013,Caricom Development Fund,m,2140000,4140000,central government
+November,2013,European Economic Community,m,13154000,13096000,central government
+November,2013,Inter-American Development Bank,m,233429000,237296000,central government
+November,2013,International Fund for Agricultural Development,m,1642000,2722000,central government
+November,2013,International Bank for Reconstruction and Development,m,21459000,23090000,central government
+November,2013,Opec Fund for International Development,m,21566000,37595000,central government
+November,2013,Central American Bank For Economic Integration,m,958000,7057000,central government
+November,2013,Bear Stearns & Company,c,5492000,0,central government
+November,2013,Bank of New York,c,1079348000,1053004000,central government
+October,2013,Banco Nacional De Comercio Exterior,c,2647000,1588000,central government
+October,2013,Government of the United States,m,384000,0,central government
+October,2013,Government of Venezuela,m,36050000,177455000,central government
+October,2013,Kuwait Fund for Arab Economic Development,b,18744000,17673000,central government
+October,2013,Republic Of China,b,280331000,285414000,central government
+October,2013,Caribbean Development Bank,m,199240000,202755000,central government
+October,2013,Caricom Development Fund,m,2140000,2140000,central government
+October,2013,European Economic Community,m,13154000,13251000,central government
+October,2013,Inter-American Development Bank,m,234198000,237199000,central government
+October,2013,International Fund for Agricultural Development,m,1642000,2727000,central government
+October,2013,International Bank for Reconstruction and Development,m,21459000,23777000,central government
+October,2013,Opec Fund for International Development,m,21566000,32866000,central government
+October,2013,Central American Bank For Economic Integration,m,958000,7057000,central government
+October,2013,Bear Stearns & Company,c,5492000,0,central government
+October,2013,Bank of New York,c,1079348000,1053004000,central government

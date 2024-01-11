@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="John Karuitha">
+<meta name="dcterms.date" content="2023-01-16">
+<meta name="description" content="Independent Data Analysis Project">
+
+<title>Estimating Systematic Risk Using the Capital Asset Pricing Model, CAPM</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="final_quarto_report_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_quarto_report_files/libs/quarto-html/quarto.js"></script>
+<script src="final_quarto_report_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_quarto_report_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_quarto_report_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_quarto_report_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_quarto_report_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_quarto_report_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_quarto_report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_quarto_report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+    .quarto-title-block .quarto-title-banner {
+      color: black;
+background-image: url(wellness_stock.jpg);
+background-size: cover;
+    }
+    </style>
+
+<script src="final_quarto_report_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="final_quarto_report_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><strong>Estimating Systematic Risk Using the Capital Asset Pricing Model, CAPM</strong></h1>
+            <p class="subtitle lead"><em>Application of CAPM to IBM and Microsoft Stocks, 2000-2022</em></p>
+                  <div>
+        <div class="description">
+          Independent Data Analysis Project
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  <div class="quarto-title-meta-author">
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Affiliation</div>
+    
+      <div class="quarto-title-meta-contents">
+      <a href="www.linkedin.com/in/Karuitha">John Karuitha</a> 
+    </div>
+      <div class="quarto-title-meta-contents">
+          <p class="affiliation">
+              <a href="www.karu.ac.ke">
+              Karatina University, School of Business, Karatina, Kenya
+              </a>
+            </p>
+        </div>
+      </div>
+
+  <div class="quarto-title-meta">
+
+        
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 16, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background"><span class="toc-section-number">1</span>  <strong>Background</strong></a></li>
+  <li><a href="#critique-of-the-capm" id="toc-critique-of-the-capm" class="nav-link" data-scroll-target="#critique-of-the-capm"><span class="toc-section-number">2</span>  <strong>Critique of the CAPM</strong></a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="toc-section-number">3</span>  <strong>Data</strong></a></li>
+  <li><a href="#exploring-the-data" id="toc-exploring-the-data" class="nav-link" data-scroll-target="#exploring-the-data"><span class="toc-section-number">4</span>  Exploring the Data</a>
+  <ul class="collapse">
+  <li><a href="#missing-values" id="toc-missing-values" class="nav-link" data-scroll-target="#missing-values"><span class="toc-section-number">4.1</span>  Missing Values</a></li>
+  <li><a href="#summary-statistics-for-stock-prices" id="toc-summary-statistics-for-stock-prices" class="nav-link" data-scroll-target="#summary-statistics-for-stock-prices"><span class="toc-section-number">4.2</span>  Summary Statistics for Stock Prices</a></li>
+  <li><a href="#trends-in-stock-returns" id="toc-trends-in-stock-returns" class="nav-link" data-scroll-target="#trends-in-stock-returns"><span class="toc-section-number">4.3</span>  Trends in Stock Returns</a></li>
+  <li><a href="#summary-statistics---stock-returns" id="toc-summary-statistics---stock-returns" class="nav-link" data-scroll-target="#summary-statistics---stock-returns"><span class="toc-section-number">4.4</span>  Summary Statistics - Stock Returns</a></li>
+  </ul></li>
+  <li><a href="#regression-model" id="toc-regression-model" class="nav-link" data-scroll-target="#regression-model"><span class="toc-section-number">5</span>  <strong>Regression Model</strong></a>
+  <ul class="collapse">
+  <li><a href="#regression-for-gm-stock" id="toc-regression-for-gm-stock" class="nav-link" data-scroll-target="#regression-for-gm-stock"><span class="toc-section-number">5.1</span>  Regression for GM Stock</a></li>
+  <li><a href="#regression-for-microsoft-stock" id="toc-regression-for-microsoft-stock" class="nav-link" data-scroll-target="#regression-for-microsoft-stock"><span class="toc-section-number">5.2</span>  Regression for Microsoft Stock</a></li>
+  <li><a href="#are-the-beta-s-for-both-stocks-significantly-different-from-1-at-the-95-confidence-level" id="toc-are-the-beta-s-for-both-stocks-significantly-different-from-1-at-the-95-confidence-level" class="nav-link" data-scroll-target="#are-the-beta-s-for-both-stocks-significantly-different-from-1-at-the-95-confidence-level"><span class="toc-section-number">5.3</span>  Are the <span class="math inline">\(\beta\)</span> ’s for Both Stocks Significantly Different from 1 at the 95% Confidence Level?</a>
+  <ul class="collapse">
+  <li><a href="#gm" id="toc-gm" class="nav-link" data-scroll-target="#gm"><span class="toc-section-number">5.3.1</span>  GM</a></li>
+  <li><a href="#microsoft" id="toc-microsoft" class="nav-link" data-scroll-target="#microsoft"><span class="toc-section-number">5.3.2</span>  Microsoft</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#checking-regression-model-assumptions" id="toc-checking-regression-model-assumptions" class="nav-link" data-scroll-target="#checking-regression-model-assumptions"><span class="toc-section-number">6</span>  Checking Regression Model Assumptions</a>
+  <ul class="collapse">
+  <li><a href="#gm-model" id="toc-gm-model" class="nav-link" data-scroll-target="#gm-model"><span class="toc-section-number">6.1</span>  GM Model</a></li>
+  <li><a href="#microsoft-model" id="toc-microsoft-model" class="nav-link" data-scroll-target="#microsoft-model"><span class="toc-section-number">6.2</span>  Microsoft Model</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="toc-section-number">7</span>  Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="toc-section-number">8</span>  References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="background" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> <strong>Background</strong></h1>
+<p>In this analysis, I use stock prices for Microsoft and General Motors (GM) to estimate the systematic risk of the stocks using the <a href="https://www.investopedia.com/terms/c/capm.asp">Capital Asset Pricing Model (CAPM)</a>. CAPM, developed by William Sharpe, Jack Treynor, John Lintner and Jan Mossin <span class="citation" data-cites="Perold:2004">(<a href="#ref-Perold:2004" role="doc-biblioref">Perold, 2004</a>)</span> quantifies the systematic risk and the expected return on an asset, particularly stocks.</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Please visit <a href="www.rpubs.com/Karuitha">my rpubs site</a> to see more data projects. Alternatively, copy and paste the link &lt;www.rpubs.com/Karuitha&gt; into your browser.</p>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Skills &amp; Technologies Applied: R, Quarto, Data Science, and Machine Learning.</p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><a href="https://www.wallstreetmojo.com/systematic-risk/">Systematic risk</a> is inherent to the entire market or market segment. The risk affects the entire economy. Hence, investors cannot diversify away systematic as they can unsystematic risk. For this reason, systematic risk is also referred to as <strong>un-diversifiable risk</strong>, <strong>market risk</strong> or <strong>volatility risk</strong>.” In finance terminology, <span class="math inline">\(\beta\)</span>, a symbol that we define in the next section before we encounter it in the section on regression analysis represents systematic risk.</p>
+</blockquote>
+<p>CAPM quantifies the relationship between the required rate of return of an investment and its risk. The model utilizes return on the given asset <span class="math inline">\(r_a\)</span> (in our case the return on GM or Microsoft), the risk free rate <span class="math inline">\(r_f\)</span> usually proxied by the return on the 90 day treasury bills, and the return on the market <span class="math inline">\(r_m\)</span> taken as the return a market index like the Dow Jones Industrial Index, the S&amp;P 500, or other similar indices <span class="citation" data-cites="Bodie:2020">(<a href="#ref-Bodie:2020" role="doc-biblioref">Bodie, 2020</a>)</span>. The relationship is as follows;</p>
+<p><span class="math inline">\(r_a - r_f = \alpha + \beta (r_m - r_f)\)</span></p>
+<p>A stock with a <span class="math inline">\(\beta\)</span> of 1 is as volatile as the market. However, stocks with <span class="math inline">\(\beta &gt; 1\)</span> are more volatile than the market and hence should command a higher return. Including such a stock in your portfolio will raise the volatility of your portfolio relative to the market portfolio. On the contrary, stocks with a <span class="math inline">\(\beta &lt; 1\)</span> have lower risk relative to the market and correspondingly, a lower rate of return. The stocks with a <span class="math inline">\(beta &lt; 1\)</span> reduce the volatility of the portfolio relative to the market. In other words, such assets have a diversification benefit.</p>
+</section>
+<section id="critique-of-the-capm" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> <strong>Critique of the CAPM</strong></h1>
+<p>CAPM is a simple and pragmatic to utilize. However, this simplicity also gives rise to its major weaknesses, the unrealistic assumptions. Specifically, the model rests on the following <a href="https://analystprep.com/cfa-level-1-exam/portfolio-management/capital-asset-pricing-model-capm/">assumptions about markets, financial assets, and market actors</a> <span class="citation" data-cites="Dumas:1996 Simmet:2020">(<a href="#ref-Dumas:1996" role="doc-biblioref">Dumas, 1996</a>; <a href="#ref-Simmet:2020" role="doc-biblioref">Simmet, 2020</a>)</span>.</p>
+<ul>
+<li>Investors are risk-averse, utility-maximizing, rational individuals.</li>
+<li>Markets are friction-less, devoid of transaction costs and taxes.</li>
+<li>Investors plan for the same, single holding period.</li>
+<li>Investors have homogeneous expectations or beliefs.</li>
+<li>All investments are infinitely divisible.</li>
+<li>Investors are price takers.</li>
+</ul>
+<p>As a result we have several alternatives to CAPM. One such model is based on the Arbitrage Pricing Theory (APT) <span class="citation" data-cites="Roll:1980">(<a href="#ref-Roll:1980" role="doc-biblioref">Roll, 1980</a>)</span> that, even when more <a href="https://www.investopedia.com/articles/markets/080916/capm-vs-arbitrage-pricing-theory-how-they-differ.asp">theoretically solid</a>, are harder to apply <span class="citation" data-cites="Huberman:1982">(<a href="#ref-Huberman:1982" role="doc-biblioref">Huberman, 1982</a>)</span>.</p>
+<p>More recent developments are the models by Fama and French that seek to improve on CAPM. For instance, the <a href="https://www.investopedia.com/terms/f/famaandfrenchthreefactormodel.asp">Fama and French 3 factor model</a> extends CAPM by factoring in the proportion of the value stocks and small cap stocks in a portfolio. The Fama and French model has seen further extensions by adding more factors <span class="citation" data-cites="Dirkx:2020 Mosoeu:2020">(<a href="#ref-Dirkx:2020" role="doc-biblioref">Dirkx, 2020</a>; <a href="#ref-Mosoeu:2020" role="doc-biblioref">Mosoeu, 2020</a>)</span>.</p>
+</section>
+<section id="data" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> <strong>Data</strong></h1>
+<p>I use data from Yahoo! Finance for the period 2002-2022. The <strong><em>Tidyquant</em></strong> package in R (courtesy of <a href="https://university.business-science.io/courses">Matt Dancho</a>) <span class="citation" data-cites="R Dancho:2022">(<a href="#ref-R" role="doc-biblioref">R Core Team, 2022</a>; <a href="#ref-Dancho:2022" role="doc-biblioref">Dancho, 2022</a>)</span> provides a convenient way to get this data (see the code chunk below). I collect data for the period from January 2, 2000 to October 25, 2022. Further, I only work with adjusted prices (<em>adjusted</em>). The adjustments take into account events like stock splits and share buy-backs. The data also includes the 90 day US treasury bills rate that proxies the risk free rate.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## uncomment this code to download the data </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># tq_get(c("GM", "MSFT", "^GSPC"),</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                       get  = "stock.prices",</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                       from = "2000-01-01",</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                       to   = "2022-10-25") %&gt;%</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     select(date, symbol, adjusted) %&gt;%</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     mutate(symbol = case_when(</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#         symbol == "^GSPC" ~ "SP500",</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#         TRUE ~ symbol</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     )) %&gt;%</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#     write_csv(., "stocks.csv")</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># #####################################</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># tq_get("DTB3", from = '2000-01-01', to = '2022-10-25', get = "economic.data") %&gt;% </span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#     select(date, symbol, price) %&gt;% </span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#     rename(adjusted = price) %&gt;% </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#     mutate(symbol = if_else(symbol == "DTB3", "us_tbill", symbol)) %&gt;% </span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#     write_csv(., "tbills.csv")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We also get the <a href="https://www.federalreserve.gov/releases/h15/">90 day treasury bills rate here</a> and combine this with the stock prices data collected above.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stock_prices <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"stocks.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> symbol, <span class="at">values_from =</span> adjusted) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">################################################</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>tbill_rate <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"FRB_H15.csv"</span>, <span class="at">skip =</span> <span class="dv">5</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">na =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NA"</span>, <span class="st">"ND"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">time_period =</span> <span class="fu">mdy</span>(time_period)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">date =</span> time_period, </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">adjusted =</span> riflgfcm03_n_b) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">symbol =</span> <span class="st">"tbill"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">relocate</span>(symbol, <span class="at">.before =</span> adjusted) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(date <span class="sc">&gt;</span> <span class="st">'2000-01-01'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="do">################################################</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> stock_prices <span class="sc">%&gt;%</span> </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(tbill_rate, <span class="at">by =</span> <span class="st">'date'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>symbol) <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">tbill =</span> adjusted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The result is a data set with 5740 and 5 columns. The table below defines each of the variables.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tribble</span>(<span class="sc">~</span> Variable, <span class="sc">~</span> Description,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Date"</span>, <span class="st">"The date corresponding to the stock price."</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"GM"</span>, <span class="st">"The stock for GM, General Motors."</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"MSFT"</span>, <span class="st">"The stock for Microsoft."</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SP500"</span>, <span class="st">"The S&amp;P 500 Index."</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"tbill"</span>, <span class="st">"The US 3 months treasury bills rate."</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatting_function</span>(<span class="at">caption =</span> <span class="st">"Description of Variables"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Description of Variables</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Description </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Date </td>
+   <td style="text-align:left;"> The date corresponding to the stock price. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GM </td>
+   <td style="text-align:left;"> The stock for GM, General Motors. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MSFT </td>
+   <td style="text-align:left;"> The stock for Microsoft. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SP500 </td>
+   <td style="text-align:left;"> The S&amp;P 500 Index. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> tbill </td>
+   <td style="text-align:left;"> The US 3 months treasury bills rate. </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+<section id="exploring-the-data" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Exploring the Data</h1>
+<section id="missing-values" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="missing-values"><span class="header-section-number">4.1</span> Missing Values</h2>
+<p>The data set has a few missing values for treasury bills. However, for GM, data is only available in the Yahoo! Finance database from November 18, 2010 and hence the notable gap.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Amelia<span class="sc">::</span><span class="fu">missmap</span>(final_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Missing values</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Hence I interpolate the missing values with the median.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>stock_prices <span class="ot">&lt;-</span> stock_prices <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">MSFT =</span> <span class="fu">replace_na</span>(MSFT, <span class="fu">median</span>(MSFT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>           </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">SP500 =</span> <span class="fu">replace_na</span>(SP500, <span class="fu">median</span>(SP500, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">####################################################</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>tbill_rate <span class="ot">&lt;-</span> tbill_rate <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">adjusted =</span> <span class="fu">replace_na</span>(adjusted, <span class="fu">median</span>(adjusted, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="do">######################################################</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> stock_prices <span class="sc">%&gt;%</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(tbill_rate, <span class="at">by =</span> <span class="st">'date'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>symbol) <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">tbill =</span> adjusted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We then examine the trend in stock prices for GM and Microsoft in Figure () below.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>final_data <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>date, <span class="at">names_to =</span> <span class="st">"stock"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> value, <span class="at">color =</span> stock)) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Adjusted Prices"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">title =</span> <span class="st">"Trends in GM and Microsoft Stock Prices"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">caption =</span> <span class="st">"John karuitha, 2022 </span><span class="sc">\n</span><span class="st"> Data source: Yahoo! Finance </span><span class="sc">\n</span><span class="st"> Note the different y-axis scales"</span>) <span class="sc">+</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>, <span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>stock, <span class="at">scales =</span> <span class="st">"free_y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Trends in GM and Microsoft Stock Prices</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>All the stocks have had a steep increase in prices. The treasury bill rate has been relatively flat compared to the stock with notable occasional spikes.</p>
+</section>
+<section id="summary-statistics-for-stock-prices" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="summary-statistics-for-stock-prices"><span class="header-section-number">4.2</span> Summary Statistics for Stock Prices</h2>
+<p>Next, I summarise the prices of stocks.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#head(final_data)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>final_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>date) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    skimr<span class="sc">::</span><span class="fu">skim_without_charts</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(skim_type, skim_variable), <span class="at">.fns =</span> round, <span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">select</span>(<span class="sc">-</span>skim_type) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">formatting_function</span>(<span class="at">caption =</span> <span class="st">"Summary Statistics for Full Data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Summary Statistics for Full Data</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> skim_variable </th>
+   <th style="text-align:right;"> n_missing </th>
+   <th style="text-align:right;"> complete_rate </th>
+   <th style="text-align:right;"> numeric.mean </th>
+   <th style="text-align:right;"> numeric.sd </th>
+   <th style="text-align:right;"> numeric.p0 </th>
+   <th style="text-align:right;"> numeric.p25 </th>
+   <th style="text-align:right;"> numeric.p50 </th>
+   <th style="text-align:right;"> numeric.p75 </th>
+   <th style="text-align:right;"> numeric.p100 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> GM </td>
+   <td style="text-align:right;"> 2737 </td>
+   <td style="text-align:right;"> 0.52 </td>
+   <td style="text-align:right;"> 31.37 </td>
+   <td style="text-align:right;"> 10.17 </td>
+   <td style="text-align:right;"> 14.50 </td>
+   <td style="text-align:right;"> 25.26 </td>
+   <td style="text-align:right;"> 29.28 </td>
+   <td style="text-align:right;"> 35.73 </td>
+   <td style="text-align:right;"> 65.59 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MSFT </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 60.90 </td>
+   <td style="text-align:right;"> 75.87 </td>
+   <td style="text-align:right;"> 11.44 </td>
+   <td style="text-align:right;"> 19.10 </td>
+   <td style="text-align:right;"> 23.01 </td>
+   <td style="text-align:right;"> 59.68 </td>
+   <td style="text-align:right;"> 340.88 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SP500 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 1857.13 </td>
+   <td style="text-align:right;"> 951.66 </td>
+   <td style="text-align:right;"> 676.53 </td>
+   <td style="text-align:right;"> 1182.11 </td>
+   <td style="text-align:right;"> 1426.67 </td>
+   <td style="text-align:right;"> 2305.66 </td>
+   <td style="text-align:right;"> 4796.56 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> tbill </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 1.53 </td>
+   <td style="text-align:right;"> 1.77 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 0.09 </td>
+   <td style="text-align:right;"> 0.95 </td>
+   <td style="text-align:right;"> 2.28 </td>
+   <td style="text-align:right;"> 6.42 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+<section id="trends-in-stock-returns" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="trends-in-stock-returns"><span class="header-section-number">4.3</span> Trends in Stock Returns</h2>
+<p>In this section I compute the returns of the assets and visualize them. I compute the return of each stock as the price of the stock today less the price of the stock in the previous day divided by the price of the stock in the previous day.</p>
+<p><span class="math inline">\(return = \frac{price_{t} - price_{t-1}}{price_{t-1}}\)</span></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>returns <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>date, <span class="at">names_to =</span> <span class="st">"stock"</span>, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">mutate</span>(<span class="at">value =</span> value <span class="sc">+</span> <span class="fl">0.00000001</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(stock) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">return =</span> <span class="fu">diff</span>(<span class="fu">log</span>(value))) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(return) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">day =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(day)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="do">#####################################</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>returns <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> day, <span class="at">y =</span> return, <span class="at">color =</span> stock)) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>() <span class="sc">+</span> <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Returns"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">title =</span> <span class="st">"Trends in GM and Microsoft Stock Returns"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">caption =</span> <span class="st">"John karuitha, 2022 </span><span class="sc">\n</span><span class="st"> Data source: Yahoo! Finance </span><span class="sc">\n</span><span class="st"> Note the different x-axis scales"</span>) <span class="sc">+</span> </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>, <span class="at">legend.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span> </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>stock, <span class="at">scale =</span> <span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Trends in GM and Microsoft Stock Returns</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The stocks and the market exhibit mean reversion although the GM stock appears the most volatile. The returns from the stock of Microsoft are surprisingly stable and closely resembles the pattern of the market portfolio (S&amp;P500). The treasury bill has an erratic pattern with notable swings. We shall revisit the significance of this perceived difference in volatility in the next section section. We also look at the distribution of the variables in the dataset.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>returns <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(return) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> return, <span class="at">fill =</span> stock)) <span class="sc">+</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"% Return"</span>, <span class="at">y =</span> <span class="st">""</span>, <span class="at">title =</span> <span class="st">"Distribution of Returns"</span>) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">trans =</span> <span class="st">'log10'</span>, </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">comma_format</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="1152"></p>
+<p></p><figcaption class="figure-caption">Distribution of Stock Returns</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="summary-statistics---stock-returns" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="summary-statistics---stock-returns"><span class="header-section-number">4.4</span> Summary Statistics - Stock Returns</h2>
+<p>In this section, we summarise the data on stock returns.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>returns <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">group_by</span>(stock) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    skimr<span class="sc">::</span><span class="fu">skim_without_charts</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(skim_variable <span class="sc">!=</span> <span class="st">"day"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>skim_type, <span class="sc">-</span>skim_variable,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>           <span class="sc">-</span>complete_rate) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kbl</span>(<span class="at">booktabs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Summary Statistics"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_classic</span>(<span class="at">latex_options =</span> <span class="fu">c</span>(<span class="st">"hold_position"</span>, <span class="st">"striped"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; margin-left: auto; margin-right: auto;">
+<caption>Summary Statistics</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> stock </th>
+   <th style="text-align:right;"> n_missing </th>
+   <th style="text-align:right;"> numeric.mean </th>
+   <th style="text-align:right;"> numeric.sd </th>
+   <th style="text-align:right;"> numeric.p0 </th>
+   <th style="text-align:right;"> numeric.p25 </th>
+   <th style="text-align:right;"> numeric.p50 </th>
+   <th style="text-align:right;"> numeric.p75 </th>
+   <th style="text-align:right;"> numeric.p100 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> GM </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.0001012 </td>
+   <td style="text-align:right;"> 0.0217487 </td>
+   <td style="text-align:right;"> -0.1902268 </td>
+   <td style="text-align:right;"> -0.0103649 </td>
+   <td style="text-align:right;"> 0.0002797 </td>
+   <td style="text-align:right;"> 0.0108145 </td>
+   <td style="text-align:right;"> 0.1818479 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MSFT </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.0000018 </td>
+   <td style="text-align:right;"> 0.0317893 </td>
+   <td style="text-align:right;"> -1.9115717 </td>
+   <td style="text-align:right;"> -0.0082546 </td>
+   <td style="text-align:right;"> 0.0003477 </td>
+   <td style="text-align:right;"> 0.0093038 </td>
+   <td style="text-align:right;"> 0.1786923 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SP500 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.0000027 </td>
+   <td style="text-align:right;"> 0.0177992 </td>
+   <td style="text-align:right;"> -0.9591438 </td>
+   <td style="text-align:right;"> -0.0048880 </td>
+   <td style="text-align:right;"> 0.0005875 </td>
+   <td style="text-align:right;"> 0.0058785 </td>
+   <td style="text-align:right;"> 0.1095720 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> tbill </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.0000120 </td>
+   <td style="text-align:right;"> 1.0668108 </td>
+   <td style="text-align:right;"> -15.4249487 </td>
+   <td style="text-align:right;"> -0.0087464 </td>
+   <td style="text-align:right;"> 0.0000000 </td>
+   <td style="text-align:right;"> 0.0091325 </td>
+   <td style="text-align:right;"> 14.9141232 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</section>
+</section>
+<section id="regression-model" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> <strong>Regression Model</strong></h1>
+<p>To fit the regression model we compute the excess returns of the stocks (GM and Microsoft) and the market portfolio (S&amp;P 500) over return on the US 90 day Treasury bills rate. For each stock, we fit the excess return (premium) against the excess return of the market.</p>
+<section id="regression-for-gm-stock" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="regression-for-gm-stock"><span class="header-section-number">5.1</span> Regression for GM Stock</h2>
+<p>The <span class="math inline">\(\alpha\)</span> for GM is negative but not statistically significant. However, the <span class="math inline">\(\beta\)</span> is significant but very close to 1 (at 1.0012069).</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>gm_reg <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(GM, SP500, tbill) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(GM) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tbill =</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(tbill, <span class="fu">median</span>(tbill, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">gm_return =</span> <span class="fu">diff</span>(<span class="fu">log</span>(GM)),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">market_return =</span> <span class="fu">diff</span>(<span class="fu">log</span>(SP500)),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">risk_free =</span> <span class="fu">diff</span>(<span class="fu">log</span>(tbill <span class="sc">+</span> <span class="fl">0.01</span>))</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>              ) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(<span class="at">gm_premium =</span> gm_return <span class="sc">-</span> risk_free,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">market_premium =</span> market_return <span class="sc">-</span> risk_free) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lm</span>(gm_premium <span class="sc">~</span> market_premium, <span class="at">data =</span> .)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gm_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gm_premium ~ market_premium, data = .)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.137871 -0.009037 -0.000312  0.007969  0.128284 
+
+Coefficients:
+                 Estimate Std. Error  t value Pr(&gt;|t|)    
+(Intercept)    -0.0002831  0.0003090   -0.916     0.36    
+market_premium  1.0006233  0.0009257 1080.906   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01693 on 3000 degrees of freedom
+Multiple R-squared:  0.9974,    Adjusted R-squared:  0.9974 
+F-statistic: 1.168e+06 on 1 and 3000 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="regression-for-microsoft-stock" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="regression-for-microsoft-stock"><span class="header-section-number">5.2</span> Regression for Microsoft Stock</h2>
+<p>Like in the case of GM, the <span class="math inline">\(\alpha\)</span> for Microsoft is not statistically significant. However, the <span class="math inline">\(\beta\)</span> of 1.002 is significant but close to 1.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>msft_reg <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(MSFT, SP500, tbill) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">drop_na</span>(MSFT) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">tbill =</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(tbill, <span class="fu">median</span>(tbill, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">msft_return =</span> <span class="fu">diff</span>(<span class="fu">log</span>(MSFT)),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">market_return =</span> <span class="fu">diff</span>(<span class="fu">log</span>(SP500)),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">risk_free =</span> <span class="fu">diff</span>(<span class="fu">log</span>(tbill <span class="sc">+</span> <span class="fl">0.01</span>))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>              ) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(<span class="at">msft_premium =</span> msft_return <span class="sc">-</span> risk_free,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">market_premium =</span> market_return <span class="sc">-</span> risk_free) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lm</span>(msft_premium <span class="sc">~</span> market_premium, <span class="at">data =</span> .)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(msft_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = msft_premium ~ market_premium, data = .)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.94980 -0.00581 -0.00005  0.00604  0.14447 
+
+Coefficients:
+                Estimate Std. Error  t value Pr(&gt;|t|)    
+(Intercept)    8.070e-07  2.456e-04    0.003    0.997    
+market_premium 1.002e+00  8.682e-04 1154.306   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01861 on 5737 degrees of freedom
+Multiple R-squared:  0.9957,    Adjusted R-squared:  0.9957 
+F-statistic: 1.332e+06 on 1 and 5737 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="are-the-beta-s-for-both-stocks-significantly-different-from-1-at-the-95-confidence-level" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="are-the-beta-s-for-both-stocks-significantly-different-from-1-at-the-95-confidence-level"><span class="header-section-number">5.3</span> Are the <span class="math inline">\(\beta\)</span> ’s for Both Stocks Significantly Different from 1 at the 95% Confidence Level?</h2>
+<p>To evaluate the riskiness of an asset, we examine 2 values <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>. In both cases the alpha is not statistically significant. The threshold for <span class="math inline">\(\beta\)</span> is 1. An asset with a <span class="math inline">\(\beta\)</span> of 1 is as volatile as the market portfolio. For <span class="math inline">\(\beta &gt; 1\)</span>, the asset is more volatile than the market portfolio and commands higher returns. The opposite is true for <span class="math inline">\(\beta &lt; 1\)</span>.</p>
+<p>In this section we examine hether the computed <span class="math inline">\(\beta\)</span> differ significantly from 1. The hypotheses are as follows.</p>
+<p>H0: The <span class="math inline">\(\beta\)</span> is not equal to 1. H1: The <span class="math inline">\(\beta\)</span> is equal to 1.</p>
+<p>We compute the t-statistic as follows.</p>
+<p><span class="math inline">\(t = \frac{\beta - hypothesised_Beta}{standard error}\)</span></p>
+<p>From the t-statistic, we then compute the p-value using the <code>pt</code> function in R.</p>
+<section id="gm" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="gm"><span class="header-section-number">5.3.1</span> GM</h3>
+<p>The <span class="math inline">\(\beta\)</span> for the GM stock does not differ significantly from 1.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>hypothesised_value <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>tgm <span class="ot">=</span> (gm_reg<span class="sc">$</span>coefficients[<span class="st">"market_premium"</span>]  <span class="sc">-</span> hypothesised_value) <span class="sc">/</span> <span class="fu">summary</span>(gm_reg)<span class="sc">$</span>sigma</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pt</span>(tgm, <span class="fu">df.residual</span>(gm_reg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>market_premium 
+     0.5146824 </code></pre>
+</div>
+</div>
+</section>
+<section id="microsoft" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="microsoft"><span class="header-section-number">5.3.2</span> Microsoft</h3>
+<p>Likewise, the <span class="math inline">\(\beta\)</span> for the GM stock does not differ significantly from 1.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tmsft <span class="ot">=</span> (msft_reg<span class="sc">$</span>coefficients[<span class="st">"market_premium"</span>]  <span class="sc">-</span> hypothesised_value) <span class="sc">/</span> <span class="fu">summary</span>(msft_reg)<span class="sc">$</span>sigma</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pt</span>(tmsft, <span class="at">df =</span> <span class="fu">df.residual</span>(msft_reg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>market_premium 
+     0.5456123 </code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="checking-regression-model-assumptions" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Checking Regression Model Assumptions</h1>
+<p>In this section, e check for violations of the regression model assumptions. Note that the model has one independent variable so that multi-collinearity is not an issue. The model evaluation focuses on linearity, homoscedasticity, outliers, and normality of residuals.</p>
+<section id="gm-model" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="gm-model"><span class="header-section-number">6.1</span> GM Model</h2>
+<p>Figure () below shows that the model does not significantly violate these assumptions but for normality of residuals. Even then the model does not display a high degree of departure from this assumption.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="1152"></p>
+</div>
+</div>
+</section>
+<section id="microsoft-model" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="microsoft-model"><span class="header-section-number">6.2</span> Microsoft Model</h2>
+<p>Figure () below shows that the model for Microsoft satisfies all the assumptions. As a robust model, it could be useful for prediction.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="final_quarto_report_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="1152"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Conclusion</h1>
+<p>In this analysis, we used the CAPM to estimate the systematic risk for GM and Microsoft stocks. The main findings are that both stocks are as volatile as the market portfolio. The implication is that in the long run, these stocks these stocks may not provide diversification benefits for investors. The results also suggest that while investors may outperform the market in the short run, they may not sustain this performance for extended periods.</p>
+</section>
+<section id="references" class="level1 unnumbered" data-number="8">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">8 References</h2><div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-Bodie:2020" class="csl-entry" role="doc-biblioentry">
+Bodie, A.A.M., Zvi AND Kane (2020) <em>Investments</em>. Boston: McGraw-Hill-Irwin.
+</div>
+<div id="ref-Dancho:2022" class="csl-entry" role="doc-biblioentry">
+Dancho, D., Matt AND Vaughan (2022) <em>Tidyquant: Tidy quantitative financial analysis</em>. Available at: <a href="https://CRAN.R-project.org/package=tidyquant">https://CRAN.R-project.org/package=tidyquant</a>.
+</div>
+<div id="ref-Dirkx:2020" class="csl-entry" role="doc-biblioentry">
+Dirkx, F.J., Philipp AND Peter (2020) <span>“The fama-french five-factor model plus momentum: Evidence for the german market,”</span> <em>Schmalenbach Business Review</em>, 72(4), pp. 661–684.
+</div>
+<div id="ref-Dumas:1996" class="csl-entry" role="doc-biblioentry">
+Dumas, B., Bernard AND Allaz (1996) <span>“Critique and evaluation of the CAPM,”</span> in <em>Financial securities</em>. Springer, pp. 113–149.
+</div>
+<div id="ref-Huberman:1982" class="csl-entry" role="doc-biblioentry">
+Huberman, G. (1982) <span>“A simple approach to arbitrage pricing theory,”</span> <em>Journal of Economic Theory</em>, 28(1), pp. 183–191.
+</div>
+<div id="ref-Mosoeu:2020" class="csl-entry" role="doc-biblioentry">
+Mosoeu, O., Selebogo AND Kodongo (2020) <span>“The fama-french five-factor model and emerging market equity returns,”</span> <em>The Quarterly Review of Economics and Finance</em> [Preprint].
+</div>
+<div id="ref-Perold:2004" class="csl-entry" role="doc-biblioentry">
+Perold, A.F. (2004) <span>“The capital asset pricing model,”</span> <em>Journal of Economic Perspectives</em>, 18(3), pp. 3–24.
+</div>
+<div id="ref-R" class="csl-entry" role="doc-biblioentry">
+R Core Team (2022) <em>R: A language and environment for statistical computing</em>. Vienna, Austria: R Foundation for Statistical Computing. Available at: <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-Roll:1980" class="csl-entry" role="doc-biblioentry">
+Roll, S.A., Richard AND Ross (1980) <span>“An empirical investigation of the arbitrage pricing theory,”</span> <em>The Journal of Finance</em>, 35(5), pp. 1073–1103.
+</div>
+<div id="ref-Simmet:2020" class="csl-entry" role="doc-biblioentry">
+Simmet, W., Anastasia AND Pohlmeier (2020) <span>“The CAPM with measurement error:<span>‘there’s life in the old dog yet!’</span>”</span> <em>Jahrb<span>ü</span>cher f<span>ü</span>r National<span>ö</span>konomie und Statistik</em>, 240(4), pp. 417–453.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

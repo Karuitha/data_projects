@@ -1,0 +1,336 @@
+---
+subtitle: "**Which Factors Relate to the Timeliness of Flights?**"
+title: "*Using Machine Learning to Predict Flight Delays : Decision Trees and Random Forests*"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, Kenya"
+      affiliation-url: www.karu.ac.ke
+description: "Independent Data Analysis Project"
+date: today
+title-block-banner: "flight.jpg"
+title-block-banner-color: "black"
+echo: true
+message: false
+warning: false
+format: 
+    html:
+        theme: 
+            light: flatly
+            dark: darkly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+bibliography: ref.bib
+---
+
+```{r}
+#| include: false
+## Load the required packages 
+###################################################
+
+if(!require(pacman)){
+    install.packages("pacman")
+}
+
+##################################################
+pacman::p_load(tidyverse, janitor, skimr, corrplot, 
+               Amelia, xtable, tidymodels, kableExtra, 
+               rpart, rpart.plot,  arules, arulesViz, gt,
+               randomForest, vip, themis)
+
+##################################################
+## Set theme and digits
+
+options(digits = 2)
+
+## Table formatting function
+formatting_function <- function(data, caption = "Table 1", 
+                                full_width = FALSE){
+    library(kableExtra)
+    data %>% 
+        kbl(booktabs = TRUE, caption = caption) %>% 
+        kableExtra::kable_classic(full_width = full_width,
+                      latex_options = "hold_position")
+}
+
+if(!require(firatheme)){remotes::install_github("vankesteren/firatheme")}
+
+```
+
+# **Background**
+
+Flight delays are a significant concern in the airline industry. Apart from the inconvenience caused to travelers, delays also affect the reputation of airlines, negatively impacting market share. In this analysis, I utilize data for flights between New York and Washington DC. The central questions in the analysis are;
+
+-   Which factors have a significant relationship to flight delays?
+-   Can machine learning be useful in predicting flight delays?
+
+::: callout-tip
+## **Read More of my Work**
+
+Please visit [my rpubs site](www.rpubs.com/Karuitha) to see more data projects. Alternatively, copy and paste the link <https://www.rpubs.com/Karuitha> into your browser.
+
+My data visualizations projects are available in my [Tableau Public profile page](https://public.tableau.com/app/profile/john.karuitha) or copy and paste the link <https://public.tableau.com/app/profile/john.karuitha>.
+
+My Shiny web apps are available on this [site](https://karuitha.shinyapps.io/). You can copy-paste this web address instead <https://karuitha.shinyapps.io/>
+:::
+
+::: callout-note
+## **Tools Utilized & Skills Applied**
+
+R [@myR], Decision Tree Model, Random Forest Model, Quarto, Data Science, Machine Learning.
+:::
+
+# **Significance of the Analysis**
+
+If airlines could accurately forecast delays, then they could mitigate the effects of the delays on the consumers. This intervention may save airlines substantial costs, and especially the cost related to consumer churn.
+
+# **Summary of Results**
+
+-   I use specificity to evaluate the model. How well does the model predict that a flight will be in time given that it is in time?
+-   The weather is the primary driver of flight delays.
+-   97.5% of the time, the decision tree model correctly predicts whether a flight will be in time.
+-   97.6% of the time, the random forest model correctly predicts whether a flight will be in time.
+-   Time conscious travelers can use the models to choose flights that will take them to their destination without delay.
+-   The random forest model has marginally superior predictions.
+
+# **Data**
+
+The file `FlightDelays.csv` contains information on all commercial flights departing the Washington, DC area and arriving at New York during January 2004.
+
+```{r}
+## read the data and clean names
+flights <- read_csv("FlightDelays.csv") %>% 
+    clean_names() %>% 
+    mutate(
+        carrier = factor(carrier),
+        day_week = factor(day_week),
+           weather = factor(weather))
+```
+
+The data consists of `r nrow(flights)` rows and and `r ncol(flights)` variables. For each flight (row of data), there is information on the distance of the route, the scheduled time and date of the flight, and so on.Table 2 describes variables in this file.
+
+![Flights data](flights.png)
+
+The variable that we are trying to predict is whether or not a flight is delayed (Fight_Status).
+
+# **Exploring the Data**
+
+```{r}
+#| fig-cap: "Exploring the Data"
+#| fig-width: 10
+#| fig-height: 10
+
+flights %>%
+    sapply(is.na) %>%
+    colSums()
+
+flights %>% 
+    select(-fl_date) %>% 
+    GGally::ggpairs(mapping = aes(color = flight_status, fill = flight_status)) + 
+    scale_fill_manual(values = c("skyblue", "gray80")) + 
+    scale_color_manual(values = c("skyblue", "gray80"))
+```
+
+# **Machine Learning Models**
+
+In this section, I train a pair of models.
+
+-   The Decision Tree Model.
+-   The Random Forest Model.
+
+But first, I split the data into training set and testing set.
+
+## **Creating Training Set and Testing Sets**
+
+In this section, I partition the data into 60% for training and 40% for validation.
+
+```{r}
+## Split the data into training and testing set
+set.seed(300, sample.kind = "Rounding")
+flights_split <- initial_split(flights, prop = 0.6, strata = flight_status)
+
+
+flights_training <- flights_split %>% training()
+flights_testing <- flights_split %>% testing()
+```
+
+## **Handling Class Imbalance**
+
+It is notable that there are 428 delays against 1773 on time departures. This level of class imbalance has an adverse effect on machine learning models. To correct this anomaly, I up-sample the training set such that it has a degree of class balance.
+
+```{r}
+my_recipe <- recipes::recipe(flight_status ~ carrier + distance + weather + day_week + day_of_month, data = flights_training) %>% 
+    themis::step_upsample(over_ratio = 1) %>% 
+    step_dummy(weather, day_week) %>% 
+    prep(training = flights_training)
+
+
+## Apply to training data
+flights_training <- my_recipe %>% 
+    bake(new_data = NULL)
+
+## Apply to testing data 
+flights_testing <- my_recipe %>% 
+    bake(new_data = flights_testing)
+```
+
+The training set is now balanced. The models can pick the signal for the previously under-represented class from the training set.
+
+Next, we train the model using the training set and test the models using the validation or testing set.
+
+## **Creating a Decision Tree**
+
+I fit a classification tree to the flight delay variable using all the relevant predictors in `FlightDelays.csv` on training sets with maximum of 8 levels and set up cp = 0.001 and then plot the tree.
+
+Note: `cp` refers to complexity parameter.
+
+I then fit the classification tree.
+
+```{r}
+## Fitting the regression tree on training data
+flights_tree <- rpart(flight_status ~ ., 
+                      data = flights_training, 
+                      method = 'class', 
+                      control = rpart.control(cp = 0.001,
+                                              maxdepth = 8))
+## Plotting the tree
+rpart.plot(flights_tree)
+```
+
+### **Pruning the (Decision) Tree**
+
+In the setting of decision tree, there is a technique called pruning. Pruning is a data compression technique for reducing the size of decision trees by removing non-critical and redundant sections of the tree.
+
+The purpose of pruning is to reduce the complexity of the classifier. Pruning also helps improves predictive accuracy reducing of over-fitting.
+
+In this section, I prune the tree we grew in section 3 above. In pruning this tree, I raise the complexity parameter to 0.1.
+
+```{r}
+## Prunning the tree
+pruned_tree <- prune(flights_tree, cp = 0.05)
+
+## Plot the prunned tree
+rpart.plot(pruned_tree)
+```
+
+The pruned tree shows that the weather is the primary driver of flight delays.
+
+## **Random Forest Model**
+
+In this section, I run the random forest model.
+
+```{r}
+rand_model <- randomForest::randomForest(factor(flight_status) ~ ., 
+                                         data = flights_training, importance = TRUE, proximity = TRUE)
+
+summary(rand_model)
+```
+
+## **Comparing Model Performance**
+
+### Decision tree model
+
+Based on the extended decision tree model, I do predictions for both training and validations sets and report their confusion matrix respectively and other model performance metrics.
+
+I now do the predictions on the test set and likewise, report the confusion matrix.
+
+```{r}
+dt_prediction <- predict(flights_tree, 
+                                 newdata = flights_testing, type = "class")
+
+
+dt_prediction <- flights_testing %>% 
+    select(flight_status) %>% 
+    bind_cols(dt_prediction) %>% 
+    set_names(c("flight_status", "estimate"))
+    
+head(dt_prediction)
+```
+
+For the decision tree model, the metrics are as follows:
+
+```{r}
+dt_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate)
+
+dt_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    autoplot()
+
+dt_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    summary()
+```
+
+### Random Forest Model
+
+The metrics for the random forest model are as follows:
+
+```{r}
+## Prediction on the testing set
+rf_prediction <- predict(rand_model, 
+                                 newdata = flights_testing, type = "class")
+
+rf_prediction <- flights_testing %>% 
+    select(flight_status) %>% 
+    bind_cols(rf_prediction) %>% 
+    set_names(c("flight_status", "estimate"))
+
+## preview the predcitions
+head(rf_prediction)
+
+```
+
+```{r}
+## Confusion matrix on the testing set
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate)
+
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    autoplot()
+
+rf_prediction %>%
+    conf_mat(truth = flight_status, estimate = estimate) %>%
+    summary()
+```
+
+# **Variable Importance**
+
+The Variable importance shows that weather is of primary importance in determining the timeliness of flights. Day of the month and the carrier are also important drivers of the timeliness of flights.
+
+```{r}
+vip(flights_tree)
+```
+
+```{r}
+vip(rand_model)
+```
+
+# **Conclusion**

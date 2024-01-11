@@ -1,0 +1,107 @@
+---
+title: "**Tidy Time Series Analysis**"
+subtitle: "*Final Day Project*"
+author: 
+    - name: John Karuitha
+      url: www.linkedin.com/in/Karuitha
+      affiliation: "Karatina University, Kenya"
+      affiliation-url: www.karu.ac.ke
+description: "Independent Data Analysis Project"
+date: today
+title-block-banner: true
+title-block-banner-color: "black"
+echo: true
+message: false
+warning: false
+format: 
+    html:
+        theme: 
+            light: flatly
+            dark: darkly
+        number-sections: true
+        code-fold: true
+        code-background: true
+        toc: true
+        toc-title: "Contents"
+        toc-depth: 3
+        toc-float: true
+        linkcolor: "blue"
+        tocolor: "blue"
+        link-citations: true
+    pdf:
+        header-includes: |
+            \usepackage{pdflscape}
+            \usepackage[OT1]{fontenc}
+            \newcommand{\blandscape}{\begin{landscape}}
+            \newcommand{\elandscape}{\end{landscape}}
+        toc: true
+        toc-depth: 3
+        toc-title: "Table of Contents"
+        linkcolor: blue
+        toccolor: blue
+        number-sections: true
+        number-depth: 3
+        documentclass: report #can always change doc type to your choice
+        margin-left: 30mm
+        margin-right: 30mm
+        link-citations: true
+editor: visual
+bibliography: ref.bib
+---
+
+# **Background**
+
+```{r}
+if(!require(pacman)){
+        install.packages("pacman")
+        library(pacman)
+}
+
+pacman::p_load(tidyverse, fpp3, lubridate, 
+tsbox, dygraphs)
+```
+
+@hyndman2018forecasting
+
+# **Data**
+In this section, I read in the data, summarise and visualize the data. 
+
+## Data and Data Sources
+
+The data is an estimate of monthly Malaria cases as collected by the Ministry of Health in Kenya.
+
+```{r}
+## Read in the data ----
+
+
+```
+
+The data consists of the following variables. 
+
+```{r}
+## Desciption of the variables 
+tribble(~ Variable, ~ Description)
+
+arty_farty
+```
+
+## Data Visualization
+
+
+
+# **Model Development**
+
+
+
+
+# **Model Evaluation**
+
+
+
+# **Concluding Remarks**
+
+
+
+# **References** {.unnumbered}
+
+

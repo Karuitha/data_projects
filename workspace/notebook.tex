@@ -1,0 +1,291 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\author{}
+\date{\vspace{-2.5em}}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+
+\includegraphics{banner.png}
+
+\hypertarget{loan-data}{%
+\section{Loan Data}\label{loan-data}}
+
+Ready to put your coding skills to the test? Join us for our Workspace
+Competition!\\
+For more information, visit
+\href{https://datacamp.com/workspacecompetition}{datacamp.com/workspacecompetition}
+
+\hypertarget{context}{%
+\subsubsection{Context}\label{context}}
+
+This dataset (\href{https://www.kaggle.com/itssuru/loan-data}{source})
+consists of data from almost 10,000 borrowers that took loans - with
+some paid back and others still in progress. It was extracted from
+lendingclub.com which is an organization that connects borrowers with
+investors. We've included a few suggested questions at the end of this
+template to help you get started.
+
+\hypertarget{load-packages}{%
+\subsubsection{Load packages}\label{load-packages}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(skimr)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{load-your-data}{%
+\subsubsection{Load your Data}\label{load-your-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loans }\OtherTok{\textless{}{-}}\NormalTok{ readr}\SpecialCharTok{::}\FunctionTok{read\_csv}\NormalTok{(}\StringTok{\textquotesingle{}data/loans.csv.gz\textquotesingle{}}\NormalTok{)}
+\FunctionTok{skim}\NormalTok{(loans) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{(numeric.p0}\SpecialCharTok{:}\NormalTok{numeric.p100)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{(complete\_rate))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Data summary}\tabularnewline
+\toprule
+\endhead
+Name & loans \\
+Number of rows & 9578 \\
+Number of columns & 14 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Column type frequency: & \\
+character & 1 \\
+numeric & 13 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Group variables & None \\
+\bottomrule
+\end{longtable}
+
+\textbf{Variable type: character}
+
+\begin{longtable}[]{@{}lrrrrrr@{}}
+\toprule
+skim\_variable & n\_missing & min & max & empty & n\_unique &
+whitespace \\
+\midrule
+\endhead
+purpose & 0 & 9 & 18 & 0 & 7 & 0 \\
+\bottomrule
+\end{longtable}
+
+\textbf{Variable type: numeric}
+
+\begin{longtable}[]{@{}lrrrl@{}}
+\toprule
+skim\_variable & n\_missing & mean & sd & hist \\
+\midrule
+\endhead
+credit\_policy & 0 & 0.80 & 0.40 & ▂▁▁▁▇ \\
+int\_rate & 0 & 0.12 & 0.03 & ▃▇▇▂▁ \\
+installment & 0 & 319.09 & 207.07 & ▇▇▃▂▁ \\
+log\_annual\_inc & 0 & 10.93 & 0.61 & ▁▂▇▁▁ \\
+dti & 0 & 12.61 & 6.88 & ▆▇▇▆▁ \\
+fico & 0 & 710.85 & 37.97 & ▁▇▆▃▁ \\
+days\_with\_cr\_line & 0 & 4560.77 & 2496.93 & ▇▇▂▁▁ \\
+revol\_bal & 0 & 16913.96 & 33756.19 & ▇▁▁▁▁ \\
+revol\_util & 0 & 46.80 & 29.01 & ▇▇▇▆▁ \\
+inq\_last\_6mths & 0 & 1.58 & 2.20 & ▇▁▁▁▁ \\
+delinq\_2yrs & 0 & 0.16 & 0.55 & ▇▁▁▁▁ \\
+pub\_rec & 0 & 0.06 & 0.26 & ▇▁▁▁▁ \\
+not\_fully\_paid & 0 & 0.16 & 0.37 & ▇▁▁▁▂ \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{understand-your-data}{%
+\subsubsection{Understand your data}\label{understand-your-data}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.20}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.20}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.59}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+description
+\end{minipage} \\
+\midrule
+\endhead
+credit\_policy & numeric & 1 if the customer meets the credit
+underwriting criteria; 0 otherwise. \\
+purpose & character & The purpose of the loan. \\
+int\_rate & numeric & The interest rate of the loan (more risky
+borrowers are assigned higher interest rates). \\
+installment & numeric & The monthly installments owed by the borrower if
+the loan is funded. \\
+log\_annual\_inc & numeric & The natural log of the self-reported annual
+income of the borrower. \\
+dti & numeric & The debt-to-income ratio of the borrower (amount of debt
+divided by annual income). \\
+fico & numeric & The FICO credit score of the borrower. \\
+days\_with\_cr\_line & numeric & The number of days the borrower has had
+a credit line. \\
+revol\_bal & numeric & The borrower's revolving balance (amount unpaid
+at the end of the credit card billing cycle). \\
+revol\_util & numeric & The borrower's revolving line utilization rate
+(the amount of the credit line used relative to total credit
+available). \\
+inq\_last\_6mths & numeric & The borrower's number of inquiries by
+creditors in the last 6 months. \\
+delinq\_2yrs & numeric & The number of times the borrower had been 30+
+days past due on a payment in the past 2 years. \\
+pub\_rec & numeric & The borrower's number of derogatory public
+records. \\
+not\_fully\_paid & numeric & 1 if the loan is not fully paid; 0
+otherwise. \\
+\bottomrule
+\end{longtable}
+
+Now you can start to explore this dataset with the chance to win
+incredible prices! Can't think of where to start? Try your hand at these
+suggestions:
+
+\begin{itemize}
+\tightlist
+\item
+  Extract useful insights and visualize them in the most interesting way
+  possible.
+\item
+  Find out how long it takes for users to pay back their loan.
+\item
+  Build a model that can predict the probability a user will be able to
+  pay back their loan within a certain period.
+\item
+  Find out what kind of people take a loan for what purposes.
+\end{itemize}
+
+\hypertarget{judging-criteria}{%
+\subsubsection{Judging Criteria}\label{judging-criteria}}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+CATEGORY & WEIGHTAGE & DETAILS \\
+\midrule
+\endhead
+\textbf{Analysis} & 30\% & \\
+\textbf{Results} & 30\% & \\
+\textbf{Creativity} & 40\% & \\
+\bottomrule
+\end{longtable}
+
+\end{document}

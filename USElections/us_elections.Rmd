@@ -1,0 +1,129 @@
+---
+author: "John Karuitha"
+title: "Analysis of 2020 US Presidential Elections"
+subtitle: "What Can We Glean from the 2020 US Elections Data?"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \usepackage[default]{sourcesanspro}
+- \usepackage[T1]{fontenc}
+- \usepackage{amsmath, amssymb}
+- \usepackage{float}
+date: "`r format(Sys.Date(), '%A %B %d, %Y')`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+
+```{r setup, include=FALSE}
+
+######################################
+my_packages <- c("knitr", "rmdformats", 
+                 "data.table", "tidyverse", 
+                 "kableExtra", "readxl", "janitor")
+
+######################################
+if(!require(my_packages)){
+    install.packages(my_packages)
+}
+
+######################################
+library(knitr)
+library(rmdformats)
+library(data.table)
+library(tidyverse)
+library(kableExtra)
+library(readxl)
+library(janitor)
+
+######################################
+## Global options
+options(max.print="75")
+
+opts_chunk$set(echo=FALSE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+
+opts_knit$set(width=75)
+```
+
+## **Background**
+
+The 2020 US presidential election was one of the most contentious in US history, but could the outcome have been predicted? There are two data sets (two different tabs within the same MS Excel spreadsheet) which relate to the 2020 US presidential election:
+
+1. Vote by state to each candidate – this dataset looks at how many votes each US presidential candidate attained in each county and whether they won or lost.       
+2. Voter turnout and eligibility – this dataset provides additional information on voter eligibility and turnout within each state. 
+
+Within the file also provided a data dictionary that defines the available attributes.
+
+The dataset is quite limited, but we want to explore the data to drive out any nuggets of insight that are there.  data is not clean, so there might be some issues you’ll have to work around.  
+
+The task is to  explore the data you have been given to see what insight you can find.  Your analysis could include, but not be limited by:
+
+1. Does the data tell us anything about the states that voted for Trump vs Biden?  How do these states differ?
+
+2. Does voter turn-out and eligibility impact the proportion of votes a presidential candidate received?
+
+3. What was the likelihood of Biden winning in a given state vs Trump (or vice versa)?
+
+
+```{r}
+#############################################
+us_metadata <- read_excel("US_elections.xlsx", 
+    sheet = "Code_Book") %>% 
+    
+    janitor::clean_names()
+
+#############################################
+us_vote_candidate <- read_excel("US_elections.xlsx", 
+    sheet = "vote_by_state_to_each_candidate") %>% 
+    
+    janitor::clean_names()
+
+#############################################
+us_voters <- read_excel("US_elections.xlsx", 
+    sheet = "voter_turn_out_and_eligability") %>% 
+    
+    janitor::clean_names()
+
+```
+
+## **The Data**
+
+The data concerns the voting patterns in counties of the United States. The primary data has `r nrow(us_vote_candidate)` rows of data. In addition, there are additional data on state level voter characteristics. The variables are as described in the metadata below. 
+
+```{r}
+us_metadata %>% 
+    
+    set_names(names(.) %>% str_to_sentence()) %>% 
+    
+    knitr::kable(booktabs = TRUE, 
+                 
+    caption = "Variable Definitions for US Presidential Poll Data, 2020") %>% 
+    
+    kableExtra::kable_styling(full_width = TRUE, 
+                              
+    bootstrap_options = "striped", font_size = 10)
+```
+
+## Exploratory Data Analysis
+
+In this section, I do exploratory data analysis, starting with the county level data followed by the state level data. 
+
+### County Level Data
+
+```{r}
+us_vote_candidate %>% filter(duplicated(.))
+```
+
+
+
+
+
+

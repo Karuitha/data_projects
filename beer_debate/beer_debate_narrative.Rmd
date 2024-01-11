@@ -1,0 +1,186 @@
+---
+title: "BEER DEBATE"
+subtitle: "Analyzing Consumer Ratings of Beers on BeerAdvocate.com"
+author: "John King'athia Karuitha"
+date: "`r format(Sys.Date(), format = '%A %B %d, %Y')`"
+output: 
+  cleanrmd::html_document_clean:
+    theme: NULL  # see cleanrmd::cleanrmd_themes()
+                    # or set to NULL for dynamic theme picker (requires internet)
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Background
+Drinkers like their beer cold. However, as is the case with all alcoholic drinks, beer is as controversial as it is loved. According to some estimates, global beer consumption stands at [200 million kilolitres](https://www.beveragedaily.com/Article/2021/01/04/Asia-continues-to-dominate-global-beer-consumption-Kirin) and growing. Without doubt, brewing beer is a major economic activity. However, detractors argue that alcohol addiction wrecks individuals and families, at times leading to death. But people continue to drink regardless. 
+
+In this article, I use data from [beer advocate](https://www.beeradvocate.com/) on the ratings of beers (by the beer lovers, of course). I supplement this data with beer consumption data from [Wikipedia](https://en.wikipedia.org/wiki/List_of_countries_by_beer_consumption_per_capita).
+
+```{r, echo = FALSE}
+knitr::read_chunk("data_beer_updated.R")
+```
+
+```{r my_packages, echo = FALSE, warning=FALSE, message=FALSE}
+```
+
+```{r wiki_beer_data}
+```
+
+```{r data_scrapping_beer_advocate}
+```
+
+
+```{r the_data}
+```
+
+```{r combined_data}
+
+```
+
+
+## Objectives
+
+This article seeks answers to the following questions:
+
+1. Which countries have the highest per capita beer consumption?
+2. Which countries have the highest beer consumption?
+2. What is the most popular beer and beer type?
+2. Which brewing company in the data set brews the most popular beers.
+2. Which beer categories have the highest alcohol content. 
+2. Which beers have the weirdest names?
+3. What factors drive beer ratings.
+
+## Summary of Results
+
+1. The Czech Republic has the highest per capita beer consumption.
+
+2. China and the United States are the most extensive beer markets.
+
+3. When it comes with beers with wierd names, there is no shortage. Sample these:
+
+- `A Deal with the Devil` by Anchorage Brewing Company.
+- `Arrogant Bastard Ale` by Arrogant Consortia.
+- `Bringing Extra Sexy Back` by Aslin Beer Company.
+- `Civil Disobedience #31` by Hill Farmstead Brewery.
+- `Holy Ghost` by, wait, Parish Brewing Company.
+- `Sexual Chocolate` by Foothills Brewing Company - Downtown Brewpub.
+- `Sweet Baby Jesus!` by DuClaw Brewing Company.
+- `The Devil Made Me Do It!` by Tyranena Brewing Company.
+
+## The Data
+
+As noted before, there are two sets of data. The data from `Wikipedia` has 61 rows and 5 columns of the following variables. 
+
+- Country
+- consumptionper_capita_1_litres: Per capita beer consumption in litres.
+- "x2018change_litres_per_year": Change in per capita consumption from the previous year.
+- total_nationalconsumption_a_million_litresper_year": Total beer consumption in millions of litres in the year. 
+- Year: Indicates the year the data was collected.
+
+```{r wiki_data_summary}
+```
+
+
+```{r wiki_data_summary_two}
+```
+
+The second data set comes from `beeradvocate.com`. The data has the following variables. 
+
+- `beer`: The name of the beer.
+- `votes`: The number of votes that the beer received from consumers.
+- `rating_average`: The average rating from consumers. Note that the rating is on a scale of 1 to 5.
+- `brewer`: The name of the brewer.
+- `type`: The type of beer, for instance, lager and ale.
+- `alcohol_perc`: The alcohol content.
+
+I start with a summary of the quantitative variables.
+
+```{r advocate_data_summary}
+```
+
+
+```{r advocate_data_summary_two}
+```
+
+## Exploring the data
+
+The data shows that the Czech Republic has the highest per capita beer consumption. It is notable that except for Namibia, an African Country, the rest of the countries with the highest per capita beer consumption are from Europe.
+
+```{r per_capita_beer}
+```
+
+The absolute amounts of alcohol taken could be a function of the country's population and level of income. In this case, China and the United States lead in total beer consumption.
+
+```{r total_beer_consumption}
+```
+
+Notably, Germany, Spain and Poland appear in both lists. These three countries present prime markets for beer.
+
+
+# Popular Beer Brands
+
+In this section, I examine the beers that have the highest average ratings. 
+
+```{r popular_beers}
+```
+
+
+It is worthy noting that some of these ratings come from very few consumers. For instance, Kentucky Brunch Brand Stout received 883 votes with n average rating of 4.83, the highest rating in the data set. On the contrary, the second highest rating beer Assassin - Double Barrel-Aged received only 17 votes with an average rating of 4.80. Beers with such few ratings may not give a fair view of consumers on the quality of a beer. 
+
+For this reason, I filter the data to only include beers with at least 100 ratings. Kentucky Brunch Brand Stout and Vanilla Bean Assassin both brewed by the Toppling Goliath Brewing Company have the highest ratings of 4.83 and 4.80, respectively. 
+
+```{r popular_beers_filtered}
+```
+
+I also visualize the number of votes that each beer has received which could is also a proxy of popularity. Breakfast Stout by Founders Brewing Company and Pliny the Elder by the Russian River Brewing Company lead the way.
+
+```{r beers_with_most_votes}
+```
+
+## Popular Beer Types
+
+There are several categories of beer that each of the beers in the data belongs to. The variable `type` gives these classifications. The most common beer categories include. Note that I also filter out beers with less than 100 votes. 
+
+```{r beer_categories}
+```
+
+I also examine beer categories that have the highest average rating. In this case, I group the data into categories and then compute the median rating. Here, `IPA - New England` and `Sour - Fruited Kettle Sour` beer categories lead with a median rating of 4.56. 
+
+```{r most_popular_beers_categories_votes}
+```
+
+## Popular Brewers
+
+In this section, I examine brewers that have the most beers in the dataset with al least 100 votes. Here, Tree House Brewing Company	and Founders Brewing Company lead the way with 27 beers and 17 beers, respectively, in the list. 
+
+```{r most_popular brewers}
+```
+
+Again, I examine the median rating that the brewers receive. Anchorage Brewing Company	leads, followed by Revolution Brewing.
+
+```{r median_rating_brewers}
+```
+
+## Weird Beer Names
+
+When it comes with beers with weird names, the data set has quite a number. Sample these:
+
+- `A Deal with the Devil` by Anchorage Brewing Company.
+- `Arrogant Bastard Ale` by Arrogant Consortia.
+- `Bringing Extra Sexy Back` by Aslin Beer Company.
+- `Civil Disobedience #31` by Hill Farmstead Brewery.
+- `Holy Ghost` by, wait, Parish Brewing Company.
+- `Sexual Chocolate` by Foothills Brewing Company - Downtown Brewpub.
+- `Sweet Baby Jesus!` by DuClaw Brewing Company.
+- `The Devil Made Me Do It!` by Tyranena Brewing Company.
+
+## Regression Analysis
+
+
+## Conclusion
+
+
+
